@@ -383,6 +383,29 @@ def recompute_interactions(row: dict[str, float]) -> None:
         row["interaction_ntprobnp_age"] = row["lab_ntprobnp_mean"] * row["age"]
 
 
+def set_demo_value(row: dict[str, float], key: str, value: float, count: float = 1.0) -> None:
+    if key not in row:
+        return
+    row[key] = float(value)
+    missing_key = f"{key}_missing"
+    count_key = f"{key}_count"
+    count_missing_key = f"{count_key}_missing"
+    if missing_key in row:
+        row[missing_key] = 0.0
+    if count_key in row:
+        row[count_key] = float(count)
+    if count_missing_key in row:
+        row[count_missing_key] = 0.0
+
+
+def set_demo_symptom(row: dict[str, float], key: str, present: bool) -> None:
+    if key in row:
+        row[key] = 1.0 if present else 0.0
+    missing_key = f"{key}_missing"
+    if missing_key in row:
+        row[missing_key] = 0.0
+
+
 class ModelService:
     @cached_property
     def model(self) -> Any:
@@ -426,16 +449,82 @@ class ModelService:
     def sample_patient(self) -> dict[str, Any]:
         df = pd.read_csv(DATA_PATH)
         test_df = df[df["split_hint"].eq("test")]
-        row = test_df.iloc[0]
+        source_row = test_df.iloc[0]
+        features = {
+            column: float(source_row[column])
+            for column in self.feature_columns
+        }
+
+        demo_values = {
+            "age": 76,
+            "gender_male": 0,
+            "history_diabetes": 1,
+            "history_chronic_kidney_disease": 1,
+            "history_obesity": 1,
+            "history_tobacco_or_nicotine": 1,
+            "omr_weight_lbs_mean": 194.0,
+            "omr_height_inches_mean": 64.6,
+            "omr_bmi_mean": 32.7,
+            "omr_sbp_mean": 164,
+            "omr_dbp_mean": 92,
+            "ed_triage_temperature_f_mean": 98.8,
+            "ed_triage_heart_rate_mean": 118,
+            "ed_triage_resp_rate_mean": 28,
+            "ed_triage_spo2_mean": 89,
+            "ed_triage_sbp_mean": 168,
+            "ed_triage_dbp_mean": 96,
+            "ed_triage_acuity_mean": 2,
+            "triage_pain_mean": 6,
+            "ed_arrived_by_ambulance": 1,
+            "lab_creatinine_mean": 1.82,
+            "lab_hemoglobin_mean": 10.9,
+            "lab_triglycerides_mean": 225,
+            "lab_chol_ratio_mean": 7.0,
+            "lab_hdl_mean": 34,
+            "lab_ntprobnp_mean": 9800,
+            "lab_ldl_measured_mean": 160,
+            "lab_platelets_mean": 310,
+            "lab_troponin_t_mean": 0.14,
+            "lab_glucose_mean": 186,
+            "lab_chol_total_mean": 238,
+            "lab_ldl_calc_mean": 158,
+        }
+        for key, value in demo_values.items():
+            set_demo_value(features, key, value, count=2.0 if key.startswith("lab_") else 1.0)
+
+        for key, present in {
+            "symptom_chest_pain": True,
+            "symptom_shortness_of_breath": True,
+            "symptom_palpitations": True,
+            "symptom_syncope": False,
+            "symptom_dizziness": True,
+            "symptom_edema": True,
+        }.items():
+            set_demo_symptom(features, key, present)
+
+        recompute_interactions(features)
+        for key in [
+            "interaction_age_omr_sbp",
+            "interaction_bmi_omr_sbp",
+            "interaction_glucose_bmi",
+            "interaction_ntprobnp_age",
+        ]:
+            if f"{key}_missing" in features:
+                features[f"{key}_missing"] = 0.0
+
         return {
-            "source": "cardio_time_aware_model_ready.csv ფაილის test split-ის პირველი ჩანაწერი",
-            "row_index": 0,
-            "original_csv_index": int(row.name),
-            "actual_target": int(row["target_cvd"]),
-            "features": {
-                column: float(row[column])
-                for column in self.feature_columns
-            },
+            "source": "კომპლექსური დემო პაციენტი: კარდიოლოგიური სიმპტომები, vital ნიშნები, ლაბორატორია და ECG კონტექსტი",
+            "row_index": -1,
+            "original_csv_index": int(source_row.name),
+            "actual_target": 1,
+            "features": features,
+            "symptom_text": (
+                "პაციენტი სასწრაფოთი მოყვანილია. აქვს ძლიერი ქოშინი დატვირთვისა და მოსვენებისას, "
+                "გულმკერდის მოჭერის ტიპის ტკივილი, გულის ფრიალი, თავბრუსხვევა და ქვედა კიდურების შეშუპება. "
+                "გულის წასვლა არ ჰქონია."
+            ),
+            "ecg_finding": "st_depression",
+            "ecg_note": "ST depression lateral leads; irregular rhythm noted, atrial fibrillation should be ruled out.",
         }
 
     def validate_features(self, features: dict[str, float]) -> None:

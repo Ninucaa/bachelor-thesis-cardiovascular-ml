@@ -78,6 +78,9 @@ class SamplePatientResponse(BaseModel):
     original_csv_index: int
     actual_target: int
     features: dict[str, float]
+    symptom_text: str | None = None
+    ecg_finding: str | None = None
+    ecg_note: str | None = None
 
 
 class HealthResponse(BaseModel):

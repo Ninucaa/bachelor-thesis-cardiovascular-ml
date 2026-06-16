@@ -1285,9 +1285,9 @@ function render() {
 
   document.getElementById("reset-button")?.addEventListener("click", () => {
     if (!sample) return;
-    symptomText = "";
-    ecgFinding = "not_available";
-    ecgNote = "";
+    symptomText = sample.symptom_text || "";
+    ecgFinding = sample.ecg_finding || "not_available";
+    ecgNote = sample.ecg_note || "";
     features = recomputeDerivedFeatures({ ...sample.features });
     result = null;
     statusText = "სატესტო პაციენტის საწყისი მონაცემები აღდგა.";
@@ -1328,7 +1328,9 @@ async function loadSample() {
     const response = await fetch(`${API_BASE}/sample-patient`);
     if (!response.ok) throw new Error(`API-მ დააბრუნა ${response.status}`);
     sample = await response.json();
-    symptomText = "";
+    symptomText = sample.symptom_text || "";
+    ecgFinding = sample.ecg_finding || "not_available";
+    ecgNote = sample.ecg_note || "";
     features = recomputeDerivedFeatures({ ...sample.features });
     statusText = "სატესტო პაციენტი ჩაიტვირთა.";
   } catch (error) {
