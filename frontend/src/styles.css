@@ -1029,6 +1029,8 @@ h3 {
 }
 
 .model-trust {
+  display: grid;
+  gap: 14px;
   padding: 18px 20px;
 }
 
@@ -1041,8 +1043,66 @@ h3 {
   width: fit-content;
 }
 
-.trust-intro {
-  margin-bottom: 12px;
+.trust-summary {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.trust-summary section {
+  background: #f8fbfc;
+  border: 1px solid #d8e5eb;
+  border-radius: 8px;
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+}
+
+.trust-summary strong,
+.trust-footnote strong {
+  color: #263645;
+  font-size: 13px;
+}
+
+.trust-summary p,
+.trust-footnote p {
+  color: #536879;
+  font-size: 12px;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.metric-guide {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.metric-guide div {
+  background: #f2f5f8;
+  border: 1px solid #dce4ea;
+  border-radius: 7px;
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+}
+
+.metric-guide b {
+  color: #263645;
+  font-size: 12px;
+}
+
+.metric-guide span {
+  color: #536879;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.metric-guide small {
+  color: #718393;
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
 }
 
 .metric-grid {
@@ -1098,11 +1158,13 @@ h3 {
   font-weight: 800;
 }
 
-.model-trust p {
-  color: #5b6e7f;
-  font-size: 13px;
-  line-height: 1.45;
-  margin-top: 12px;
+.trust-footnote {
+  background: #fffdf4;
+  border: 1px solid #e5dba7;
+  border-radius: 8px;
+  display: grid;
+  gap: 6px;
+  padding: 12px;
 }
 
 .patient-report {
@@ -1243,6 +1305,11 @@ h3 {
   }
 
   .metric-row {
+    grid-template-columns: 1fr;
+  }
+
+  .trust-summary,
+  .metric-guide {
     grid-template-columns: 1fr;
   }
 

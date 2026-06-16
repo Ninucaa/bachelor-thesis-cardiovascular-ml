@@ -224,6 +224,21 @@ const metricDescriptions = [
   { key: "precision", label: "დადებითი პასუხის სიზუსტე", technical: "Precision", note: "დადებითი პასუხებიდან რამდენია უფრო სარწმუნო" },
 ];
 
+const modelTrustNotes = [
+  {
+    title: "რა აჩვენებს ეს ნაწილი",
+    text: "ეს არის მოდელის შემოწმება უკვე ცნობილ test პაციენტებზე. აქ ჩანს, რამდენად კარგად არჩევდა სისტემა შესაბამის დიაგნოზის ჯგუფებს ისტორიულ მონაცემებში.",
+  },
+  {
+    title: "როგორ წავიკითხოთ",
+    text: "გარჩევის უნარი აჩვენებს საერთო ხარისხს, აღმოჩენის უნარი - რამდენ შემთხვევას პოულობს, დადებითი პასუხის სიზუსტე - რამდენად სანდოა დადებითი სიგნალი.",
+  },
+  {
+    title: "კლინიკური შეზღუდვა",
+    text: "ეს რიცხვები არ ნიშნავს, რომ მოდელი ექიმზე უკეთ სვამს დიაგნოზს. ისინი აჩვენებს prototype-ის ტექნიკურ ხარისხს კონკრეტულ dataset-ზე.",
+  },
+];
+
 const symptomTextRules = [
   {
     key: "symptom_chest_pain",
@@ -865,11 +880,36 @@ function renderModelTrust() {
         <div class="reference-header">
           <div>
             <h2>მოდელის ტექნიკური შეფასება</h2>
-            <p>ეს ნაწილი აჩვენებს, როგორ იმუშავა მოდელმა უკვე ცნობილ სატესტო პაციენტებზე. მაღალი რიცხვი უკეთეს შედეგს ნიშნავს, მაგრამ საბოლოო დიაგნოზს ექიმი ადასტურებს.</p>
+            <p>მოკლე, ადამიანურად წაკითხვადი შეფასება იმისა, რამდენად სანდოა მოდელის სიგნალები test მონაცემებზე.</p>
           </div>
           <button class="icon-button" id="close-model-trust" aria-label="დახურვა">×</button>
         </div>
         <div class="model-trust">
+          <div class="trust-summary">
+            ${modelTrustNotes
+              .map(
+                (note) => `
+                  <section>
+                    <strong>${note.title}</strong>
+                    <p>${note.text}</p>
+                  </section>
+                `,
+              )
+              .join("")}
+          </div>
+          <div class="metric-guide" aria-label="მეტრიკების განმარტება">
+            ${metricDescriptions
+              .map(
+                (description) => `
+                  <div>
+                    <b>${description.label}</b>
+                    <span>${description.note}</span>
+                    <small>${description.technical}</small>
+                  </div>
+                `,
+              )
+              .join("")}
+          </div>
           <div class="metric-grid">
             ${modelMetrics
               .map(
@@ -892,7 +932,10 @@ function renderModelTrust() {
               )
               .join("")}
           </div>
-          <p>მაჩვენებლები დათვლილია სატესტო ნაწილზე. დიაგნოზის ჯგუფებისთვის ზღვარი შერჩეულია validation ნაწილზე, რათა დადებითი და უარყოფითი პასუხები უკეთ დაბალანსდეს.</p>
+          <div class="trust-footnote">
+            <strong>საბოლოო ინტერპრეტაცია</strong>
+            <p>მაჩვენებლები დათვლილია test ნაწილზე. დიაგნოზის ჯგუფებისთვის ზღვარი შეირჩა validation ნაწილზე, რათა დადებითი და უარყოფითი პასუხები უკეთ დაბალანსდეს. დაბალი precision ზოგ subtype-ში ნიშნავს, რომ დადებითი სიგნალი ექიმმა დამატებით უნდა გადაამოწმოს.</p>
+          </div>
         </div>
       </div>
     </div>
