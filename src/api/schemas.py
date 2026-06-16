@@ -74,6 +74,8 @@ class PredictionResponse(BaseModel):
 
 class SamplePatientResponse(BaseModel):
     source: str
+    sample_id: str | None = None
+    sample_label: str | None = None
     row_index: int
     original_csv_index: int
     actual_target: int

@@ -148,6 +148,13 @@ const labReferenceRanges = [
 
 const bmiReference = { key: "omr_bmi_mean", label: "BMI", low: 18.5, high: 24.9, unit: "kg/m2" };
 
+const samplePatientOptions = [
+  { value: "demo-1", label: "სატესტო პაციენტი 1" },
+  { value: "demo-2", label: "სატესტო პაციენტი 2" },
+  { value: "demo-3", label: "სატესტო პაციენტი 3" },
+  { value: "demo-4", label: "სატესტო პაციენტი 4" },
+];
+
 const featureLabels = {
   age: "ასაკი",
   gender_male: "სქესი",
@@ -343,6 +350,7 @@ let ecgNote = "";
 let isLabReferenceOpen = false;
 let isModelTrustOpen = false;
 let clearedFieldKeys = new Set();
+let selectedSampleId = "demo-1";
 
 function escapeHtml(value) {
   return String(value)
@@ -1216,8 +1224,13 @@ function render() {
               <p>არასავალდებულო ველები ცარიელი დატოვეთ; დიახ/არა ველები გამოიყენება დიაგნოსტიკურ ახსნაში.</p>
             </div>
             <div class="panel-actions">
-              <button class="secondary-button" id="clear-data-button" ${features ? "" : "disabled"}>ყველა მონაცემის წაშლა</button>
-              <button class="secondary-button" id="load-sample-button">სატესტო პაციენტის ჩატვირთვა</button>
+              <select class="sample-select" id="sample-select" aria-label="სატესტო პაციენტის არჩევა">
+                ${samplePatientOptions
+                  .map((option) => `<option value="${option.value}" ${selectedSampleId === option.value ? "selected" : ""}>${option.label}</option>`)
+                  .join("")}
+              </select>
+              <button class="secondary-button compact-button" id="load-sample-button">ჩატვირთვა</button>
+              <button class="secondary-button compact-button" id="clear-data-button" ${features ? "" : "disabled"}>გასუფთავება</button>
             </div>
           </div>
 
@@ -1300,6 +1313,9 @@ function render() {
     clearPatientData();
     render();
   });
+  document.getElementById("sample-select")?.addEventListener("change", (event) => {
+    selectedSampleId = event.target.value;
+  });
   document.getElementById("load-sample-button")?.addEventListener("click", loadSample);
 
   document.getElementById("predict-button")?.addEventListener("click", runPrediction);
@@ -1333,9 +1349,10 @@ function render() {
 
 async function loadSample() {
   try {
-    const response = await fetch(`${API_BASE}/sample-patient`);
+    const response = await fetch(`${API_BASE}/sample-patient?sample_id=${encodeURIComponent(selectedSampleId)}`);
     if (!response.ok) throw new Error(`API-მ დააბრუნა ${response.status}`);
     sample = await response.json();
+    selectedSampleId = sample.sample_id || selectedSampleId;
     symptomText = sample.symptom_text || "";
     ecgFinding = sample.ecg_finding || "not_available";
     ecgNote = sample.ecg_note || "";

@@ -250,6 +250,26 @@ h3 {
   justify-content: flex-end;
 }
 
+.sample-select,
+.compact-button {
+  font-size: 12px;
+  min-height: 32px;
+}
+
+.sample-select {
+  background: #ffffff;
+  border: 1px solid #cbd9e2;
+  border-radius: 6px;
+  color: #263645;
+  font-weight: 700;
+  max-width: 170px;
+  padding: 6px 8px;
+}
+
+.compact-button {
+  padding: 6px 9px;
+}
+
 .sample-meta {
   display: flex;
   flex-wrap: wrap;
@@ -1622,6 +1642,11 @@ h3 {
 
   .panel-actions {
     justify-content: stretch;
+  }
+
+  .sample-select {
+    max-width: none;
+    width: 100%;
   }
 
   .section-action {
