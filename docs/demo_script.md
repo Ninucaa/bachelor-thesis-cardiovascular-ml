@@ -83,7 +83,7 @@ http://127.0.0.1:5173/
 
 სათქმელი:
 
-> მოდელი ელოდება 137 feature-ს, ამიტომ demo-სთვის ვიყენებ რეალურ test-split პაციენტს როგორც baseline-ს. მომხმარებელი ცვლის მხოლოდ რამდენიმე გასაგებ clinical field-ს, ხოლო დანარჩენი feature-ები რჩება sample patient-ის მნიშვნელობებით.
+> მოდელი ელოდება 140 feature-ს, ამიტომ demo-სთვის ვიყენებ რეალურ test-split პაციენტს როგორც baseline-ს. მომხმარებელი ცვლის მხოლოდ რამდენიმე გასაგებ clinical field-ს, ხოლო დანარჩენი feature-ები რჩება sample patient-ის მნიშვნელობებით.
 
 ### ნაბიჯი 4 - პირველი პროგნოზი
 
@@ -179,12 +179,12 @@ Swagger-ში შეგიძლიათ ახსენოთ:
 
 ### Slide 7 - შედეგები
 
-XGBoost test metrics:
+Final time-aware XGBoost test metrics:
 
-- AUC-ROC: `0.8754`
-- F1-score: `0.8536`
-- Recall/Sensitivity: `0.8818`
-- Precision: `0.8271`
+- AUC-ROC: `0.8874`
+- F1-score: `0.8323`
+- Recall/Sensitivity: `0.8139`
+- Precision: `0.8515`
 
 ### Slide 8 - Explainable AI
 
@@ -197,7 +197,7 @@ XGBoost test metrics:
 აჩვენეთ flow:
 
 ```text
-Dataset -> Preprocessing -> Training -> Saved Model -> FastAPI -> React UI
+Dataset -> Preprocessing -> Training -> Saved Model -> FastAPI -> Vite JavaScript UI
 ```
 
 ### Slide 10 - Demo
@@ -247,7 +247,7 @@ Dataset -> Preprocessing -> Training -> Saved Model -> FastAPI -> React UI
 
 პასუხი:
 
-> მოდელს სჭირდება 137 feature. ყველა მათგანის ხელით შეყვანა demo-სთვის არაპრაქტიკულია. sample patient approach ინარჩუნებს სრულ model payload-ს და ამავე დროს აძლევს მომხმარებელს გასაგები კლინიკური ველების შეცვლის საშუალებას.
+> მოდელს სჭირდება 140 feature. ყველა feature-ის ხელით შეყვანა demo-სთვის არაპრაქტიკულია. sample patient approach ინარჩუნებს სრულ model payload-ს და ამავე დროს აძლევს მომხმარებელს გასაგები კლინიკური ველების შეცვლის საშუალებას.
 
 ### კითხვა: რა არის SHAP?
 

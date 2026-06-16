@@ -27,22 +27,23 @@ Saved ML Models + Feature List
 FastAPI Backend
     |
     v
-React Frontend
+Vite JavaScript Frontend
 ```
 
 ## ძირითადი კომპონენტები
 
 ### 1. მონაცემთა წყარო
 
-საწყისი მონაცემი არის `cardio_training_features.csv`.
+საწყისი მონაცემები არის MIMIC-IV/PhysioNet-ის CSV ფაილები, რომლებიც ლოკალურად ინახება პროექტის parent საქაღალდეში და GitHub-ზე არ იტვირთება. საბოლოო model-ready ფაილი იქმნება `src/build_time_aware_dataset.py` სკრიპტით.
 
-მონაცემი შეიცავს:
+გამოყენებული მონაცემები შეიცავს:
 
 - დემოგრაფიულ მახასიათებლებს
 - ლაბორატორიულ მაჩვენებლებს
 - ED vital signs
 - ICU vital signs
-- ECG მახასიათებლებს
+- OMR მონაცემებს: BMI, წონა, სიმაღლე და outpatient blood pressure
+- ICD დიაგნოზებზე დაფუძნებულ target-ებს და prior history feature-ებს
 - სამიზნე ცვლადს `target_cvd`
 - train/validation/test დაყოფას `split_hint`
 
@@ -50,7 +51,7 @@ React Frontend
 
 - `target_cvd = 1` ნიშნავს CVD-positive class-ს ამ dataset-ის განსაზღვრებით.
 - `target_cvd = 0` ნიშნავს non-CVD class-ს ამ dataset-ის განსაზღვრებით.
-- მოდელი არ პროგნოზირებს კონკრეტულ ერთ დიაგნოზს, მაგალითად heart attack-ს ან stroke-ს.
+- დამატებითი subtype მოდელები პროგნოზირებს სავარაუდო დიაგნოზის ჯგუფებს, მაგალითად მიოკარდიუმის ინფარქტს, გულის უკმარისობას, ინსულტს, არითმიას, ჰიპერტენზიულ დაავადებას და კორონარული არტერიის დაავადებას.
 
 მნიშვნელოვანი თვისება:
 
@@ -75,16 +76,20 @@ Preprocessing ეტაპზე შესრულდა:
 
 - `data/processed/cardio_model_ready.csv`
 - `546,028` ჩანაწერი
-- `137` model feature
+- `140` model feature
 - `0` გამოტოვებული მნიშვნელობა საბოლოო model-ready ფაილში
 
 ### 3. მოდელის გაწვრთნა
 
-გაწვრთნილი მოდელები:
+საბოლოო demo/API-ში გამოყენებულია XGBoost time-aware მოდელები:
 
-- Logistic Regression
-- Random Forest
-- XGBoost
+- საერთო გულ-სისხლძარღვთა დიაგნოსტიკური სიგნალი
+- მიოკარდიუმის ინფარქტი
+- გულის უკმარისობა
+- ინსულტი / ცერებროვასკულური დაავადება
+- გულის არითმია
+- ჰიპერტენზიული დაავადება
+- კორონარული არტერიის დაავადება
 
 გამოყენებული შეფასების მეტრიკები:
 
@@ -101,19 +106,23 @@ Preprocessing ეტაპზე შესრულდა:
 ტესტური შედეგები:
 
 ```text
-AUC-ROC: 0.8754
-F1-score: 0.8536
-Recall/Sensitivity: 0.8818
-Precision: 0.8271
+AUC-ROC: 0.8874
+F1-score: 0.8323
+Recall/Sensitivity: 0.8139
+Precision: 0.8515
 ```
 
 მოდელის ფაილები:
 
 ```text
-models/xgboost.pkl
-models/random_forest.pkl
-models/logistic_regression.pkl
-models/feature_columns.json
+models/time_aware/target_cvd.pkl
+models/time_aware/target_myocardial_infarction.pkl
+models/time_aware/target_heart_failure.pkl
+models/time_aware/target_stroke.pkl
+models/time_aware/target_arrhythmia.pkl
+models/time_aware/target_hypertension.pkl
+models/time_aware/target_coronary_artery_disease.pkl
+models/time_aware/feature_columns.json
 ```
 
 ### 4. SHAP ახსნადობა
@@ -179,7 +188,7 @@ POST /predict
   - risk level
   - SHAP top factors
 
-### 6. React Frontend
+### 6. Vite JavaScript Frontend
 
 Frontend მდებარეობს:
 
@@ -196,13 +205,13 @@ Frontend-ის ლოგიკა:
 
 1. იტვირთება sample patient backend-იდან.
 2. მომხმარებელი ცვლის რამდენიმე გასაგებ clinical field-ს.
-3. დანარჩენი 137 feature რჩება sample patient-ის მნიშვნელობებით.
+3. დანარჩენი 140 feature რჩება sample patient-ის მნიშვნელობებით.
 4. frontend აგზავნის სრულ payload-ს `/predict` endpoint-ზე.
 5. ეკრანზე ჩანს პროგნოზი და SHAP ფაქტორები.
 
 რატომ sample patient approach?
 
-მოდელი ელოდება `137` feature-ს. ყველა feature-ის ხელით შეყვანა demo-სთვის არაპრაქტიკულია. ამიტომ UI მომხმარებელს აძლევს მხოლოდ რამდენიმე მნიშვნელოვან ველს, ხოლო სრული payload ინარჩუნებს ტექნიკურ სისწორეს.
+მოდელი ელოდება `140` feature-ს. ყველა feature-ის ხელით შეყვანა demo-სთვის არაპრაქტიკულია. ამიტომ UI მომხმარებელს აძლევს მხოლოდ რამდენიმე მნიშვნელოვან ველს, ხოლო სრული payload ინარჩუნებს ტექნიკურ სისწორეს.
 
 ## Prediction Flow
 
@@ -219,7 +228,7 @@ User edits key fields
 Frontend sends POST /predict
     |
     v
-Backend validates all 137 features
+Backend validates all 140 features
     |
     v
 XGBoost model predicts probability
@@ -265,8 +274,8 @@ Machine Learning:
 
 Frontend:
 
-- React
 - Vite
+- JavaScript
 - CSS
 
 Development:
@@ -281,7 +290,7 @@ Development:
 - სისტემა არ არის კლინიკურად ვალიდირებული რეალურ სამედიცინო გარემოში.
 - ბევრი feature თავდაპირველად იყო missing, ამიტომ გამოყენებულია missing indicator-ები და median imputation.
 - ICU მონაცემები შეიძლება ასახავდეს უკვე განვითარებულ მძიმე მდგომარეობას და არა მხოლოდ ადრეულ რისკს.
-- frontend demo იყენებს sample patient-ს, რადგან სრული 137 feature-ის ხელით შეყვანა პრაქტიკული არ არის.
+- frontend demo იყენებს sample patient-ს, რადგან სრული 140 feature-ის ხელით შეყვანა პრაქტიკული არ არის.
 
 ## მომავალი გაუმჯობესება
 

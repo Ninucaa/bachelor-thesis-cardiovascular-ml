@@ -46,7 +46,7 @@
 
 - მომზადდა ფაილი `data/processed/cardio_model_ready.csv`.
 - საბოლოო მონაცემებში გამოტოვებული მნიშვნელობები აღარ არის.
-- მოდელისთვის ხელმისაწვდომია `137` feature.
+- მოდელისთვის ხელმისაწვდომია `140` feature.
 
 ## ეტაპი 4 - მოდელების გაწვრთნა და შედარება
 
@@ -106,11 +106,11 @@
 - backend აბრუნებს მოდელის სტატუსს, feature-ების სიას და პროგნოზს SHAP ახსნით.
 - არასრული feature payload-ის შემთხვევაში API აბრუნებს `422` შეცდომას missing feature-ების დეტალებით.
 
-## ეტაპი 7 - React frontend
+## ეტაპი 7 - Vite JavaScript frontend
 
 შესრულებული სამუშაო:
 
-- შეიქმნა React/Vite frontend.
+- შეიქმნა Vite JavaScript frontend.
 - frontend უკავშირდება FastAPI backend-ს.
 - დაემატა sample patient-ის ჩატვირთვა `GET /sample-patient` endpoint-იდან.
 - მომხმარებელს შეუძლია შეცვალოს რამდენიმე ძირითადი კლინიკური ველი:
