@@ -48,7 +48,7 @@ src/preprocess_cardio_data.py
 მისი გაშვების მაგალითი:
 
 ```bash
-cd /Users/ninucaaa/Desktop/new_project/PythonProject
+cd /Users/ninucaaa/Desktop/new_project/bachelor-cardio-ai-project
 .venv/bin/python src/preprocess_cardio_data.py
 ```
 
@@ -69,7 +69,7 @@ reports/preprocessing_report.md
 უფრო ახალი time-aware dataset-ის ასაწყობად გამოიყენება:
 
 ```bash
-cd /Users/ninucaaa/Desktop/new_project/PythonProject
+cd /Users/ninucaaa/Desktop/new_project/bachelor-cardio-ai-project
 .venv/bin/python src/build_time_aware_dataset.py
 ```
 
@@ -113,7 +113,7 @@ cd /Users/ninucaaa/Desktop/new_project/PythonProject
 თუ repository ჯერ არ არის შექმნილი:
 
 ```bash
-cd /Users/ninucaaa/Desktop/new_project/PythonProject
+cd /Users/ninucaaa/Desktop/new_project/bachelor-cardio-ai-project
 git init
 git status
 git add .

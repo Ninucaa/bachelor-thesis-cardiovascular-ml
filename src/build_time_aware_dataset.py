@@ -10,10 +10,11 @@ from typing import Iterable
 import pandas as pd
 
 
-PROJECT_DIR = Path(__file__).resolve().parents[2]
-OUTPUT_PATH = PROJECT_DIR / "data" / "processed" / "cardio_time_aware_model_ready.csv"
-REPORT_PATH = PROJECT_DIR / "PythonProject" / "reports" / "time_aware_dataset_report.md"
-FEATURES_REPORT_PATH = PROJECT_DIR / "PythonProject" / "reports" / "time_aware_feature_summary.json"
+PROJECT_DIR = Path(__file__).resolve().parents[1]
+ROOT_DIR = PROJECT_DIR.parent
+OUTPUT_PATH = ROOT_DIR / "data" / "processed" / "cardio_time_aware_model_ready.csv"
+REPORT_PATH = PROJECT_DIR / "reports" / "time_aware_dataset_report.md"
+FEATURES_REPORT_PATH = PROJECT_DIR / "reports" / "time_aware_feature_summary.json"
 
 OBSERVATION_HOURS = 24
 RANDOM_STATE = 42

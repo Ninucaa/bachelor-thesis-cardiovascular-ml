@@ -31,7 +31,7 @@
 ## პროექტის სტრუქტურა
 
 ```text
-PythonProject/
+bachelor-cardio-ai-project/
 ├── main.py
 ├── requirements.txt
 ├── src/
@@ -66,21 +66,21 @@ frontend/
 ## ინსტალაცია
 
 ```bash
-cd /Users/ninucaaa/Desktop/new_project/PythonProject
+cd /Users/ninucaaa/Desktop/new_project/bachelor-cardio-ai-project
 .venv/bin/python -m pip install -r requirements.txt
 ```
 
 ## მოდელის გაწვრთნა
 
 ```bash
-cd /Users/ninucaaa/Desktop/new_project/PythonProject
+cd /Users/ninucaaa/Desktop/new_project/bachelor-cardio-ai-project
 .venv/bin/python src/train_model.py
 ```
 
 ## ერთი პაციენტის პროგნოზი
 
 ```bash
-cd /Users/ninucaaa/Desktop/new_project/PythonProject
+cd /Users/ninucaaa/Desktop/new_project/bachelor-cardio-ai-project
 .venv/bin/python src/predict.py --row-index 0 --top-n 6
 ```
 
@@ -97,7 +97,7 @@ cd /Users/ninucaaa/Desktop/new_project/PythonProject
 backend-ის გაშვება:
 
 ```bash
-cd /Users/ninucaaa/Desktop/new_project/PythonProject
+cd /Users/ninucaaa/Desktop/new_project/bachelor-cardio-ai-project
 .venv/bin/uvicorn src.api.app:app --host 127.0.0.1 --port 8765
 ```
 
@@ -133,7 +133,7 @@ endpoint-ები:
 frontend-ის გაშვება:
 
 ```bash
-cd /Users/ninucaaa/Desktop/new_project/PythonProject/frontend
+cd /Users/ninucaaa/Desktop/new_project/bachelor-cardio-ai-project/frontend
 npm install
 npm run dev
 ```
