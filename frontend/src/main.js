@@ -1179,9 +1179,12 @@ function render() {
   document.getElementById("root").innerHTML = `
     <main class="app-shell">
       <section class="topbar">
-        <div>
-          <p class="eyebrow">კლინიკური გადაწყვეტილების დამხმარე პროტოტიპი</p>
-          <h1>გულ-სისხლძარღვთა სავარაუდო დიაგნოზის პროგნოზირება</h1>
+        <div class="topbar-title">
+          <div class="clinical-mark" aria-hidden="true"><span></span></div>
+          <div>
+            <p class="eyebrow">კლინიკური გადაწყვეტილების დამხმარე პროტოტიპი</p>
+            <h1>გულ-სისხლძარღვთა სავარაუდო დიაგნოზის პროგნოზირება</h1>
+          </div>
         </div>
         <div class="server-status">${statusText}</div>
       </section>
