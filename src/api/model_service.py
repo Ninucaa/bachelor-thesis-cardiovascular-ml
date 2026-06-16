@@ -8,6 +8,8 @@ from typing import Any
 import joblib
 import pandas as pd
 
+from src.diagnosis_targets import EXPANDED_CLINICAL_CHECKS, EXPANDED_DIAGNOSIS_TARGETS
+
 
 PROJECT_DIR = Path(__file__).resolve().parents[2]
 DATA_PATH = PROJECT_DIR.parent / "data" / "processed" / "cardio_time_aware_model_ready.csv"
@@ -36,46 +38,11 @@ SUBTYPE_NOTE = (
 )
 
 SUBTYPE_LABELS = {
-    "target_myocardial_infarction": "მიოკარდიუმის ინფარქტი",
-    "target_heart_failure": "გულის უკმარისობა",
-    "target_stroke": "ინსულტი / ცერებროვასკულური დაავადება",
-    "target_arrhythmia": "გულის არითმია",
-    "target_hypertension": "ჰიპერტენზიული დაავადება",
-    "target_coronary_artery_disease": "კორონარული არტერიის დაავადება",
+    target: config["label_ge"]
+    for target, config in EXPANDED_DIAGNOSIS_TARGETS.items()
 }
 
-CLINICAL_CHECKS = {
-    "target_myocardial_infarction": [
-        "ECG და ST/T ცვლილებების შეფასება",
-        "Troponin-ის განმეორებითი კონტროლი",
-        "გულმკერდის ტკივილის კლინიკური შეფასება",
-    ],
-    "target_heart_failure": [
-        "NT-proBNP/BNP მაჩვენებლის გადამოწმება",
-        "ფილტვების შეშუპებისა და პერიფერიული შეშუპების შეფასება",
-        "ექოკარდიოგრაფიის განხილვა",
-    ],
-    "target_stroke": [
-        "ნევროლოგიური სტატუსის შეფასება",
-        "თავის ტვინის CT/MRI საჭიროების განხილვა",
-        "არტერიული წნევისა და რისკ-ფაქტორების გადამოწმება",
-    ],
-    "target_arrhythmia": [
-        "ECG rhythm strip-ის შეფასება",
-        "ელექტროლიტებისა და გულისცემის მონიტორინგი",
-        "პალპიტაციის/სინკოპეს ისტორიის გადამოწმება",
-    ],
-    "target_hypertension": [
-        "არტერიული წნევის განმეორებითი გაზომვა",
-        "თირკმლის ფუნქციისა და მეტაბოლური რისკების შეფასება",
-        "ჰიპერტენზიის ისტორიის გადამოწმება",
-    ],
-    "target_coronary_artery_disease": [
-        "იშემიური სიმპტომების და დატვირთვასთან კავშირის შეფასება",
-        "ლიპიდური პროფილის და რისკ-ფაქტორების გადამოწმება",
-        "ECG/ტროპონინის ან დამატებითი კარდიოლოგიური კვლევის განხილვა",
-    ],
-}
+CLINICAL_CHECKS = EXPANDED_CLINICAL_CHECKS
 
 FEATURE_GROUPS = {
     "age": "დემოგრაფიული მონაცემები",
