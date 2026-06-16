@@ -8,3 +8,5 @@ seaborn
 shap
 fastapi
 uvicorn
+pytest
+httpx

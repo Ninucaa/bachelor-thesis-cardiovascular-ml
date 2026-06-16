@@ -101,7 +101,7 @@ backend-ის გაშვება:
 
 ```bash
 cd /Users/ninucaaa/Desktop/new_project/bachelor-cardio-ai-project
-.venv/bin/uvicorn src.api.app:app --host 127.0.0.1 --port 8765
+scripts/run_backend.sh
 ```
 
 Swagger დოკუმენტაცია:
@@ -138,7 +138,7 @@ frontend-ის გაშვება:
 ```bash
 cd /Users/ninucaaa/Desktop/new_project/bachelor-cardio-ai-project/frontend
 npm install
-npm run dev
+../scripts/run_frontend.sh
 ```
 
 მისამართი:
@@ -148,6 +148,32 @@ http://127.0.0.1:5173/
 ```
 
 frontend აგებულია Vite + vanilla JavaScript + CSS-ით და იყენებს `GET /sample-patient` endpoint-ს, რათა ჩატვირთოს ერთი რეალური test-split პაციენტი. მომხმარებელი ცვლის გასაგებ კლინიკურ ველებს, ხოლო backend-ში იგზავნება სრული `140` feature payload.
+
+## ტესტირება
+
+Backend API smoke tests:
+
+```bash
+cd /Users/ninucaaa/Desktop/new_project/bachelor-cardio-ai-project
+scripts/test_backend.sh
+```
+
+სერვისების სწრაფი შემოწმება გაშვების შემდეგ:
+
+```bash
+scripts/check_services.sh
+```
+
+## Docker
+
+Backend-ის containerized გაშვებისთვის დამატებულია `Dockerfile` და `docker-compose.yml`.
+
+```bash
+cd /Users/ninucaaa/Desktop/new_project/bachelor-cardio-ai-project
+docker compose up --build
+```
+
+შენიშვნა: Docker Desktop/daemon უნდა იყოს გაშვებული. Docker image იყენებს saved models-ს და raw MIMIC CSV ფაილებს არ აკოპირებს.
 
 ## შეზღუდვები
 
