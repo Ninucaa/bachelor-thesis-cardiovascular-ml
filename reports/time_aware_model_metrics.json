@@ -1,0 +1,289 @@
+{
+  "target_cvd": {
+    "label": "Any cardiovascular diagnosis",
+    "train_positive_rows": 228563,
+    "train_negative_rows": 154390,
+    "validation": {
+      "auc_roc": 0.8865,
+      "average_precision": 0.9162,
+      "f1": 0.8323,
+      "recall_sensitivity": 0.8135,
+      "precision": 0.852,
+      "positive_rate": 0.6,
+      "confusion_matrix": [
+        [
+          34031,
+          9150
+        ],
+        [
+          12082,
+          52689
+        ]
+      ]
+    },
+    "test": {
+      "auc_roc": 0.8874,
+      "average_precision": 0.9168,
+      "f1": 0.8323,
+      "recall_sensitivity": 0.8139,
+      "precision": 0.8515,
+      "positive_rate": 0.598,
+      "confusion_matrix": [
+        [
+          17482,
+          4679
+        ],
+        [
+          6134,
+          26828
+        ]
+      ]
+    }
+  },
+  "target_myocardial_infarction": {
+    "label": "Myocardial infarction",
+    "train_positive_rows": 11480,
+    "train_negative_rows": 371473,
+    "validation": {
+      "auc_roc": 0.9333,
+      "average_precision": 0.597,
+      "f1": 0.3315,
+      "recall_sensitivity": 0.8054,
+      "precision": 0.2087,
+      "positive_rate": 0.031,
+      "confusion_matrix": [
+        [
+          94367,
+          10234
+        ],
+        [
+          652,
+          2699
+        ]
+      ]
+    },
+    "test": {
+      "auc_roc": 0.9337,
+      "average_precision": 0.6079,
+      "f1": 0.3296,
+      "recall_sensitivity": 0.8054,
+      "precision": 0.2072,
+      "positive_rate": 0.0309,
+      "confusion_matrix": [
+        [
+          48160,
+          5257
+        ],
+        [
+          332,
+          1374
+        ]
+      ]
+    }
+  },
+  "target_heart_failure": {
+    "label": "Heart failure",
+    "train_positive_rows": 56827,
+    "train_negative_rows": 326126,
+    "validation": {
+      "auc_roc": 0.8729,
+      "average_precision": 0.5756,
+      "f1": 0.5099,
+      "recall_sensitivity": 0.795,
+      "precision": 0.3753,
+      "positive_rate": 0.1444,
+      "confusion_matrix": [
+        [
+          71750,
+          20619
+        ],
+        [
+          3194,
+          12389
+        ]
+      ]
+    },
+    "test": {
+      "auc_roc": 0.8801,
+      "average_precision": 0.5971,
+      "f1": 0.5266,
+      "recall_sensitivity": 0.8087,
+      "precision": 0.3905,
+      "positive_rate": 0.1488,
+      "confusion_matrix": [
+        [
+          36569,
+          10353
+        ],
+        [
+          1569,
+          6632
+        ]
+      ]
+    }
+  },
+  "target_stroke": {
+    "label": "Stroke / cerebrovascular disease",
+    "train_positive_rows": 20011,
+    "train_negative_rows": 362942,
+    "validation": {
+      "auc_roc": 0.8146,
+      "average_precision": 0.3362,
+      "f1": 0.2247,
+      "recall_sensitivity": 0.7141,
+      "precision": 0.1333,
+      "positive_rate": 0.053,
+      "confusion_matrix": [
+        [
+          75656,
+          26573
+        ],
+        [
+          1636,
+          4087
+        ]
+      ]
+    },
+    "test": {
+      "auc_roc": 0.8182,
+      "average_precision": 0.3415,
+      "f1": 0.2263,
+      "recall_sensitivity": 0.7149,
+      "precision": 0.1344,
+      "positive_rate": 0.0534,
+      "confusion_matrix": [
+        [
+          38629,
+          13551
+        ],
+        [
+          839,
+          2104
+        ]
+      ]
+    }
+  },
+  "target_arrhythmia": {
+    "label": "Cardiac arrhythmia",
+    "train_positive_rows": 75495,
+    "train_negative_rows": 307458,
+    "validation": {
+      "auc_roc": 0.8197,
+      "average_precision": 0.5234,
+      "f1": 0.5225,
+      "recall_sensitivity": 0.7842,
+      "precision": 0.3918,
+      "positive_rate": 0.1951,
+      "confusion_matrix": [
+        [
+          61245,
+          25645
+        ],
+        [
+          4545,
+          16517
+        ]
+      ]
+    },
+    "test": {
+      "auc_roc": 0.8188,
+      "average_precision": 0.5266,
+      "f1": 0.5228,
+      "recall_sensitivity": 0.7841,
+      "precision": 0.3921,
+      "positive_rate": 0.1947,
+      "confusion_matrix": [
+        [
+          31346,
+          13045
+        ],
+        [
+          2317,
+          8415
+        ]
+      ]
+    }
+  },
+  "target_hypertension": {
+    "label": "Hypertensive disease",
+    "train_positive_rows": 194964,
+    "train_negative_rows": 187989,
+    "validation": {
+      "auc_roc": 0.846,
+      "average_precision": 0.8307,
+      "f1": 0.78,
+      "recall_sensitivity": 0.8132,
+      "precision": 0.7494,
+      "positive_rate": 0.5101,
+      "confusion_matrix": [
+        [
+          37911,
+          14975
+        ],
+        [
+          10284,
+          44782
+        ]
+      ]
+    },
+    "test": {
+      "auc_roc": 0.8472,
+      "average_precision": 0.8319,
+      "f1": 0.7804,
+      "recall_sensitivity": 0.8148,
+      "precision": 0.7487,
+      "positive_rate": 0.509,
+      "confusion_matrix": [
+        [
+          19395,
+          7671
+        ],
+        [
+          5197,
+          22860
+        ]
+      ]
+    }
+  },
+  "target_coronary_artery_disease": {
+    "label": "Coronary artery / ischemic heart disease",
+    "train_positive_rows": 73281,
+    "train_negative_rows": 309672,
+    "validation": {
+      "auc_roc": 0.8413,
+      "average_precision": 0.5667,
+      "f1": 0.5383,
+      "recall_sensitivity": 0.7983,
+      "precision": 0.4061,
+      "positive_rate": 0.1957,
+      "confusion_matrix": [
+        [
+          62166,
+          24663
+        ],
+        [
+          4260,
+          16863
+        ]
+      ]
+    },
+    "test": {
+      "auc_roc": 0.8458,
+      "average_precision": 0.5714,
+      "f1": 0.5415,
+      "recall_sensitivity": 0.8082,
+      "precision": 0.4071,
+      "positive_rate": 0.1937,
+      "confusion_matrix": [
+        [
+          31876,
+          12569
+        ],
+        [
+          2048,
+          8630
+        ]
+      ]
+    }
+  }
+}
