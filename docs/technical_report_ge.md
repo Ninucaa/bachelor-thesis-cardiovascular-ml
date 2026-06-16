@@ -1,0 +1,279 @@
+# ტექნიკური დოკუმენტაცია
+
+პროექტი: გულ-სისხლძარღვთა დაავადებების ადრეული დიაგნოსტიკის დამხმარე სისტემა მანქანური სწავლების გამოყენებით
+
+ავტორი: ნინო ჯინჭარაძე
+
+GitHub repository:
+
+```text
+https://github.com/Ninucaa/bachelor-thesis-cardiovascular-ml
+```
+
+## 1. პროექტის მიზანი
+
+პროექტის მიზანია შეიქმნას decision-support ტიპის ვებ სისტემა, რომელიც პაციენტის კლინიკური მონაცემების საფუძველზე აფასებს გულ-სისხლძარღვთა დაავადებების სავარაუდო დიაგნოსტიკურ მიმართულებას. სისტემა არ ცვლის ექიმის საბოლოო გადაწყვეტილებას. მისი დანიშნულებაა ექიმს ან მომხმარებელს აჩვენოს, რომელ ICD-კოდირებულ გულ-სისხლძარღვთა დიაგნოზის ჯგუფთან ხედავს მოდელი ყველაზე ძლიერ სიგნალს და რომელი ფაქტორები განსაზღვრავს ამ შედეგს.
+
+სისტემა აფასებს შემდეგ დიაგნოსტიკურ ჯგუფებს:
+
+- მიოკარდიუმის ინფარქტი
+- გულის უკმარისობა
+- ინსულტი / ცერებროვასკულური დაავადება
+- გულის არითმია
+- ჰიპერტენზიული დაავადება
+- კორონარული არტერიის დაავადება
+
+## 2. სისტემის არქიტექტურა
+
+მაღალი დონის არქიტექტურა:
+
+```mermaid
+flowchart LR
+    A[MIMIC-IV CSV ფაილები] --> B[Preprocessing და feature engineering]
+    B --> C[Time-aware model-ready dataset]
+    C --> D[XGBoost მოდელების გაწვრთნა]
+    D --> E[შენახული მოდელები models/time_aware]
+    E --> F[FastAPI backend]
+    F --> G[Vite + JavaScript frontend]
+    G --> H[Georgian clinical decision-support UI]
+```
+
+ძირითადი კომპონენტები:
+
+- `src/build_time_aware_dataset.py` - MIMIC-IV ფაილებიდან time-aware dataset-ის აგება.
+- `src/train_time_aware_model.py` - ძირითადი და subtype XGBoost მოდელების გაწვრთნა.
+- `src/build_diagnosis_thresholds.py` - diagnosis threshold-ების შერჩევა validation split-ზე.
+- `src/api/app.py` - FastAPI endpoint-ები.
+- `src/api/model_service.py` - მოდელის ჩატვირთვა, feature validation, prediction და ინტერპრეტაცია.
+- `frontend/src/main.js` - ქართულენოვანი UI და API-სთან კომუნიკაცია.
+- `frontend/src/styles.css` - frontend-ის ვიზუალური სტილი.
+
+## 3. მონაცემები
+
+მონაცემთა წყაროა MIMIC-IV/PhysioNet-ის დეიდენტიფიცირებული კლინიკური მონაცემები. raw CSV ფაილები GitHub-ზე არ არის ატვირთული, რადგან ისინი დიდი ზომისაა და ექვემდებარება მონაცემთა გამოყენების შეზღუდვებს.
+
+გამოყენებული მონაცემთა ჯგუფები:
+
+- admissions და patients - admission და დემოგრაფიული ინფორმაცია.
+- diagnoses_icd - ICD კოდებზე დაფუძნებული სამიზნე ცვლადები და ისტორიული დაავადებები.
+- labevents - ლაბორატორიული მაჩვენებლები.
+- chartevents - vital signs/ICU ტიპის გაზომვები.
+- edstays და triage - გადაუდებელი განყოფილების triage მონაცემები.
+- omr - BMI, წონა, სიმაღლე და outpatient blood pressure.
+
+Final time-aware dataset-ის summary ინახება:
+
+```text
+reports/time_aware_dataset_report.md
+reports/time_aware_feature_summary.json
+```
+
+## 4. Preprocessing და feature engineering
+
+Preprocessing-ის მთავარი პრინციპია time-aware აგება: მოდელმა არ უნდა გამოიყენოს ისეთი ინფორმაცია, რომელიც პაციენტის ადრეული შეფასების მომენტში ჯერ ცნობილი არ იქნებოდა.
+
+შესრულებული ნაბიჯები:
+
+- მონაცემების გაერთიანება admission დონეზე.
+- ლაბორატორიული და vital signs მონაცემების აგრეგაცია პირველი 24 საათის ფარგლებში.
+- ICD კოდების საფუძველზე subtype target-ების შექმნა.
+- დიაბეტის, თირკმლის ქრონიკული დაავადების, სიმსუქნის და თამბაქოს/ნიკოტინის ისტორიის გამოთვლა prior admission-ებიდან.
+- triage chief complaint-იდან სიმპტომების binary feature-ებად ამოღება.
+- არარეალისტური კლინიკური მნიშვნელობების missing-ად მონიშვნა.
+- missing indicator სვეტების დამატება.
+- numeric missing values-ის შევსება training split-ის median-ით.
+- train/validation/test დაყოფა subject_id-ის დონეზე, patient leakage-ის შესამცირებლად.
+
+## 5. მოდელის აგება
+
+გამოყენებულია XGBoost classifier. არჩევანი განპირობებულია tabular clinical data-ზე მისი პრაქტიკული ეფექტიანობით და არახაზოვანი/კომბინაციური კავშირების სწავლით.
+
+გაწვრთნილია:
+
+- ერთი ძირითადი მოდელი საერთო გულ-სისხლძარღვთა დიაგნოსტიკური სიგნალისთვის.
+- ექვსი subtype მოდელი კონკრეტული დიაგნოზის ჯგუფებისთვის.
+
+მოდელები ინახება:
+
+```text
+models/time_aware/
+```
+
+მეტრიკები ინახება:
+
+```text
+reports/time_aware_model_metrics.md
+reports/time_aware_model_metrics.json
+reports/diagnosis_thresholds.md
+```
+
+## 6. შედეგები
+
+ძირითადი მოდელის test შედეგები:
+
+| მოდელი | AUC-ROC | Avg Precision | F1 | Recall | Precision |
+|---|---:|---:|---:|---:|---:|
+| საერთო გულ-სისხლძარღვთა დიაგნოსტიკური სიგნალი | 0.8874 | 0.9168 | 0.8323 | 0.8139 | 0.8515 |
+
+Subtype მოდელების test AUC:
+
+| დიაგნოზის ჯგუფი | AUC-ROC |
+|---|---:|
+| მიოკარდიუმის ინფარქტი | 0.9337 |
+| გულის უკმარისობა | 0.8801 |
+| ინსულტი / ცერებროვასკულური დაავადება | 0.8182 |
+| გულის არითმია | 0.8188 |
+| ჰიპერტენზიული დაავადება | 0.8472 |
+| კორონარული არტერიის დაავადება | 0.8458 |
+
+სამედიცინო კონტექსტში მნიშვნელოვანი განმარტება: subtype მოდელებზე precision ზოგიერთ შემთხვევაში დაბალია კლასების დისბალანსის გამო. ამიტომ სისტემა უნდა განიხილებოდეს როგორც screening/decision-support ინსტრუმენტი და არა საბოლოო დიაგნოზის ავტომატური დამსმელი.
+
+## 7. Explainability / ინტერპრეტაცია
+
+პროექტში გამოყენებულია SHAP-ის იდეა მოდელის ახსნადობისთვის. Backend ითვლის კონკრეტული პაციენტის პროგნოზზე გავლენიან ფაქტორებს და frontend-ში აჩვენებს მოკლე ქართულ განმარტებას.
+
+ინტერფეისში შედეგი წარმოდგენილია შემდეგი სახით:
+
+- სავარაუდო დიაგნოზის ჯგუფი.
+- ალბათობა და threshold.
+- მოდელის დიაგნოსტიკური სიგნალის დონე.
+- მოკლე განმსაზღვრელი ფაქტორები.
+- კლინიკური გადამოწმების რეკომენდებული მიმართულებები.
+- subtype risk-ების სრული სია.
+
+## 8. Backend API დოკუმენტაცია
+
+Backend მუშაობს FastAPI-ზე.
+
+გაშვების შემდეგ Swagger documentation ხელმისაწვდომია:
+
+```text
+http://127.0.0.1:8765/docs
+```
+
+Endpoint-ები:
+
+| Method | Endpoint | დანიშნულება |
+|---|---|---|
+| GET | `/health` | API-ის და მოდელის ჩატვირთვის სტატუსი |
+| GET | `/features` | მოდელის feature schema |
+| GET | `/sample-patient` | test split-იდან demo პაციენტის მონაცემები |
+| POST | `/predict` | პაციენტის feature payload-ზე პროგნოზის დაბრუნება |
+
+`GET /health` response:
+
+```json
+{
+  "status": "ok",
+  "model_loaded": true,
+  "feature_count": 140
+}
+```
+
+`POST /predict` request-ის ზოგადი ფორმა:
+
+```json
+{
+  "features": {
+    "age": 67,
+    "gender_male": 1
+  },
+  "top_n": 6
+}
+```
+
+რეალურ მოთხოვნაში `features` უნდა შეიცავდეს ყველა feature-ს, რომელსაც `/features` აბრუნებს.
+
+## 9. ინსტალაცია და გაშვება
+
+Python dependency-ები:
+
+```bash
+cd /Users/ninucaaa/Desktop/new_project/bachelor-cardio-ai-project
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+```
+
+Backend-ის გაშვება:
+
+```bash
+cd /Users/ninucaaa/Desktop/new_project/bachelor-cardio-ai-project
+.venv/bin/uvicorn src.api.app:app --host 127.0.0.1 --port 8765
+```
+
+Frontend dependency-ები და გაშვება:
+
+```bash
+cd /Users/ninucaaa/Desktop/new_project/bachelor-cardio-ai-project/frontend
+npm install
+npm run dev
+```
+
+მისამართები:
+
+```text
+Frontend: http://127.0.0.1:5173
+Backend docs: http://127.0.0.1:8765/docs
+```
+
+## 10. მომხმარებლის სახელმძღვანელო
+
+ძირითადი გამოყენების flow:
+
+1. მომხმარებელი ხსნის frontend-ს.
+2. იტვირთება demo პაციენტის მონაცემები.
+3. მომხმარებელი საჭიროებისამებრ ცვლის პაციენტის მონაცემებს: ასაკი, სქესი, წონა, სიმაღლე, წნევა, ლაბორატორიული პასუხები, triage მონაცემები და დამატებითი სიმპტომები.
+4. BMI ავტომატურად ითვლება წონისა და სიმაღლის მიხედვით.
+5. ლაბორატორიული და BMI ნორმები იხსნება ცალკე ფანჯარაში.
+6. მომხმარებელი აჭერს პროგნოზის გაშვებას.
+7. სისტემა აჩვენებს სავარაუდო დიაგნოზის ჯგუფს, რისკის განმსაზღვრელ ფაქტორებს და subtype სიის შედარებას.
+8. ტექნიკური მოდელის შეფასება იხსნება ცალკე ფანჯარაში, რათა კლინიკური შედეგი ზედმეტად არ გადაიტვირთოს.
+9. მომხმარებელს შეუძლია ნახოს ქართულად გენერირებული პაციენტის ანგარიში.
+
+Use case 1 - demo პაციენტის შეფასება:
+
+- მომხმარებელი ხსნის აპლიკაციას.
+- ტოვებს sample patient-ის მონაცემებს.
+- აჭერს პროგნოზის ღილაკს.
+- სისტემა აჩვენებს სავარაუდო დიაგნოზის ჯგუფს და განმსაზღვრელ ფაქტორებს.
+
+Use case 2 - ახალი პაციენტის მონაცემების შეცვლა:
+
+- მომხმარებელი ცვლის წონას, სიმაღლეს, წნევას, ლაბორატორიულ პასუხებს და სიმპტომებს.
+- სისტემა ავტომატურად ითვლის BMI-ს და აახლებს derived features-ს.
+- პროგნოზის გაშვებისას backend იღებს სრულ feature payload-ს და აბრუნებს განახლებულ შედეგს.
+
+## 11. უსაფრთხოება და ეთიკური მხარე
+
+პროექტი არ იყენებს რეალური იდენტიფიცირებადი პაციენტების მონაცემებს frontend demo-ში. MIMIC-IV არის დეიდენტიფიცირებული კლინიკური მონაცემთა ბაზა.
+
+სისტემა არ უნდა იქნას გამოყენებული როგორც დამოუკიდებელი კლინიკური გადაწყვეტილების მიმღები სისტემა. შედეგი უნდა დადასტურდეს ექიმის მიერ.
+
+## 12. პროექტის შეზღუდვები
+
+- სისტემა არის prototype/MVP და არა სამედიცინო მოწყობილობა.
+- გამოყენებულია retrospective hospital-based მონაცემები, ამიტომ სხვა პოპულაციებზე შედეგი შეიძლება განსხვავდებოდეს.
+- ECG raw signal/image recognition არ არის დამატებული.
+- Radiology/chest X-ray არ არის გამოყენებული.
+- PostgreSQL და hospital system integration არ არის მიმდინარე ვერსიაში.
+- Docker containerization ჯერ არ არის დამატებული.
+- UCI Heart Disease Dataset-ზე external validation არ არის შესრულებული.
+- SMOTE საბოლოო time-aware pipeline-ში არ არის გამოყენებული; class imbalance ნაწილობრივ მოდელის პარამეტრებით და threshold selection-ით მუშავდება.
+
+## 13. PDF გეგმასთან განსხვავებები
+
+შუალედურ PDF-ში პროექტის საწყის გეგმაში ნახსენები იყო React, Tailwind CSS, Docker, PostgreSQL, SMOTE და UCI external validation. საბოლოო MVP-ში პრიორიტეტი მიენიჭა მუშა clinical decision-support prototype-ს, time-aware preprocessing-ს, subtype დიაგნოზის ჯგუფებს, FastAPI backend-ს და ქართულ frontend demo-ს.
+
+საბოლოო პროექტის რეალური frontend აგებულია Vite + vanilla JavaScript + CSS-ით. ეს არ ამცირებს ფუნქციურობას, რადგან აპლიკაცია მუშაობს როგორც full interactive web interface, მაგრამ ტექნიკურ დოკუმენტაციაში არ უნდა ჩაიწეროს React/Tailwind როგორც შესრულებული კომპონენტი.
+
+## 14. მომავალი განვითარება
+
+შემდეგი გაუმჯობესებები:
+
+- Dockerfile და docker-compose დამატება.
+- automated tests backend endpoint-ებისთვის.
+- screenshot-ებით user manual-ის დასრულება.
+- ECG processed results-ის optional input-ის გაფართოება.
+- external validation სხვა dataset-ზე.
+- model cards და data cards.
+- deployment guide.
