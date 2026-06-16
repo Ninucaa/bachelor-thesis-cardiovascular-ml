@@ -137,12 +137,12 @@ const labReferenceRanges = [
   { key: "lab_creatinine_mean", label: "კრეატინინი", low: 0.6, high: 1.3, unit: "mg/dL" },
   { key: "lab_hemoglobin_mean", label: "ჰემოგლობინი", low: 12, high: 17.5, unit: "g/dL" },
   { key: "lab_glucose_mean", label: "გლუკოზა", low: 70, high: 140, unit: "mg/dL" },
-  { key: "lab_ntprobnp_mean", label: "NT-proBNP (გულის დატვირთვის მარკერი)", low: 0, high: 450, unit: "pg/mL", highLabel: "მომატებული" },
-  { key: "lab_troponin_t_mean", label: "Troponin T", low: 0, high: 0.01, unit: "ng/mL", highLabel: "მომატებული" },
-  { key: "lab_chol_total_mean", label: "საერთო ქოლესტერინი", low: 0, high: 200, unit: "mg/dL", highLabel: "მომატებული" },
+  { key: "lab_ntprobnp_mean", label: "NT-proBNP (გულის დატვირთვის მარკერი)", low: 0, high: 450, unit: "pg/mL" },
+  { key: "lab_troponin_t_mean", label: "Troponin T", low: 0, high: 0.01, unit: "ng/mL" },
+  { key: "lab_chol_total_mean", label: "საერთო ქოლესტერინი", low: 0, high: 200, unit: "mg/dL" },
   { key: "lab_hdl_mean", label: "HDL ქოლესტერინი", low: 40, high: 1000, unit: "mg/dL", lowLabel: "დაბალი" },
-  { key: "lab_ldl_calc_mean", label: "LDL ქოლესტერინი", low: 0, high: 100, unit: "mg/dL", highLabel: "მომატებული" },
-  { key: "lab_triglycerides_mean", label: "ტრიგლიცერიდები", low: 0, high: 150, unit: "mg/dL", highLabel: "მომატებული" },
+  { key: "lab_ldl_calc_mean", label: "LDL ქოლესტერინი", low: 0, high: 100, unit: "mg/dL" },
+  { key: "lab_triglycerides_mean", label: "ტრიგლიცერიდები", low: 0, high: 150, unit: "mg/dL" },
   { key: "lab_platelets_mean", label: "თრომბოციტები", low: 150, high: 450, unit: "K/uL" },
 ];
 
@@ -435,7 +435,7 @@ function labStatus(reference) {
   const value = Number(features[reference.key]);
   if (Number.isNaN(value)) return { label: "არ არის შეყვანილი", className: "missing" };
   if (value < reference.low) return { label: reference.lowLabel || "დაბალი", className: "low" };
-  if (value > reference.high) return { label: reference.highLabel || "მაღალი", className: "high" };
+  if (value > reference.high) return { label: "მაღალი", className: "high" };
   return { label: "ნორმაში", className: "normal" };
 }
 
