@@ -47,6 +47,9 @@ Git history ამჟამად შეიცავს:
 - project folder reference update
 - GitHub README merge
 - final submission documentation branch
+- runtime/tests/Docker improvements
+- clinical result UI/report improvement
+- documentation/user manual update
 
 შენიშვნა: არ უნდა შეიქმნას ყალბი ძველი commit history. დარჩენილი გაუმჯობესებები უნდა გაკეთდეს რეალური branch/commit-ებით.
 
@@ -64,16 +67,16 @@ git push -u origin docs/final-report
 
 ## 3. ტექნიკური დოკუმენტაცია / Report
 
-სტატუსი: ნაწილობრივ მზად, უნდა დასრულდეს ერთიან ფაილად.
+სტატუსი: ძირითადი ტექსტი მზად არის. საბოლოო Word/PDF ვერსიაში დასამატებელია სქრინშოტები.
 
 აუცილებელი მოთხოვნები და არსებული ფაილები:
 
 | მოთხოვნა | არსებული ფაილი | სტატუსი |
 |---|---|---|
-| სისტემის არქიტექტურა და დიზაინი | `docs/architecture.md`, `docs/technical_report_ge.md` | დასასრულებელია |
-| API დოკუმენტაცია | `docs/technical_report_ge.md`, Swagger `/docs` | დასასრულებელია |
-| ინსტალაცია და კონფიგურაცია | `README.md`, `docs/technical_report_ge.md` | დასასრულებელია |
-| მომხმარებლის სახელმძღვანელო | `docs/technical_report_ge.md` | დასასრულებელია |
+| სისტემის არქიტექტურა და დიზაინი | `docs/architecture.md`, `docs/technical_report_ge.md` | მზად |
+| API დოკუმენტაცია | `docs/technical_report_ge.md`, Swagger `/docs` | მზად |
+| ინსტალაცია და კონფიგურაცია | `README.md`, `docs/technical_report_ge.md` | მზად |
+| მომხმარებლის სახელმძღვანელო | `docs/user_manual_ge.md`, `docs/technical_report_ge.md` | მზად |
 | README | `README.md` | განახლებულია |
 | GitHub link ერთ სივრცეში | `docs/technical_report_ge.md` | დაემატა |
 
@@ -104,6 +107,12 @@ git push -u origin docs/final-report
 9. შეზღუდვები და ეთიკური მხარე
 10. მომავალი გაუმჯობესებები
 
+დემო სცენარი მომზადებულია:
+
+```text
+docs/demo_script.md
+```
+
 ## 5. PDF/სილაბუსთან შესაბამისობის რისკები
 
 PDF-ში ნახსენებია რამდენიმე კომპონენტი, რომელიც საბოლოო პროექტში ან შეცვლილია, ან გადავიდა future work-ში:
@@ -116,3 +125,10 @@ PDF-ში ნახსენებია რამდენიმე კომ�
 - ECG digital features: საბოლოო time-aware მოდელში ძირითადი input არ არის; ECG გამოიყენება კლინიკური შემოწმების რეკომენდაციებში/მომავალი განვითარების ნაწილში.
 
 ეს პუნქტები უნდა აიხსნას ტექნიკურ დოკუმენტაციაში როგორც პროექტის გეგმისგან განსხვავებული საბოლოო არქიტექტურული გადაწყვეტილებები ან მომავალი განვითარების ნაწილი.
+
+## 6. დარჩენილი რეალური სამუშაო
+
+- საბოლოო report-ის Word/PDF ფორმატში გადატანა.
+- სქრინშოტების ჩასმა report-ში.
+- პრეზენტაციის slide deck-ის შექმნა.
+- დაცვის წინ live demo-ს ერთხელ თავიდან ბოლომდე გაშვება.

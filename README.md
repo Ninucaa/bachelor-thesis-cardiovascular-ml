@@ -57,6 +57,7 @@ bachelor-cardio-ai-project/
     ├── demo_script.md
     ├── target_definition.md
     ├── technical_report_ge.md
+    ├── user_manual_ge.md
     └── final_submission_checklist_ge.md
 ├── frontend/
 │   ├── package.json
@@ -147,7 +148,18 @@ npm install
 http://127.0.0.1:5173/
 ```
 
+თუ `5173` დაკავებულია, Vite ავტომატურად გახსნის შემდეგ თავისუფალ პორტს, მაგალითად `5174`.
+
 frontend აგებულია Vite + vanilla JavaScript + CSS-ით და იყენებს `GET /sample-patient` endpoint-ს, რათა ჩატვირთოს ერთი რეალური test-split პაციენტი. მომხმარებელი ცვლის გასაგებ კლინიკურ ველებს, ხოლო backend-ში იგზავნება სრული `140` feature payload.
+
+## დოკუმენტაცია
+
+საბოლოო ჩაბარებისთვის საჭირო ძირითადი დოკუმენტები:
+
+- `docs/technical_report_ge.md` - ტექნიკური დოკუმენტაცია, არქიტექტურა, API, მოდელი და შეზღუდვები.
+- `docs/user_manual_ge.md` - მომხმარებლის სახელმძღვანელო და use case-ები.
+- `docs/demo_script.md` - დაცვის დროს demo-ს თანმიმდევრობა.
+- `docs/final_submission_checklist_ge.md` - საბოლოო ჩაბარების checklist.
 
 ## ტესტირება
 

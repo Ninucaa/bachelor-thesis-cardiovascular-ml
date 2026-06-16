@@ -245,6 +245,12 @@ docker compose up --build
 
 ## 10. მომხმარებლის სახელმძღვანელო
 
+სრული მომხმარებლის სახელმძღვანელო ცალკე ფაილად ინახება:
+
+```text
+docs/user_manual_ge.md
+```
+
 ძირითადი გამოყენების flow:
 
 1. მომხმარებელი ხსნის frontend-ს.
@@ -293,13 +299,28 @@ Use case 2 - ახალი პაციენტის მონაცემ�
 
 საბოლოო პროექტის რეალური frontend აგებულია Vite + vanilla JavaScript + CSS-ით. ეს არ ამცირებს ფუნქციურობას, რადგან აპლიკაცია მუშაობს როგორც full interactive web interface, მაგრამ ტექნიკურ დოკუმენტაციაში არ უნდა ჩაიწეროს React/Tailwind როგორც შესრულებული კომპონენტი.
 
-## 14. მომავალი განვითარება
+## 14. ჩასაბარებელი მასალები
+
+საბოლოო ჩაბარებისთვის პროექტში მომზადებულია შემდეგი კომპონენტები:
+
+- სამუშაო prototype: FastAPI backend და Vite JavaScript frontend.
+- Source code GitHub-ზე: `https://github.com/Ninucaa/bachelor-thesis-cardiovascular-ml`
+- ტექნიკური დოკუმენტაცია: `docs/technical_report_ge.md`
+- მომხმარებლის სახელმძღვანელო: `docs/user_manual_ge.md`
+- demo სცენარი: `docs/demo_script.md`
+- README ფაილი repository-ის root საქაღალდეში.
+- backend smoke tests: `tests/test_api_smoke.py`
+- Docker configuration backend-ისთვის: `Dockerfile`, `docker-compose.yml`
+
+საბოლოო Word/PDF report-ში რეკომენდებულია დამატდეს ეკრანის სქრინშოტები შემდეგი ნაწილებისთვის: მთავარი frontend, პროგნოზის შედეგი, დაავადების ჯგუფების შედარება, ლაბორატორიული ნორმების ფანჯარა, მოდელის ტექნიკური შეფასება და Swagger `/docs`.
+
+## 15. მომავალი განვითარება
 
 შემდეგი გაუმჯობესებები:
 
-- automated tests backend endpoint-ებისთვის.
-- screenshot-ებით user manual-ის დასრულება.
 - ECG processed results-ის optional input-ის გაფართოება.
 - external validation სხვა dataset-ზე.
 - model cards და data cards.
 - deployment guide.
+- პაციენტის ისტორიის შენახვა database-ში.
+- calibration analysis და threshold-ების დამატებითი კლინიკური გადამოწმება.
