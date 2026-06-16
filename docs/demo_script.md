@@ -10,7 +10,7 @@
 
 ```bash
 cd /Users/ninucaaa/Desktop/new_project/bachelor-cardio-ai-project
-.venv/bin/uvicorn src.api.app:app --host 127.0.0.1 --port 8765
+scripts/run_backend.sh
 ```
 
 შესამოწმებელი მისამართი:
@@ -22,8 +22,8 @@ http://127.0.0.1:8765/docs
 ### 2. Frontend
 
 ```bash
-cd /Users/ninucaaa/Desktop/new_project/bachelor-cardio-ai-project/frontend
-npm run dev
+cd /Users/ninucaaa/Desktop/new_project/bachelor-cardio-ai-project
+scripts/run_frontend.sh
 ```
 
 გასახსნელი მისამართი:

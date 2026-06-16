@@ -19,6 +19,9 @@ https://github.com/Ninucaa/bachelor-thesis-cardiovascular-ml
 - Georgian frontend: `frontend/src/main.js`, `frontend/src/styles.css`
 - გაწვრთნილი მოდელები: `models/time_aware/`
 - ტექნიკური მოდელის შეფასების reports: `reports/`
+- Backend API smoke tests: `tests/test_api_smoke.py`
+- Local run scripts: `scripts/`
+- Backend Docker configuration: `Dockerfile`, `docker-compose.yml`
 
 Live demo-სთვის გასაშვები მისამართები:
 
@@ -71,7 +74,7 @@ git push -u origin docs/final-report
 | API დოკუმენტაცია | `docs/technical_report_ge.md`, Swagger `/docs` | დასასრულებელია |
 | ინსტალაცია და კონფიგურაცია | `README.md`, `docs/technical_report_ge.md` | დასასრულებელია |
 | მომხმარებლის სახელმძღვანელო | `docs/technical_report_ge.md` | დასასრულებელია |
-| README | `README.md` | განახლება საჭიროა |
+| README | `README.md` | განახლებულია |
 | GitHub link ერთ სივრცეში | `docs/technical_report_ge.md` | დაემატა |
 
 სქრინშოტები ჯერ დასამატებელია საბოლოო report-ში:
@@ -106,7 +109,7 @@ git push -u origin docs/final-report
 PDF-ში ნახსენებია რამდენიმე კომპონენტი, რომელიც საბოლოო პროექტში ან შეცვლილია, ან გადავიდა future work-ში:
 
 - React/Tailwind: რეალურად გამოყენებულია Vite + vanilla JavaScript + CSS.
-- Docker: ამჟამად არ არის დამატებული.
+- Docker: backend configuration დამატებულია, local build საჭიროებს გაშვებულ Docker daemon-ს.
 - PostgreSQL: ამ ეტაპზე არ გამოიყენება.
 - SMOTE: საბოლოო pipeline-ში არ გამოიყენება.
 - UCI external validation: არ არის შესრულებული.

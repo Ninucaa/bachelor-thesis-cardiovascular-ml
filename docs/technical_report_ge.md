@@ -47,6 +47,10 @@ flowchart LR
 - `src/api/model_service.py` - მოდელის ჩატვირთვა, feature validation, prediction და ინტერპრეტაცია.
 - `frontend/src/main.js` - ქართულენოვანი UI და API-სთან კომუნიკაცია.
 - `frontend/src/styles.css` - frontend-ის ვიზუალური სტილი.
+- `scripts/run_backend.sh` - backend-ის სტაბილური local run script.
+- `scripts/run_frontend.sh` - frontend-ის local run script.
+- `scripts/test_backend.sh` - backend API smoke tests.
+- `Dockerfile`, `docker-compose.yml` - backend-ის containerized გაშვების კონფიგურაცია.
 
 ## 3. მონაცემები
 
@@ -198,7 +202,7 @@ Backend-ის გაშვება:
 
 ```bash
 cd /Users/ninucaaa/Desktop/new_project/bachelor-cardio-ai-project
-.venv/bin/uvicorn src.api.app:app --host 127.0.0.1 --port 8765
+scripts/run_backend.sh
 ```
 
 Frontend dependency-ები და გაშვება:
@@ -206,7 +210,7 @@ Frontend dependency-ები და გაშვება:
 ```bash
 cd /Users/ninucaaa/Desktop/new_project/bachelor-cardio-ai-project/frontend
 npm install
-npm run dev
+../scripts/run_frontend.sh
 ```
 
 მისამართები:
@@ -215,6 +219,29 @@ npm run dev
 Frontend: http://127.0.0.1:5173
 Backend docs: http://127.0.0.1:8765/docs
 ```
+
+სერვისების შემოწმება:
+
+```bash
+cd /Users/ninucaaa/Desktop/new_project/bachelor-cardio-ai-project
+scripts/check_services.sh
+```
+
+Backend API smoke tests:
+
+```bash
+cd /Users/ninucaaa/Desktop/new_project/bachelor-cardio-ai-project
+scripts/test_backend.sh
+```
+
+Docker-ით backend-ის გაშვება:
+
+```bash
+cd /Users/ninucaaa/Desktop/new_project/bachelor-cardio-ai-project
+docker compose up --build
+```
+
+შენიშვნა: Docker Desktop/daemon უნდა იყოს გაშვებული. Docker image იყენებს GitHub-ზე შენახულ saved model ფაილებს და raw MIMIC-IV CSV ფაილებს არ აკოპირებს.
 
 ## 10. მომხმარებლის სახელმძღვანელო
 
@@ -256,13 +283,13 @@ Use case 2 - ახალი პაციენტის მონაცემ�
 - ECG raw signal/image recognition არ არის დამატებული.
 - Radiology/chest X-ray არ არის გამოყენებული.
 - PostgreSQL და hospital system integration არ არის მიმდინარე ვერსიაში.
-- Docker containerization ჯერ არ არის დამატებული.
+- Docker containerization დამატებულია backend API-სთვის, მაგრამ local Docker build საჭიროებს გაშვებულ Docker daemon-ს.
 - UCI Heart Disease Dataset-ზე external validation არ არის შესრულებული.
 - SMOTE საბოლოო time-aware pipeline-ში არ არის გამოყენებული; class imbalance ნაწილობრივ მოდელის პარამეტრებით და threshold selection-ით მუშავდება.
 
 ## 13. PDF გეგმასთან განსხვავებები
 
-შუალედურ PDF-ში პროექტის საწყის გეგმაში ნახსენები იყო React, Tailwind CSS, Docker, PostgreSQL, SMOTE და UCI external validation. საბოლოო MVP-ში პრიორიტეტი მიენიჭა მუშა clinical decision-support prototype-ს, time-aware preprocessing-ს, subtype დიაგნოზის ჯგუფებს, FastAPI backend-ს და ქართულ frontend demo-ს.
+შუალედურ PDF-ში პროექტის საწყის გეგმაში ნახსენები იყო React, Tailwind CSS, Docker, PostgreSQL, SMOTE და UCI external validation. საბოლოო MVP-ში პრიორიტეტი მიენიჭა მუშა clinical decision-support prototype-ს, time-aware preprocessing-ს, subtype დიაგნოზის ჯგუფებს, FastAPI backend-ს, ქართულ frontend demo-ს, backend smoke tests-ს და Docker configuration-ს.
 
 საბოლოო პროექტის რეალური frontend აგებულია Vite + vanilla JavaScript + CSS-ით. ეს არ ამცირებს ფუნქციურობას, რადგან აპლიკაცია მუშაობს როგორც full interactive web interface, მაგრამ ტექნიკურ დოკუმენტაციაში არ უნდა ჩაიწეროს React/Tailwind როგორც შესრულებული კომპონენტი.
 
@@ -270,7 +297,6 @@ Use case 2 - ახალი პაციენტის მონაცემ�
 
 შემდეგი გაუმჯობესებები:
 
-- Dockerfile და docker-compose დამატება.
 - automated tests backend endpoint-ებისთვის.
 - screenshot-ებით user manual-ის დასრულება.
 - ECG processed results-ის optional input-ის გაფართოება.
