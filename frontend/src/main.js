@@ -1180,7 +1180,14 @@ function render() {
     <main class="app-shell">
       <section class="topbar">
         <div class="topbar-title">
-          <div class="clinical-mark" aria-hidden="true"><span></span></div>
+          <div class="clinical-mark" aria-hidden="true">
+            <svg viewBox="0 0 64 64" role="img">
+              <path class="heart-shadow" d="M32 53s-19.5-11.4-24-26.1C5.3 18.1 10.2 11 18.5 11c5 0 8.8 2.8 11.1 6.2C31.9 13.8 35.7 11 40.7 11c8.3 0 13.2 7.1 10.5 15.9C46.7 41.6 32 53 32 53Z" />
+              <path class="heart-shape" d="M32 50.5s-18.2-10.7-22.4-24.4C7.1 18 11.7 11.5 19.4 11.5c4.7 0 8.2 2.6 10.3 5.8C31.8 14.1 35.3 11.5 40 11.5c7.7 0 12.3 6.5 9.8 14.6C45.6 39.8 32 50.5 32 50.5Z" />
+              <path class="heart-highlight" d="M19.8 16.6c-4.3 0-6.8 3.7-5.4 8.1" />
+              <path class="heart-pulse" d="M12.5 33h10.1l3.8-7.6 5.5 15.6 5.2-19 4.3 11h10.1" />
+            </svg>
+          </div>
           <div>
             <p class="eyebrow">კლინიკური გადაწყვეტილების დამხმარე პროტოტიპი</p>
             <h1>გულ-სისხლძარღვთა სავარაუდო დიაგნოზის პროგნოზირება</h1>

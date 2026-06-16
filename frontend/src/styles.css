@@ -86,46 +86,67 @@ textarea {
 
 .clinical-mark {
   align-items: center;
-  background: #ffffff;
-  border: 1px solid #b7d2dc;
+  background:
+    radial-gradient(circle at 28% 24%, #ffffff 0 22%, transparent 23%),
+    linear-gradient(145deg, #ffffff 0, #eef9fb 100%);
+  border: 1px solid #aed0da;
   border-radius: 8px;
-  box-shadow: 0 8px 18px rgba(20, 58, 76, 0.12);
+  box-shadow: 0 10px 22px rgba(20, 58, 76, 0.16), 0 1px 0 rgba(255, 255, 255, 0.95) inset;
   display: flex;
   flex: 0 0 auto;
   height: 52px;
   justify-content: center;
+  overflow: hidden;
   position: relative;
   width: 52px;
 }
 
-.clinical-mark::before,
 .clinical-mark::after {
-  background: var(--accent);
-  border-radius: 999px;
+  background:
+    linear-gradient(90deg, rgba(10, 120, 144, 0.07) 0 1px, transparent 1px 100%),
+    linear-gradient(180deg, rgba(10, 120, 144, 0.06) 0 1px, transparent 1px 100%);
+  background-size: 9px 9px;
   content: "";
+  inset: 0;
+  opacity: 0.5;
+  pointer-events: none;
   position: absolute;
 }
 
-.clinical-mark::before {
-  height: 26px;
-  width: 6px;
+.clinical-mark svg {
+  display: block;
+  height: 42px;
+  position: relative;
+  width: 42px;
+  z-index: 1;
 }
 
-.clinical-mark::after {
-  height: 6px;
-  width: 26px;
+.heart-shadow {
+  fill: rgba(10, 79, 97, 0.12);
+  transform: translateY(1.5px);
 }
 
-.clinical-mark span {
-  background: #ffffff;
-  border-left: 2px solid var(--danger);
-  border-top: 2px solid var(--danger);
-  height: 9px;
-  position: absolute;
-  right: 8px;
-  top: 12px;
-  transform: skewX(-22deg);
-  width: 18px;
+.heart-shape {
+  fill: #d84f43;
+  stroke: #9f332a;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.heart-highlight {
+  fill: none;
+  opacity: 0.72;
+  stroke: #ffd5d0;
+  stroke-linecap: round;
+  stroke-width: 3;
+}
+
+.heart-pulse {
+  fill: none;
+  stroke: #ffffff;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 3.8;
 }
 
 .eyebrow {
