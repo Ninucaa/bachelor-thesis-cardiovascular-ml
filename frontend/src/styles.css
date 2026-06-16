@@ -241,6 +241,15 @@ h3 {
   color: #143044;
 }
 
+.panel-actions {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
 .sample-meta {
   display: flex;
   flex-wrap: wrap;
@@ -1604,10 +1613,15 @@ h3 {
     flex-direction: column;
   }
 
+  .panel-header,
   .section-heading,
   .reference-header {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .panel-actions {
+    justify-content: stretch;
   }
 
   .section-action {

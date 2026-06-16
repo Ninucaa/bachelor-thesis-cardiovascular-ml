@@ -342,6 +342,7 @@ let ecgFinding = "not_available";
 let ecgNote = "";
 let isLabReferenceOpen = false;
 let isModelTrustOpen = false;
+let clearedFieldKeys = new Set();
 
 function escapeHtml(value) {
   return String(value)
@@ -385,17 +386,6 @@ function clampPercent(value) {
   return Math.max(0, Math.min(100, Math.round(value * 1000) / 10));
 }
 
-function changedFieldCount() {
-  if (!sample || !features) return 0;
-  return editableFields.filter((field) => {
-    const missingKey = `${field.key}_missing`;
-    return (
-      Number(features[field.key]) !== Number(sample.features[field.key]) ||
-      Number(features[missingKey] ?? 0) !== Number(sample.features[missingKey] ?? 0)
-    );
-  }).length;
-}
-
 function displayFeatureName(feature) {
   if (featureLabels[feature]) return featureLabels[feature];
   if (feature.endsWith("_missing")) {
@@ -409,8 +399,13 @@ function isOptionalMissing(field) {
   return Boolean(field.optional && Number(features?.[`${field.key}_missing`]) === 1);
 }
 
+function hasBlockingClearedFields() {
+  return editableFields.some((field) => !field.optional && field.type !== "computed" && clearedFieldKeys.has(field.key));
+}
+
 function inputValue(field) {
   if (!features) return "";
+  if (clearedFieldKeys.has(field.key)) return "";
   if (isOptionalMissing(field)) return "";
   let value = Number(features[field.key]);
   if (Number.isNaN(value)) return "";
@@ -594,6 +589,7 @@ function recomputeBmi(nextFeatures) {
   }
 
   nextFeatures.omr_bmi_mean = (weightLbs / (heightInches * heightInches)) * 703;
+  clearedFieldKeys.delete("omr_bmi_mean");
   syncMeasurementMetadata(nextFeatures, "omr_bmi_mean", false);
 }
 
@@ -623,11 +619,16 @@ function updateFeatureFromInput(key, rawValue) {
   const nextFeatures = { ...features };
   const normalizedValue = String(rawValue).replace(",", ".").trim();
 
+  clearedFieldKeys.delete(key);
   if (field?.optional && normalizedValue === "") {
+    clearedFieldKeys.add(key);
     nextFeatures[key] = optionalDefaults[key];
     syncMeasurementMetadata(nextFeatures, key, true);
   } else {
-    if (normalizedValue === "") return;
+    if (normalizedValue === "") {
+      clearedFieldKeys.add(key);
+      return;
+    }
     let value = Number(normalizedValue);
     if (!Number.isFinite(value)) return;
     if (field?.displayUnit === "kg") value *= 2.20462;
@@ -639,9 +640,19 @@ function updateFeatureFromInput(key, rawValue) {
   features = recomputeDerivedFeatures(nextFeatures);
 }
 
-function updateChangedCountDisplay() {
-  const changedCount = document.getElementById("changed-count");
-  if (changedCount) changedCount.textContent = `შეცვლილია ${changedFieldCount()} ველი`;
+function clearPatientData() {
+  const baseFeatures = sample ? { ...sample.features } : { ...features };
+  editableFields.forEach((field) => {
+    clearedFieldKeys.add(field.key);
+    if (field.type === "boolean") baseFeatures[field.key] = 0;
+    if (field.optional) syncMeasurementMetadata(baseFeatures, field.key, true);
+  });
+  symptomText = "";
+  ecgFinding = "not_available";
+  ecgNote = "";
+  features = recomputeDerivedFeatures(baseFeatures);
+  result = null;
+  statusText = "ყველა მონაცემი გასუფთავდა.";
 }
 
 function fieldDisabled(field) {
@@ -667,13 +678,14 @@ function renderInputField(field) {
           : 
         field.type === "select" || field.type === "boolean"
           ? `<select data-feature="${field.key}" ${fieldDisabled(field) ? "disabled" : ""}>
+              <option value="" ${clearedFieldKeys.has(field.key) ? "selected" : ""}>აირჩიეთ</option>
               ${(field.options || [
                 { value: 0, label: "არა" },
                 { value: 1, label: "დიახ" },
               ])
                 .map(
                   (option) => `
-                    <option value="${option.value}" ${Number(features?.[field.key]) === option.value ? "selected" : ""}>
+                    <option value="${option.value}" ${!clearedFieldKeys.has(field.key) && Number(features?.[field.key]) === option.value ? "selected" : ""}>
                       ${option.label}
                     </option>
                   `,
@@ -684,7 +696,7 @@ function renderInputField(field) {
               data-feature="${field.key}"
               type="text"
               inputmode="decimal"
-              placeholder="${field.optional ? "არასავალდებულო" : ""}"
+              placeholder="${field.optional ? "არასავალდებულო" : "შეიყვანეთ"}"
               value="${inputValue(field)}"
               ${fieldDisabled(field) ? "disabled" : ""}
             />`
@@ -1203,7 +1215,10 @@ function render() {
               <h2>პაციენტის მონაცემები</h2>
               <p>არასავალდებულო ველები ცარიელი დატოვეთ; დიახ/არა ველები გამოიყენება დიაგნოსტიკურ ახსნაში.</p>
             </div>
-            <button class="secondary-button" id="reset-button" ${sample ? "" : "disabled"}>საწყისზე დაბრუნება</button>
+            <div class="panel-actions">
+              <button class="secondary-button" id="clear-data-button" ${features ? "" : "disabled"}>ყველა მონაცემის წაშლა</button>
+              <button class="secondary-button" id="load-sample-button">სატესტო პაციენტის ჩატვირთვა</button>
+            </div>
           </div>
 
           ${renderFormSections()}
@@ -1225,10 +1240,9 @@ function render() {
           </div>
 
           <div class="action-row">
-            <button class="primary-button" id="predict-button" ${!features || isPredicting ? "disabled" : ""}>
+            <button class="primary-button" id="predict-button" ${!features || isPredicting || hasBlockingClearedFields() ? "disabled" : ""}>
               ${isPredicting ? "მიმდინარეობს პროგნოზირება..." : "პროგნოზის გაშვება"}
             </button>
-            <span id="changed-count">შეცვლილია ${changedFieldCount()} ველი</span>
           </div>
         </div>
 
@@ -1256,7 +1270,6 @@ function render() {
     input.addEventListener("input", (event) => {
       updateFeatureFromInput(event.target.dataset.feature, event.target.value);
       result = null;
-      updateChangedCountDisplay();
     });
   });
 
@@ -1283,16 +1296,11 @@ function render() {
     if (status) status.textContent = ecgClinicalText();
   });
 
-  document.getElementById("reset-button")?.addEventListener("click", () => {
-    if (!sample) return;
-    symptomText = sample.symptom_text || "";
-    ecgFinding = sample.ecg_finding || "not_available";
-    ecgNote = sample.ecg_note || "";
-    features = recomputeDerivedFeatures({ ...sample.features });
-    result = null;
-    statusText = "სატესტო პაციენტის საწყისი მონაცემები აღდგა.";
+  document.getElementById("clear-data-button")?.addEventListener("click", () => {
+    clearPatientData();
     render();
   });
+  document.getElementById("load-sample-button")?.addEventListener("click", loadSample);
 
   document.getElementById("predict-button")?.addEventListener("click", runPrediction);
   document.getElementById("copy-report-button")?.addEventListener("click", copyPatientReport);
@@ -1331,6 +1339,7 @@ async function loadSample() {
     symptomText = sample.symptom_text || "";
     ecgFinding = sample.ecg_finding || "not_available";
     ecgNote = sample.ecg_note || "";
+    clearedFieldKeys = new Set();
     features = recomputeDerivedFeatures({ ...sample.features });
     statusText = "სატესტო პაციენტი ჩაიტვირთა.";
   } catch (error) {
