@@ -153,6 +153,10 @@ const samplePatientOptions = [
   { value: "demo-2", label: "სატესტო პაციენტი 2" },
   { value: "demo-3", label: "სატესტო პაციენტი 3" },
   { value: "demo-4", label: "სატესტო პაციენტი 4" },
+  { value: "demo-5", label: "სატესტო პაციენტი 5" },
+  { value: "demo-6", label: "სატესტო პაციენტი 6" },
+  { value: "demo-7", label: "სატესტო პაციენტი 7" },
+  { value: "demo-8", label: "სატესტო პაციენტი 8" },
 ];
 
 const featureLabels = {

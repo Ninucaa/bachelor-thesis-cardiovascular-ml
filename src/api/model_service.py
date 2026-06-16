@@ -330,11 +330,15 @@ def short_factor_label(factor: dict[str, Any]) -> str:
 def is_user_facing_positive_factor(factor: dict[str, Any]) -> bool:
     if factor["shap_value"] <= 0:
         return False
-    if factor["feature"].endswith("_missing") and factor["value"] < 0.5:
+    if factor["feature"].endswith("_missing"):
         return False
-    if factor["feature"].endswith("_count_missing") and factor["value"] < 0.5:
+    if factor["feature"].endswith("_count"):
         return False
     return True
+
+
+def user_facing_factors(factors: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [factor for factor in factors if not factor["feature"].endswith("_missing") and not factor["feature"].endswith("_count")]
 
 
 def join_phrases(phrases: list[str]) -> str:
@@ -663,6 +667,202 @@ class ModelService:
                 "ecg_finding": "normal",
                 "ecg_note": "Sinus rhythm; acute ischemic changes are not described.",
             },
+            "demo-5": {
+                "label": "სატესტო პაციენტი 5",
+                "source": "კომპლექსური დემო პაციენტი: ჰიპერტენზიული გულის დაავადების მსგავსი პროფილი",
+                "values": {
+                    "age": 64,
+                    "gender_male": 0,
+                    "history_diabetes": 1,
+                    "history_chronic_kidney_disease": 0,
+                    "history_obesity": 1,
+                    "history_tobacco_or_nicotine": 0,
+                    "omr_weight_lbs_mean": 205.0,
+                    "omr_height_inches_mean": 64.0,
+                    "omr_bmi_mean": 35.2,
+                    "omr_sbp_mean": 178,
+                    "omr_dbp_mean": 104,
+                    "ed_triage_temperature_f_mean": 98.6,
+                    "ed_triage_heart_rate_mean": 96,
+                    "ed_triage_resp_rate_mean": 21,
+                    "ed_triage_spo2_mean": 95,
+                    "ed_triage_sbp_mean": 186,
+                    "ed_triage_dbp_mean": 108,
+                    "ed_triage_acuity_mean": 3,
+                    "triage_pain_mean": 2,
+                    "ed_arrived_by_ambulance": 0,
+                    "lab_creatinine_mean": 1.18,
+                    "lab_hemoglobin_mean": 12.6,
+                    "lab_triglycerides_mean": 210,
+                    "lab_chol_ratio_mean": 5.8,
+                    "lab_hdl_mean": 38,
+                    "lab_ntprobnp_mean": 720,
+                    "lab_ldl_measured_mean": 145,
+                    "lab_platelets_mean": 275,
+                    "lab_troponin_t_mean": 0.02,
+                    "lab_glucose_mean": 162,
+                    "lab_chol_total_mean": 224,
+                    "lab_ldl_calc_mean": 148,
+                },
+                "symptoms": {
+                    "symptom_chest_pain": False,
+                    "symptom_shortness_of_breath": True,
+                    "symptom_palpitations": False,
+                    "symptom_syncope": False,
+                    "symptom_dizziness": True,
+                    "symptom_edema": True,
+                },
+                "symptom_text": "პაციენტს აქვს ხანგრძლივი მაღალი წნევა, ქოშინი კიბეზე ასვლისას, თავბრუსხვევა და მსუბუქი შეშუპება. მკვეთრ გულმკერდის ტკივილს უარყოფს.",
+                "ecg_finding": "other_abnormal",
+                "ecg_note": "Left ventricular strain pattern is suspected; acute ST elevation is not described.",
+            },
+            "demo-6": {
+                "label": "სატესტო პაციენტი 6",
+                "source": "კომპლექსური დემო პაციენტი: ჰიპერტენზიული კრიზის მსგავსი პროფილი",
+                "values": {
+                    "age": 58,
+                    "gender_male": 1,
+                    "history_diabetes": 0,
+                    "history_chronic_kidney_disease": 1,
+                    "history_obesity": 0,
+                    "history_tobacco_or_nicotine": 1,
+                    "omr_weight_lbs_mean": 186.0,
+                    "omr_height_inches_mean": 70.0,
+                    "omr_bmi_mean": 26.7,
+                    "omr_sbp_mean": 196,
+                    "omr_dbp_mean": 118,
+                    "ed_triage_temperature_f_mean": 98.7,
+                    "ed_triage_heart_rate_mean": 104,
+                    "ed_triage_resp_rate_mean": 23,
+                    "ed_triage_spo2_mean": 96,
+                    "ed_triage_sbp_mean": 214,
+                    "ed_triage_dbp_mean": 126,
+                    "ed_triage_acuity_mean": 2,
+                    "triage_pain_mean": 5,
+                    "ed_arrived_by_ambulance": 1,
+                    "lab_creatinine_mean": 1.75,
+                    "lab_hemoglobin_mean": 13.4,
+                    "lab_triglycerides_mean": 180,
+                    "lab_chol_ratio_mean": 5.2,
+                    "lab_hdl_mean": 40,
+                    "lab_ntprobnp_mean": 620,
+                    "lab_ldl_measured_mean": 136,
+                    "lab_platelets_mean": 290,
+                    "lab_troponin_t_mean": 0.05,
+                    "lab_glucose_mean": 128,
+                    "lab_chol_total_mean": 208,
+                    "lab_ldl_calc_mean": 136,
+                },
+                "symptoms": {
+                    "symptom_chest_pain": True,
+                    "symptom_shortness_of_breath": True,
+                    "symptom_palpitations": False,
+                    "symptom_syncope": False,
+                    "symptom_dizziness": True,
+                    "symptom_edema": False,
+                },
+                "symptom_text": "პაციენტი სასწრაფოთი მოყვანილია ძალიან მაღალი წნევით, ძლიერი თავის ტკივილით, თავბრუსხვევით, ქოშინით და გულმკერდის დისკომფორტით.",
+                "ecg_finding": "st_depression",
+                "ecg_note": "Nonspecific ST-T changes; severe hypertension at triage.",
+            },
+            "demo-7": {
+                "label": "სატესტო პაციენტი 7",
+                "source": "კომპლექსური დემო პაციენტი: ქრონიკული იშემიური დაავადების/სტენოკარდიის მსგავსი პროფილი",
+                "values": {
+                    "age": 70,
+                    "gender_male": 1,
+                    "history_diabetes": 1,
+                    "history_chronic_kidney_disease": 0,
+                    "history_obesity": 0,
+                    "history_tobacco_or_nicotine": 1,
+                    "omr_weight_lbs_mean": 174.0,
+                    "omr_height_inches_mean": 67.0,
+                    "omr_bmi_mean": 27.3,
+                    "omr_sbp_mean": 154,
+                    "omr_dbp_mean": 88,
+                    "ed_triage_temperature_f_mean": 98.2,
+                    "ed_triage_heart_rate_mean": 92,
+                    "ed_triage_resp_rate_mean": 20,
+                    "ed_triage_spo2_mean": 97,
+                    "ed_triage_sbp_mean": 158,
+                    "ed_triage_dbp_mean": 90,
+                    "ed_triage_acuity_mean": 3,
+                    "triage_pain_mean": 6,
+                    "ed_arrived_by_ambulance": 0,
+                    "lab_creatinine_mean": 1.1,
+                    "lab_hemoglobin_mean": 13.0,
+                    "lab_triglycerides_mean": 240,
+                    "lab_chol_ratio_mean": 6.0,
+                    "lab_hdl_mean": 36,
+                    "lab_ntprobnp_mean": 390,
+                    "lab_ldl_measured_mean": 170,
+                    "lab_platelets_mean": 260,
+                    "lab_troponin_t_mean": 0.02,
+                    "lab_glucose_mean": 155,
+                    "lab_chol_total_mean": 246,
+                    "lab_ldl_calc_mean": 168,
+                },
+                "symptoms": {
+                    "symptom_chest_pain": True,
+                    "symptom_shortness_of_breath": True,
+                    "symptom_palpitations": False,
+                    "symptom_syncope": False,
+                    "symptom_dizziness": False,
+                    "symptom_edema": False,
+                },
+                "symptom_text": "პაციენტს აქვს განმეორებითი გულმკერდის ტკივილი დატვირთვაზე, ქოშინი სიარულისას და მაღალი ქოლესტერინის ისტორია.",
+                "ecg_finding": "st_depression",
+                "ecg_note": "ST depression during symptoms; chronic ischemic pattern should be considered.",
+            },
+            "demo-8": {
+                "label": "სატესტო პაციენტი 8",
+                "source": "კომპლექსური დემო პაციენტი: ცერებროვასკულური/ინსულტის მსგავსი პროფილი",
+                "values": {
+                    "age": 81,
+                    "gender_male": 0,
+                    "history_diabetes": 1,
+                    "history_chronic_kidney_disease": 1,
+                    "history_obesity": 0,
+                    "history_tobacco_or_nicotine": 0,
+                    "omr_weight_lbs_mean": 158.0,
+                    "omr_height_inches_mean": 63.0,
+                    "omr_bmi_mean": 28.0,
+                    "omr_sbp_mean": 182,
+                    "omr_dbp_mean": 96,
+                    "ed_triage_temperature_f_mean": 98.5,
+                    "ed_triage_heart_rate_mean": 88,
+                    "ed_triage_resp_rate_mean": 20,
+                    "ed_triage_spo2_mean": 95,
+                    "ed_triage_sbp_mean": 190,
+                    "ed_triage_dbp_mean": 100,
+                    "ed_triage_acuity_mean": 2,
+                    "triage_pain_mean": 1,
+                    "ed_arrived_by_ambulance": 1,
+                    "lab_creatinine_mean": 1.55,
+                    "lab_hemoglobin_mean": 11.8,
+                    "lab_triglycerides_mean": 170,
+                    "lab_chol_ratio_mean": 5.4,
+                    "lab_hdl_mean": 39,
+                    "lab_ntprobnp_mean": 1100,
+                    "lab_ldl_measured_mean": 142,
+                    "lab_platelets_mean": 220,
+                    "lab_troponin_t_mean": 0.03,
+                    "lab_glucose_mean": 168,
+                    "lab_chol_total_mean": 214,
+                    "lab_ldl_calc_mean": 140,
+                },
+                "symptoms": {
+                    "symptom_chest_pain": False,
+                    "symptom_shortness_of_breath": False,
+                    "symptom_palpitations": True,
+                    "symptom_syncope": False,
+                    "symptom_dizziness": True,
+                    "symptom_edema": False,
+                },
+                "symptom_text": "პაციენტი სასწრაფოთი მოყვანილია უეცარი თავბრუსხვევით, სისუსტით და მეტყველების გაძნელებით. გულმკერდის ტკივილს უარყოფს.",
+                "ecg_finding": "atrial_fibrillation",
+                "ecg_note": "Atrial fibrillation pattern; cerebrovascular event risk should be considered clinically.",
+            },
         }
 
         profile = profiles.get(sample_id, profiles["demo-1"])
@@ -740,8 +940,9 @@ class ModelService:
     def subtype_explanation(
         self, display_name: str, probability: float, level: str, factors: list[dict[str, Any]]
     ) -> str:
-        increasing = [factor for factor in factors if factor["shap_value"] > 0]
-        decreasing = [factor for factor in factors if factor["shap_value"] < 0]
+        clinical_factors = user_facing_factors(factors)
+        increasing = [factor for factor in clinical_factors if factor["shap_value"] > 0]
+        decreasing = [factor for factor in clinical_factors if factor["shap_value"] < 0]
         increasing_text = join_phrases([factor_phrase(factor) for factor in increasing[:3]])
         decreasing_text = join_phrases([factor_phrase(factor) for factor in decreasing[:2]])
         probability_text = f"{round(probability * 100, 1)}%"
@@ -767,12 +968,13 @@ class ModelService:
             display_name = SUBTYPE_LABELS[target]
             threshold = float(self.diagnosis_thresholds.get(target, {}).get("threshold", 0.5))
             confidence = diagnosis_confidence(probability, threshold)
-            factors = self.explain_with(self.subtype_explainers[target], patient, 5)
+            factors = self.explain_with(self.subtype_explainers[target], patient, 12)
             reason_factors = [
                 short_factor_label(factor)
                 for factor in factors
                 if is_user_facing_positive_factor(factor)
             ][:3]
+            clinical_factors = user_facing_factors(factors)
             risks.append(
                 {
                     "target_name": target,
@@ -785,10 +987,10 @@ class ModelService:
                     "diagnosis_status": diagnosis_status(confidence),
                     "diagnosis_confidence": confidence,
                     "diagnosis_interpretation": diagnosis_interpretation(
-                        display_name, probability, threshold, confidence, factors
+                        display_name, probability, threshold, confidence, clinical_factors
                     ),
                     "suggested_clinical_checks": CLINICAL_CHECKS.get(target, []),
-                    "explanation": self.subtype_explanation(display_name, probability, level, factors),
+                    "explanation": self.subtype_explanation(display_name, probability, level, clinical_factors),
                     "reason_factors": reason_factors,
                 }
             )
