@@ -680,6 +680,50 @@ h3 {
   line-height: 1.45;
 }
 
+.clinical-driver-block {
+  background: #f8fbfc;
+  border: 1px solid #d8e5eb;
+  border-radius: 8px;
+  display: grid;
+  gap: 9px;
+  padding: 12px;
+}
+
+.clinical-driver-block > span {
+  color: #405668;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.driver-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.driver-list.compact {
+  gap: 6px;
+}
+
+.driver-chip {
+  background: #ffffff;
+  border: 1px solid #cfdae3;
+  border-radius: 999px;
+  color: #263645;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.25;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  padding: 6px 9px;
+}
+
+.driver-chip.muted {
+  color: #687a8a;
+  font-weight: 700;
+}
+
 .risk-card {
   display: grid;
   gap: 6px;
@@ -868,6 +912,11 @@ h3 {
   opacity: 0.9;
 }
 
+.top-disease .driver-chip {
+  border-color: rgba(38, 54, 69, 0.18);
+  color: inherit;
+}
+
 .top-disease.high {
   background: #fff0ee;
   border-color: #efb8ae;
@@ -917,6 +966,7 @@ h3 {
   color: #687a8a;
   font-size: 12px;
   line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 
 .subtype-card b {

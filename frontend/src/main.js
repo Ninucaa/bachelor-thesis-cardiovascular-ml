@@ -721,23 +721,53 @@ function renderFactors() {
 }
 
 function riskReasonText(risk, limit = 3) {
-  return risk.reason_factors?.length
-    ? risk.reason_factors.slice(0, limit).join(", ")
+  const reasons = clinicalReasonList(risk, limit);
+  return reasons.length
+    ? reasons.join(", ")
     : "მკვეთრი განმსაზღვრელი ფაქტორი არ გამოიკვეთა";
+}
+
+function clinicalReasonList(risk, limit = 4) {
+  if (!risk?.reason_factors?.length) return [];
+  const seen = new Set();
+  return risk.reason_factors
+    .map((item) => String(item || "").replace(/\s+/g, " ").replace(/^[-–•]\s*/, "").trim())
+    .filter(Boolean)
+    .filter((item) => {
+      const key = item.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .slice(0, limit);
+}
+
+function renderReasonChips(risk, limit = 4) {
+  const reasons = clinicalReasonList(risk, limit);
+  if (!reasons.length) return `<span class="driver-chip muted">მკვეთრი განმსაზღვრელი ფაქტორი არ გამოიკვეთა</span>`;
+  return reasons.map((item) => `<span class="driver-chip">${escapeHtml(item)}</span>`).join("");
+}
+
+function getPrimaryDiagnosticRisk() {
+  if (!result?.subtype_risks?.length) return null;
+  const diagnosticCandidates = result.subtype_risks.filter((risk) =>
+    ["high", "diagnostic_signal"].includes(risk.diagnosis_confidence),
+  );
+  return diagnosticCandidates[0] || result.subtype_risks[0];
 }
 
 function renderProbabilityMeter(risk) {
   const probability = clampPercent(risk.diagnosis_probability ?? risk.risk_probability);
   const threshold = clampPercent(risk.diagnosis_threshold ?? 0.5);
   return `
-    <div class="probability-meter" aria-label="probability ${probability}% threshold ${threshold}%">
+    <div class="probability-meter" aria-label="ალბათობა ${probability}% ზღვარი ${threshold}%">
       <div class="meter-track">
         <span class="meter-fill ${confidenceClass(risk.diagnosis_confidence)}" style="width: ${probability}%"></span>
         <span class="meter-threshold" style="left: ${threshold}%"></span>
       </div>
       <div class="meter-labels">
         <span>${probability}%</span>
-        <span>threshold ${threshold}%</span>
+        <span>ზღვარი ${threshold}%</span>
       </div>
     </div>
   `;
@@ -745,28 +775,29 @@ function renderProbabilityMeter(risk) {
 
 function renderDecisionSummary() {
   if (!result?.subtype_risks?.length) return "";
-  const diagnosticCandidates = result.subtype_risks.filter((risk) =>
-    ["high", "diagnostic_signal"].includes(risk.diagnosis_confidence),
-  );
-  const topRisk = diagnosticCandidates[0] || result.subtype_risks[0];
+  const topRisk = getPrimaryDiagnosticRisk();
   const secondRisk = result.subtype_risks.find((risk) => risk.target_name !== topRisk.target_name);
 
   return `
     <div class="decision-summary">
       <div class="decision-topline">
-        <span>სავარაუდო დიაგნოსტიკური მიმართულება</span>
+        <span>ყველაზე ძლიერი კლინიკური სიგნალი</span>
         <em class="status-pill ${confidenceClass(topRisk.diagnosis_confidence)}">${diagnosisConfidenceLabel(topRisk.diagnosis_confidence)}</em>
       </div>
-      <strong>${topRisk.diagnosis_label || topRisk.display_name}</strong>
+      <strong>${escapeHtml(topRisk.diagnosis_label || topRisk.display_name)}</strong>
       <div class="decision-score">
         <b>${formatPercent(topRisk.diagnosis_probability ?? topRisk.risk_probability)}</b>
-        <em>threshold ${formatPercent(topRisk.diagnosis_threshold ?? 0.5)}</em>
+        <em>დიაგნოსტიკური ზღვარი ${formatPercent(topRisk.diagnosis_threshold ?? 0.5)}</em>
       </div>
       ${renderProbabilityMeter(topRisk)}
-      <p>${topRisk.diagnosis_interpretation || `სიგნალს ძირითადად განსაზღვრავს: ${riskReasonText(topRisk)}.`}</p>
+      <div class="clinical-driver-block">
+        <span>რა განსაზღვრავს ამ სიგნალს</span>
+        <div class="driver-list">${renderReasonChips(topRisk)}</div>
+      </div>
+      <p>${escapeHtml(topRisk.diagnosis_interpretation || "სისტემა ამ პაციენტის მონაცემებში ხედავს მსგავსებას შესაბამის ICD-კოდირებულ შემთხვევებთან.")}</p>
       ${
         secondRisk
-          ? `<small>შემდეგი შედარებით მაღალი მიმართულება: ${secondRisk.display_name} (${formatPercent(secondRisk.risk_probability)}).</small>`
+          ? `<small>შემდეგი შესადარებელი მიმართულება: ${escapeHtml(secondRisk.display_name)} (${formatPercent(secondRisk.risk_probability)}).</small>`
           : ""
       }
     </div>
@@ -775,21 +806,21 @@ function renderDecisionSummary() {
 
 function renderSubtypeRisks() {
   if (!result?.subtype_risks?.length) return "";
-  const topRisk = result.subtype_risks[0];
-  const otherRisks = result.subtype_risks.slice(1);
+  const topRisk = getPrimaryDiagnosticRisk();
+  const otherRisks = result.subtype_risks.filter((risk) => risk.target_name !== topRisk.target_name);
 
   return `
     <div class="subtype-section">
-      <h3>სავარაუდო დიაგნოზები ICD ჯგუფების მიხედვით</h3>
+      <h3>რისკები დაავადების ჯგუფების მიხედვით</h3>
       <div class="top-disease ${topRisk.risk_level}">
         <div class="disease-heading">
-          <span>ყველაზე მაღალი დიაგნოსტიკური სიგნალი</span>
+          <span>მთავარი სავარაუდო მიმართულება</span>
           <em class="status-pill ${confidenceClass(topRisk.diagnosis_confidence)}">${topRisk.diagnosis_status || diseaseRiskLabel(topRisk.risk_level)}</em>
         </div>
-        <strong>${topRisk.display_name}</strong>
+        <strong>${escapeHtml(topRisk.display_name)}</strong>
         <b>${formatPercent(topRisk.diagnosis_probability ?? topRisk.risk_probability)}</b>
         ${renderProbabilityMeter(topRisk)}
-        <small>განსაზღვრავს: ${riskReasonText(topRisk)}</small>
+        <div class="driver-list compact">${renderReasonChips(topRisk, 3)}</div>
       </div>
       <div class="subtype-grid">
         ${otherRisks
@@ -797,9 +828,9 @@ function renderSubtypeRisks() {
             (risk) => `
               <div class="subtype-card ${risk.risk_level}">
                 <div class="subtype-main">
-                  <strong>${risk.display_name}</strong>
+                  <strong>${escapeHtml(risk.display_name)}</strong>
                   <em>${risk.diagnosis_status || diseaseRiskLabel(risk.risk_level)}</em>
-                  <span>განსაზღვრავს: ${riskReasonText(risk)}</span>
+                  <span>${escapeHtml(riskReasonText(risk, 2))}</span>
                   ${renderProbabilityMeter(risk)}
                 </div>
                 <b class="${confidenceClass(risk.diagnosis_confidence)}">${diagnosisConfidenceLabel(risk.diagnosis_confidence)}</b>
@@ -820,7 +851,7 @@ function renderClinicalChecks(risk) {
     <div class="clinical-checks">
       <h4>ექიმმა დამატებით გადაამოწმოს</h4>
       <ul>
-        ${risk.suggested_clinical_checks.map((item) => `<li>${item}</li>`).join("")}
+        ${risk.suggested_clinical_checks.slice(0, 4).map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
       </ul>
     </div>
   `;
@@ -900,28 +931,37 @@ function patientProfileText() {
 
 function patientReportText() {
   if (!result?.subtype_risks?.length) return "";
-  const topRisk = result.subtype_risks[0];
+  const topRisk = getPrimaryDiagnosticRisk();
   const topThree = result.subtype_risks
     .slice(0, 3)
     .map((risk, index) => `${index + 1}. ${risk.display_name}: ${formatPercent(risk.diagnosis_probability ?? risk.risk_probability)} (${risk.diagnosis_status})`)
     .join("\n");
+  const reasons = clinicalReasonList(topRisk, 5).map((item) => `- ${item}`).join("\n") || "- მკვეთრი განმსაზღვრელი ფაქტორი არ გამოიკვეთა";
+  const checks =
+    (topRisk.suggested_clinical_checks || [])
+      .slice(0, 4)
+      .map((item) => `- ${item}`)
+      .join("\n") || "- ექიმის კლინიკური შეფასება და საჭიროების მიხედვით დამატებითი კვლევები";
 
   return [
     "პაციენტის სავარაუდო დიაგნოსტიკური ანგარიში",
     "",
     patientProfileText(),
     "",
-    `საერთო გულ-სისხლძარღვთა დიაგნოსტიკური სიგნალი: ${formatPercent(result.risk_probability)} (${riskLabel(result.risk_level)}).`,
-    `ყველაზე სავარაუდო ICD დიაგნოზის ჯგუფი: ${topRisk.display_name} - ${formatPercent(topRisk.diagnosis_probability ?? topRisk.risk_probability)}.`,
-    `დიაგნოსტიკური სტატუსი: ${topRisk.diagnosis_status}.`,
-    `ამ მიმართულებას განსაზღვრავს: ${riskReasonText(topRisk)}.`,
+    "სავარაუდო მთავარი მიმართულება:",
+    `${topRisk.display_name} - ${formatPercent(topRisk.diagnosis_probability ?? topRisk.risk_probability)} (${topRisk.diagnosis_status}).`,
     "",
-    "სამი ყველაზე მაღალი დიაგნოსტიკური მიმართულება:",
+    "რა განსაზღვრავს ამ რისკს:",
+    reasons,
+    "",
+    "სხვა შესადარებელი მიმართულებები:",
     topThree,
     "",
-    `ექიმმა დამატებით უნდა გადაამოწმოს: ${(topRisk.suggested_clinical_checks || []).join("; ")}.`,
+    "ექიმმა დამატებით უნდა გადაამოწმოს:",
+    checks,
     "",
-    "ინტერპრეტაცია: შედეგი აჩვენებს, რომ პაციენტის კლინიკური პროფილი გარკვეული ნიშნებით ჰგავს იმ პაციენტებს, რომლებთანაც MIMIC-IV მონაცემებში შესაბამისი ICD-კოდირებული გულ-სისხლძარღვთა დიაგნოზი დაფიქსირდა. პროგნოზი არის სავარაუდო დიაგნოსტიკური მხარდაჭერა და საჭიროებს ექიმის კლინიკურ შეფასებას.",
+    `საერთო გულ-სისხლძარღვთა სიგნალი: ${formatPercent(result.risk_probability)} (${riskLabel(result.risk_level)}).`,
+    "შენიშვნა: ეს არის კლინიკური გადაწყვეტილების დამხმარე პროგნოზი. იგი არ ცვლის ექიმის საბოლოო დიაგნოზს და საჭიროებს პაციენტის სრულ კლინიკურ შეფასებას.",
   ].join("\n");
 }
 
