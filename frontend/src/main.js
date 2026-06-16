@@ -119,6 +119,18 @@ const formSections = [
   },
 ];
 
+const ecgOptions = [
+  { value: "not_available", label: "არ არის ხელმისაწვდომი", severity: "neutral" },
+  { value: "normal", label: "ნორმალური ECG", severity: "low" },
+  { value: "st_elevation", label: "ST elevation / მწვავე ინფარქტის ეჭვი", severity: "high" },
+  { value: "st_depression", label: "ST depression / იშემიის ეჭვი", severity: "medium" },
+  { value: "arrhythmia", label: "არითმიის ნიშნები", severity: "medium" },
+  { value: "atrial_fibrillation", label: "წინაგულთა ფიბრილაციის ნიშნები", severity: "medium" },
+  { value: "wide_qrs", label: "QRS გაფართოება", severity: "medium" },
+  { value: "long_qt", label: "QT გახანგრძლივება", severity: "medium" },
+  { value: "other_abnormal", label: "სხვა პათოლოგიური ცვლილება", severity: "medium" },
+];
+
 const editableFieldByKey = Object.fromEntries(editableFields.map((field) => [field.key, field]));
 
 const labReferenceRanges = [
@@ -313,6 +325,8 @@ let result = null;
 let statusText = "იტვირთება სატესტო პაციენტი...";
 let isPredicting = false;
 let symptomText = "";
+let ecgFinding = "not_available";
+let ecgNote = "";
 let isLabReferenceOpen = false;
 let isModelTrustOpen = false;
 
@@ -500,6 +514,33 @@ function detectedSymptomLabels() {
   return Object.values(details)
     .filter((item) => item.status === "present")
     .map((item) => item.label);
+}
+
+function selectedEcgOption() {
+  return ecgOptions.find((option) => option.value === ecgFinding) || ecgOptions[0];
+}
+
+function ecgClinicalText() {
+  const selected = selectedEcgOption();
+  const note = ecgNote.trim();
+  if (selected.value === "not_available" && !note) return "ECG პასუხი არ არის მითითებული";
+  if (selected.value === "normal" && !note) return "ECG მითითებულია როგორც ნორმალური";
+  return [selected.label, note].filter(Boolean).join(" - ");
+}
+
+function ecgClinicalChecks() {
+  const selected = selectedEcgOption();
+  if (selected.value === "not_available" || selected.value === "normal") return [];
+  const checksByFinding = {
+    st_elevation: ["ECG ცვლილების გადამოწმება ექიმის მიერ და მწვავე კორონარული სინდრომის გამორიცხვა", "Troponin T-ის დინამიკა და საჭიროების შემთხვევაში გადაუდებელი კარდიოლოგიური შეფასება"],
+    st_depression: ["იშემიური ცვლილებების კლინიკურ სურათთან შედარება", "Troponin T, სიმპტომები და არტერიული წნევის დინამიკა"],
+    arrhythmia: ["რიტმის ტიპის დადასტურება ECG ჩანაწერით", "ელექტროლიტების, გულისცემის და ჰემოდინამიკის შეფასება"],
+    atrial_fibrillation: ["წინაგულთა ფიბრილაციის დადასტურება და ინსულტის რისკის შეფასება", "გულისცემის კონტროლისა და ანტიკოაგულაციის საჭიროების განხილვა ექიმის მიერ"],
+    wide_qrs: ["გამტარობის დარღვევის ან ბლოკადის შეფასება", "QRS ცვლილების შედარება წინა ECG-სთან, თუ ხელმისაწვდომია"],
+    long_qt: ["QT-ის გახანგრძლივების მიზეზების შეფასება", "მედიკამენტების და ელექტროლიტების გადამოწმება"],
+    other_abnormal: ["ECG-ის პათოლოგიური აღწერის ექიმის მიერ ინტერპრეტაცია", "ECG ცვლილებების შედარება სიმპტომებთან და ლაბორატორიულ პასუხებთან"],
+  };
+  return checksByFinding[selected.value] || checksByFinding.other_abnormal;
 }
 
 function applySymptomText(nextFeatures, text) {
@@ -861,12 +902,13 @@ function renderSubtypeRisks() {
 }
 
 function renderClinicalChecks(risk) {
-  if (!risk?.suggested_clinical_checks?.length) return "";
+  const checks = [...(risk?.suggested_clinical_checks || []).slice(0, 4), ...ecgClinicalChecks()];
+  if (!checks.length) return "";
   return `
     <div class="clinical-checks">
       <h4>ექიმმა დამატებით გადაამოწმოს</h4>
       <ul>
-        ${risk.suggested_clinical_checks.slice(0, 4).map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+        ${checks.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
       </ul>
     </div>
   `;
@@ -969,6 +1011,7 @@ function patientProfileText() {
     `პაციენტი: ასაკი ${Math.round(Number(features.age))} წელი, სქესი ${sex}.`,
     `ძირითადი მონაცემები: BMI ${bmi}, არტერიული წნევა ${sbp}/${dbp} mmHg, გლუკოზა ${glucose} mg/dL, კრეატინინი ${creatinine} mg/dL.`,
     `სიმპტომები: ${symptoms}.`,
+    `ECG: ${ecgClinicalText()}.`,
   ].join("\n");
 }
 
@@ -981,8 +1024,7 @@ function patientReportText() {
     .join("\n");
   const reasons = clinicalReasonList(topRisk, 5).map((item) => `- ${item}`).join("\n") || "- მკვეთრი განმსაზღვრელი ფაქტორი არ გამოიკვეთა";
   const checks =
-    (topRisk.suggested_clinical_checks || [])
-      .slice(0, 4)
+    [...(topRisk.suggested_clinical_checks || []).slice(0, 4), ...ecgClinicalChecks()]
       .map((item) => `- ${item}`)
       .join("\n") || "- ექიმის კლინიკური შეფასება და საჭიროების მიხედვით დამატებითი კვლევები";
 
@@ -1066,6 +1108,52 @@ function renderDetectedSymptoms() {
   `;
 }
 
+function renderEcgInput() {
+  return `
+    <div class="ecg-box">
+      <div class="section-heading">
+        <div>
+          <h3>ECG პასუხი / ელექტროკარდიოგრამა</h3>
+          <p>არასავალდებულო კლინიკური კონტექსტი. ეს ველი არ ცვლის მოდელის probability-ს, მაგრამ ჩანს ინტერპრეტაციასა და პაციენტის ანგარიშში.</p>
+        </div>
+      </div>
+      <div class="ecg-grid">
+        <label class="field">
+          <span>
+            ECG შეფასება
+            <small>optional</small>
+          </span>
+          <select id="ecg-finding" ${features ? "" : "disabled"}>
+            ${ecgOptions
+              .map(
+                (option) => `
+                  <option value="${option.value}" ${option.value === ecgFinding ? "selected" : ""}>
+                    ${option.label}
+                  </option>
+                `,
+              )
+              .join("")}
+          </select>
+        </label>
+        <label class="field ecg-note-field">
+          <span>
+            ECG აღწერა
+            <small>ტექსტი</small>
+          </span>
+          <textarea
+            id="ecg-note"
+            placeholder="მაგ: სინუსური რიტმი; ST depression V4-V6; წინაგულთა ფიბრილაცია"
+            ${features ? "" : "disabled"}
+          >${escapeHtml(ecgNote)}</textarea>
+        </label>
+      </div>
+      <p class="ecg-status ${selectedEcgOption().severity}">
+        ${escapeHtml(ecgClinicalText())}
+      </p>
+    </div>
+  `;
+}
+
 function symptomStatusLabel(status) {
   if (status === "present") return "დადებითი";
   if (status === "negated") return "უარყოფილია";
@@ -1096,6 +1184,7 @@ function render() {
           </div>
 
           ${renderFormSections()}
+          ${renderEcgInput()}
 
           <div class="symptom-text-box">
             <label class="field">
@@ -1161,10 +1250,21 @@ function render() {
     result = null;
     syncSymptomControls();
   });
+  document.getElementById("ecg-finding")?.addEventListener("change", (event) => {
+    ecgFinding = event.target.value;
+    render();
+  });
+  document.getElementById("ecg-note")?.addEventListener("input", (event) => {
+    ecgNote = event.target.value;
+    const status = document.querySelector(".ecg-status");
+    if (status) status.textContent = ecgClinicalText();
+  });
 
   document.getElementById("reset-button")?.addEventListener("click", () => {
     if (!sample) return;
     symptomText = "";
+    ecgFinding = "not_available";
+    ecgNote = "";
     features = recomputeDerivedFeatures({ ...sample.features });
     result = null;
     statusText = "სატესტო პაციენტის საწყისი მონაცემები აღდგა.";

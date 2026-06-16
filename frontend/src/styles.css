@@ -430,6 +430,60 @@ h3 {
   padding: 18px 20px 20px;
 }
 
+.ecg-box {
+  border-top: 1px solid #e2e8ee;
+  padding: 0 20px 18px;
+}
+
+.ecg-box .section-heading {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.ecg-grid {
+  display: grid;
+  gap: 14px 16px;
+  grid-template-columns: minmax(190px, 0.8fr) minmax(0, 1.2fr);
+}
+
+.ecg-note-field textarea {
+  min-height: 84px;
+}
+
+.ecg-status {
+  border: 1px solid #dce4ea;
+  border-radius: 7px;
+  color: #415364;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.35;
+  margin-top: 10px;
+  padding: 9px 10px;
+}
+
+.ecg-status.neutral {
+  background: #f3f6f8;
+  color: #607484;
+}
+
+.ecg-status.low {
+  background: #eef9f1;
+  border-color: #aedbb8;
+  color: #245b32;
+}
+
+.ecg-status.medium {
+  background: #fff8e6;
+  border-color: #e8cf7d;
+  color: #72530c;
+}
+
+.ecg-status.high {
+  background: #fff0ee;
+  border-color: #efb8ae;
+  color: #8d2f22;
+}
+
 .symptom-text-box p {
   align-items: center;
   color: #5d7081;
@@ -1270,9 +1324,14 @@ h3 {
     padding: 14px 16px 18px;
   }
 
+  .ecg-grid {
+    grid-template-columns: 1fr;
+  }
+
   .panel-header,
   .section-heading,
   .symptom-text-box,
+  .ecg-box,
   .action-row,
   .decision-summary,
   .subtype-section,
