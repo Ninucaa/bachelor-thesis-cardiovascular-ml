@@ -9,6 +9,8 @@ from typing import Iterable
 
 import pandas as pd
 
+from diagnosis_targets import EXPANDED_DIAGNOSIS_TARGETS
+
 
 PROJECT_DIR = Path(__file__).resolve().parents[1]
 ROOT_DIR = PROJECT_DIR.parent
@@ -52,32 +54,7 @@ CHART_ITEMIDS = {
 LAB_FEATURES = sorted(set(LAB_ITEMIDS.values()))
 CHART_FEATURES = sorted(set(CHART_ITEMIDS.values()))
 
-SUBTYPE_PREFIXES = {
-    "target_myocardial_infarction": {
-        "icd9": ("410",),
-        "icd10": ("I21", "I22"),
-    },
-    "target_heart_failure": {
-        "icd9": ("428",),
-        "icd10": ("I50",),
-    },
-    "target_stroke": {
-        "icd9": ("430", "431", "432", "433", "434", "436"),
-        "icd10": ("I60", "I61", "I62", "I63", "I64", "I65", "I66", "I67", "I68", "I69"),
-    },
-    "target_arrhythmia": {
-        "icd9": ("426", "427"),
-        "icd10": ("I44", "I45", "I46", "I47", "I48", "I49"),
-    },
-    "target_hypertension": {
-        "icd9": ("401", "402", "403", "404", "405"),
-        "icd10": ("I10", "I11", "I12", "I13", "I15", "I16"),
-    },
-    "target_coronary_artery_disease": {
-        "icd9": ("411", "412", "413", "414"),
-        "icd10": ("I20", "I24", "I25"),
-    },
-}
+SUBTYPE_PREFIXES = EXPANDED_DIAGNOSIS_TARGETS
 
 HISTORY_PREFIXES = {
     "history_diabetes": {
@@ -179,6 +156,10 @@ def prefix_mask(codes: pd.Series, versions: pd.Series, prefixes: dict[str, tuple
         mask = mask | (versions.eq(9) & codes.str.startswith(prefixes["icd9"], na=False))
     if prefixes.get("icd10"):
         mask = mask | (versions.eq(10) & codes.str.startswith(prefixes["icd10"], na=False))
+    if prefixes.get("exclude_icd9"):
+        mask = mask & ~(versions.eq(9) & codes.str.startswith(prefixes["exclude_icd9"], na=False))
+    if prefixes.get("exclude_icd10"):
+        mask = mask & ~(versions.eq(10) & codes.str.startswith(prefixes["exclude_icd10"], na=False))
     return mask
 
 

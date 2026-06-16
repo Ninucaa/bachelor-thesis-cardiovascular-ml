@@ -9,6 +9,8 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import confusion_matrix, f1_score, precision_score, recall_score
 
+from diagnosis_targets import EXPANDED_DIAGNOSIS_TARGETS
+
 
 PROJECT_DIR = Path(__file__).resolve().parents[1]
 ROOT_DIR = PROJECT_DIR.parent
@@ -20,12 +22,8 @@ REPORT_PATH = PROJECT_DIR / "reports" / "diagnosis_thresholds.md"
 
 SPLIT = "split_hint"
 TARGETS = {
-    "target_myocardial_infarction": "მიოკარდიუმის ინფარქტი",
-    "target_heart_failure": "გულის უკმარისობა",
-    "target_stroke": "ინსულტი / ცერებროვასკულური დაავადება",
-    "target_arrhythmia": "გულის არითმია",
-    "target_hypertension": "ჰიპერტენზიული დაავადება",
-    "target_coronary_artery_disease": "კორონარული არტერიის დაავადება",
+    target: config["label_ge"]
+    for target, config in EXPANDED_DIAGNOSIS_TARGETS.items()
 }
 
 

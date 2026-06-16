@@ -16,6 +16,8 @@ from sklearn.metrics import (
 )
 from xgboost import XGBClassifier
 
+from diagnosis_targets import EXPANDED_DIAGNOSIS_TARGETS
+
 
 PROJECT_DIR = Path(__file__).resolve().parents[1]
 ROOT_DIR = PROJECT_DIR.parent
@@ -29,12 +31,10 @@ RANDOM_STATE = 42
 
 TARGETS = {
     "target_cvd": "Any cardiovascular diagnosis",
-    "target_myocardial_infarction": "Myocardial infarction",
-    "target_heart_failure": "Heart failure",
-    "target_stroke": "Stroke / cerebrovascular disease",
-    "target_arrhythmia": "Cardiac arrhythmia",
-    "target_hypertension": "Hypertensive disease",
-    "target_coronary_artery_disease": "Coronary artery / ischemic heart disease",
+    **{
+        target: config["label_en"]
+        for target, config in EXPANDED_DIAGNOSIS_TARGETS.items()
+    },
 }
 
 EXCLUDED_FEATURE_COLUMNS = {"subject_id", "hadm_id", "hospital_expire_flag"}
@@ -107,7 +107,10 @@ def main() -> None:
     feature_columns = [
         column
         for column in df.columns
-        if column not in EXCLUDED_FEATURE_COLUMNS and column != SPLIT and column not in target_columns
+        if column not in EXCLUDED_FEATURE_COLUMNS
+        and column != SPLIT
+        and column not in target_columns
+        and not column.startswith("target_")
     ]
 
     train_mask = df[SPLIT].eq("train")
