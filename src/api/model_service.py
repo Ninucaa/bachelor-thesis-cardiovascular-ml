@@ -124,6 +124,29 @@ FEATURE_LABELS = {
     "icu_height_in_mean": "ICU სიმაღლე",
 }
 
+FEATURE_REFERENCE_RANGES = {
+    "omr_bmi_mean": (18.5, 24.9, "kg/m2"),
+    "omr_sbp_mean": (90, 120, "mmHg"),
+    "omr_dbp_mean": (60, 80, "mmHg"),
+    "ed_triage_heart_rate_mean": (60, 100, "bpm"),
+    "ed_triage_resp_rate_mean": (12, 20, "breaths/min"),
+    "ed_triage_spo2_mean": (95, 100, "%"),
+    "ed_triage_sbp_mean": (90, 120, "mmHg"),
+    "ed_triage_dbp_mean": (60, 80, "mmHg"),
+    "lab_creatinine_mean": (0.6, 1.3, "mg/dL"),
+    "lab_hemoglobin_mean": (12, 17.5, "g/dL"),
+    "lab_glucose_mean": (70, 140, "mg/dL"),
+    "lab_ntprobnp_mean": (0, 450, "pg/mL"),
+    "lab_troponin_t_mean": (0, 0.01, "ng/mL"),
+    "lab_chol_ratio_mean": (0, 5, ""),
+    "lab_hdl_mean": (40, 1000, "mg/dL"),
+    "lab_ldl_calc_mean": (0, 100, "mg/dL"),
+    "lab_ldl_measured_mean": (0, 100, "mg/dL"),
+    "lab_chol_total_mean": (0, 200, "mg/dL"),
+    "lab_triglycerides_mean": (0, 150, "mg/dL"),
+    "lab_platelets_mean": (150, 450, "K/uL"),
+}
+
 COUNTERFACTUAL_GROUPS = [
     {
         "factor_group": "წნევა და სასიცოცხლო ნიშნები",
@@ -311,17 +334,65 @@ def format_feature_value(feature: str, value: float) -> str:
     return str(round(value, 2))
 
 
+def format_numeric_value(feature: str, value: float, unit: str = "") -> str:
+    if feature == "lab_troponin_t_mean":
+        formatted = f"{value:.3f}"
+    elif feature in {"lab_creatinine_mean", "lab_glucose_mean"}:
+        formatted = f"{value:.2f}"
+    elif abs(value) >= 100:
+        formatted = str(round(value))
+    else:
+        formatted = str(round(value, 1))
+    return f"{formatted} {unit}".strip()
+
+
+def value_status(feature: str, value: float) -> str | None:
+    reference = FEATURE_REFERENCE_RANGES.get(feature)
+    if not reference:
+        return None
+    low, high, _unit = reference
+    if value < low:
+        return "დაბალი"
+    if value > high:
+        return "მაღალი"
+    return "ნორმაში"
+
+
+def clinical_factor_label(factor: dict[str, Any]) -> str:
+    feature = factor["feature"]
+    value = float(factor["value"])
+    label = feature_label(feature)
+
+    if feature == "age":
+        return f"ასაკი: {round(value)} წელი"
+    if feature == "gender_male":
+        return f"სქესი: {format_feature_value(feature, value)}"
+    if feature.startswith("history_") or feature.startswith("symptom_") or feature == "ed_arrived_by_ambulance":
+        return f"{label}: {format_feature_value(feature, value)}"
+    if feature == "ed_triage_acuity_mean":
+        return f"triage სიმძიმე: {round(value)} / 5"
+    if feature == "triage_pain_mean":
+        return f"ტკივილის შეფასება: {round(value, 1)} / 10"
+    if feature in FEATURE_REFERENCE_RANGES:
+        _low, _high, unit = FEATURE_REFERENCE_RANGES[feature]
+        status = value_status(feature, value)
+        formatted = format_numeric_value(feature, value, unit)
+        if status == "ნორმაში":
+            return f"{label}: {formatted} (ნორმაში)"
+        return f"{status} {label}: {formatted}"
+    if feature.startswith("interaction_"):
+        return f"{label}: {format_numeric_value(feature, value)}"
+    return f"{label}: {format_feature_value(feature, value)}"
+
+
 def factor_phrase(factor: dict[str, Any]) -> str:
-    return (
-        f"{feature_label(factor['feature'])} "
-        f"({format_feature_value(factor['feature'], factor['value'])})"
-    )
+    return clinical_factor_label(factor)
 
 
 def short_factor_label(factor: dict[str, Any]) -> str:
     if factor["feature"].endswith("_missing") and factor["value"] < 0.5:
         return f"{feature_label(factor['feature'].removesuffix('_missing'))} მითითებულია"
-    return feature_label(factor["feature"])
+    return clinical_factor_label(factor)
 
 
 def is_user_facing_positive_factor(factor: dict[str, Any]) -> bool:
