@@ -44,7 +44,7 @@ const editableFields = [
   { key: "ed_triage_dbp_mean", label: "დიასტოლური წნევა", min: 30, max: 140, step: 1, unit: "mmHg", optional: true },
   { key: "ed_triage_resp_rate_mean", label: "სუნთქვის სიხშირე", min: 4, max: 80, step: 1, unit: "breaths/min", optional: true },
   { key: "ed_triage_spo2_mean", label: "SpO2", min: 50, max: 100, step: 1, unit: "%", optional: true },
-  { key: "ed_triage_temperature_f_mean", label: "ტემპერატურა", min: 80, max: 110, step: 0.1, unit: "F", optional: true },
+  { key: "ed_triage_temperature_f_mean", label: "ტემპერატურა", min: 26.7, max: 43.3, step: 0.1, unit: "°C", optional: true, displayUnit: "celsius" },
   { key: "ed_triage_acuity_mean", label: "triage სიმძიმე", min: 1, max: 5, step: 1, unit: "1-5", optional: true },
   { key: "ed_arrived_by_ambulance", label: "სასწრაფოთი მოყვანა", type: "boolean" },
 ];
@@ -137,16 +137,27 @@ const labReferenceRanges = [
   { key: "lab_creatinine_mean", label: "კრეატინინი", low: 0.6, high: 1.3, unit: "mg/dL" },
   { key: "lab_hemoglobin_mean", label: "ჰემოგლობინი", low: 12, high: 17.5, unit: "g/dL" },
   { key: "lab_glucose_mean", label: "გლუკოზა", low: 70, high: 140, unit: "mg/dL" },
-  { key: "lab_ntprobnp_mean", label: "NT-proBNP (გულის დატვირთვის მარკერი)", low: 0, high: 450, unit: "pg/mL", highLabel: "მომატებული" },
-  { key: "lab_troponin_t_mean", label: "Troponin T", low: 0, high: 0.01, unit: "ng/mL", highLabel: "მომატებული" },
-  { key: "lab_chol_total_mean", label: "საერთო ქოლესტერინი", low: 0, high: 200, unit: "mg/dL", highLabel: "მომატებული" },
+  { key: "lab_ntprobnp_mean", label: "NT-proBNP (გულის დატვირთვის მარკერი)", low: 0, high: 450, unit: "pg/mL" },
+  { key: "lab_troponin_t_mean", label: "Troponin T", low: 0, high: 0.01, unit: "ng/mL" },
+  { key: "lab_chol_total_mean", label: "საერთო ქოლესტერინი", low: 0, high: 200, unit: "mg/dL" },
   { key: "lab_hdl_mean", label: "HDL ქოლესტერინი", low: 40, high: 1000, unit: "mg/dL", lowLabel: "დაბალი" },
-  { key: "lab_ldl_calc_mean", label: "LDL ქოლესტერინი", low: 0, high: 100, unit: "mg/dL", highLabel: "მომატებული" },
-  { key: "lab_triglycerides_mean", label: "ტრიგლიცერიდები", low: 0, high: 150, unit: "mg/dL", highLabel: "მომატებული" },
+  { key: "lab_ldl_calc_mean", label: "LDL ქოლესტერინი", low: 0, high: 100, unit: "mg/dL" },
+  { key: "lab_triglycerides_mean", label: "ტრიგლიცერიდები", low: 0, high: 150, unit: "mg/dL" },
   { key: "lab_platelets_mean", label: "თრომბოციტები", low: 150, high: 450, unit: "K/uL" },
 ];
 
 const bmiReference = { key: "omr_bmi_mean", label: "BMI", low: 18.5, high: 24.9, unit: "kg/m2" };
+
+const samplePatientOptions = [
+  { value: "demo-1", label: "პაციენტი 1 - გულის უკმარისობა" },
+  { value: "demo-2", label: "პაციენტი 2 - ინფარქტი" },
+  { value: "demo-3", label: "პაციენტი 3 - არითმია" },
+  { value: "demo-4", label: "პაციენტი 4 - დაბალი რისკი" },
+  { value: "demo-5", label: "პაციენტი 5 - ჰიპერტენზიული გული" },
+  { value: "demo-6", label: "პაციენტი 6 - ჰიპერტენზიული კრიზი" },
+  { value: "demo-7", label: "პაციენტი 7 - ქრონიკული იშემია" },
+  { value: "demo-8", label: "პაციენტი 8 - ინსულტი" },
+];
 
 const featureLabels = {
   age: "ასაკი",
@@ -342,6 +353,9 @@ let ecgFinding = "not_available";
 let ecgNote = "";
 let isLabReferenceOpen = false;
 let isModelTrustOpen = false;
+let isAllDiagnosesOpen = false;
+let clearedFieldKeys = new Set();
+let selectedSampleId = "demo-1";
 
 function escapeHtml(value) {
   return String(value)
@@ -366,7 +380,7 @@ function diseaseRiskLabel(level) {
 function diagnosisConfidenceLabel(confidence) {
   if (confidence === "high") return "ძლიერი სავარაუდო დიაგნოზი";
   if (confidence === "diagnostic_signal") return "სავარაუდო დიაგნოზის ჯგუფი";
-  if (confidence === "borderline") return "საზღვრული სიგნალი";
+  if (confidence === "borderline") return "სუსტი/საზღვრული სიგნალი";
   return "დაბალი მხარდაჭერა";
 }
 
@@ -385,17 +399,6 @@ function clampPercent(value) {
   return Math.max(0, Math.min(100, Math.round(value * 1000) / 10));
 }
 
-function changedFieldCount() {
-  if (!sample || !features) return 0;
-  return editableFields.filter((field) => {
-    const missingKey = `${field.key}_missing`;
-    return (
-      Number(features[field.key]) !== Number(sample.features[field.key]) ||
-      Number(features[missingKey] ?? 0) !== Number(sample.features[missingKey] ?? 0)
-    );
-  }).length;
-}
-
 function displayFeatureName(feature) {
   if (featureLabels[feature]) return featureLabels[feature];
   if (feature.endsWith("_missing")) {
@@ -409,13 +412,19 @@ function isOptionalMissing(field) {
   return Boolean(field.optional && Number(features?.[`${field.key}_missing`]) === 1);
 }
 
+function hasBlockingClearedFields() {
+  return editableFields.some((field) => !field.optional && field.type !== "computed" && clearedFieldKeys.has(field.key));
+}
+
 function inputValue(field) {
   if (!features) return "";
+  if (clearedFieldKeys.has(field.key)) return "";
   if (isOptionalMissing(field)) return "";
   let value = Number(features[field.key]);
   if (Number.isNaN(value)) return "";
   if (field.displayUnit === "kg") value /= 2.20462;
   if (field.displayUnit === "cm") value *= 2.54;
+  if (field.displayUnit === "celsius") value = (value - 32) * (5 / 9);
   if (field.precision !== undefined) return value.toFixed(field.precision);
   if (field.step && Number(field.step) < 1) return String(Math.round(value * 10) / 10);
   return String(Math.round(value));
@@ -428,7 +437,7 @@ function labStatus(reference) {
   const value = Number(features[reference.key]);
   if (Number.isNaN(value)) return { label: "არ არის შეყვანილი", className: "missing" };
   if (value < reference.low) return { label: reference.lowLabel || "დაბალი", className: "low" };
-  if (value > reference.high) return { label: reference.highLabel || "მაღალი", className: "high" };
+  if (value > reference.high) return { label: "მაღალი", className: "high" };
   return { label: "ნორმაში", className: "normal" };
 }
 
@@ -594,6 +603,7 @@ function recomputeBmi(nextFeatures) {
   }
 
   nextFeatures.omr_bmi_mean = (weightLbs / (heightInches * heightInches)) * 703;
+  clearedFieldKeys.delete("omr_bmi_mean");
   syncMeasurementMetadata(nextFeatures, "omr_bmi_mean", false);
 }
 
@@ -623,15 +633,21 @@ function updateFeatureFromInput(key, rawValue) {
   const nextFeatures = { ...features };
   const normalizedValue = String(rawValue).replace(",", ".").trim();
 
+  clearedFieldKeys.delete(key);
   if (field?.optional && normalizedValue === "") {
+    clearedFieldKeys.add(key);
     nextFeatures[key] = optionalDefaults[key];
     syncMeasurementMetadata(nextFeatures, key, true);
   } else {
-    if (normalizedValue === "") return;
+    if (normalizedValue === "") {
+      clearedFieldKeys.add(key);
+      return;
+    }
     let value = Number(normalizedValue);
     if (!Number.isFinite(value)) return;
     if (field?.displayUnit === "kg") value *= 2.20462;
     if (field?.displayUnit === "cm") value /= 2.54;
+    if (field?.displayUnit === "celsius") value = value * (9 / 5) + 32;
     nextFeatures[key] = value;
     syncMeasurementMetadata(nextFeatures, key, false);
   }
@@ -639,9 +655,19 @@ function updateFeatureFromInput(key, rawValue) {
   features = recomputeDerivedFeatures(nextFeatures);
 }
 
-function updateChangedCountDisplay() {
-  const changedCount = document.getElementById("changed-count");
-  if (changedCount) changedCount.textContent = `შეცვლილია ${changedFieldCount()} ველი`;
+function clearPatientData() {
+  const baseFeatures = sample ? { ...sample.features } : { ...features };
+  editableFields.forEach((field) => {
+    clearedFieldKeys.add(field.key);
+    if (field.type === "boolean") baseFeatures[field.key] = 0;
+    if (field.optional) syncMeasurementMetadata(baseFeatures, field.key, true);
+  });
+  symptomText = "";
+  ecgFinding = "not_available";
+  ecgNote = "";
+  features = recomputeDerivedFeatures(baseFeatures);
+  result = null;
+  statusText = "ყველა მონაცემი გასუფთავდა.";
 }
 
 function fieldDisabled(field) {
@@ -667,13 +693,14 @@ function renderInputField(field) {
           : 
         field.type === "select" || field.type === "boolean"
           ? `<select data-feature="${field.key}" ${fieldDisabled(field) ? "disabled" : ""}>
+              <option value="" ${clearedFieldKeys.has(field.key) ? "selected" : ""}>აირჩიეთ</option>
               ${(field.options || [
                 { value: 0, label: "არა" },
                 { value: 1, label: "დიახ" },
               ])
                 .map(
                   (option) => `
-                    <option value="${option.value}" ${Number(features?.[field.key]) === option.value ? "selected" : ""}>
+                    <option value="${option.value}" ${!clearedFieldKeys.has(field.key) && Number(features?.[field.key]) === option.value ? "selected" : ""}>
                       ${option.label}
                     </option>
                   `,
@@ -684,7 +711,7 @@ function renderInputField(field) {
               data-feature="${field.key}"
               type="text"
               inputmode="decimal"
-              placeholder="${field.optional ? "არასავალდებულო" : ""}"
+              placeholder="${field.optional ? "არასავალდებულო" : "შეიყვანეთ"}"
               value="${inputValue(field)}"
               ${fieldDisabled(field) ? "disabled" : ""}
             />`
@@ -817,12 +844,46 @@ function renderReasonChips(risk, limit = 4) {
   return reasons.map((item) => `<span class="driver-chip">${escapeHtml(item)}</span>`).join("");
 }
 
+function clinicalResemblanceText(risk) {
+  const reasons = clinicalReasonList(risk, 5);
+  if (!reasons.length) return "მკვეთრი განმსაზღვრელი კლინიკური კომბინაცია არ გამოიკვეთა";
+  return reasons.join(" + ");
+}
+
+function ecgResultContext() {
+  const selected = selectedEcgOption();
+  if (selected.value === "not_available") return "";
+  if (selected.value === "normal") {
+    return "ECG კონტექსტი: ნორმალური ECG ამ ეტაპზე მწვავე ECG-სიგნალს არ ამატებს, თუმცა კლინიკურ შეფასებას სრულად არ ცვლის.";
+  }
+  return `ECG კონტექსტი: ${selected.label} აძლიერებს შესაბამისი კარდიოლოგიური მიმართულების გადამოწმების საჭიროებას.`;
+}
+
 function getPrimaryDiagnosticRisk() {
   if (!result?.subtype_risks?.length) return null;
   const diagnosticCandidates = result.subtype_risks.filter((risk) =>
     ["high", "diagnostic_signal"].includes(risk.diagnosis_confidence),
   );
   return diagnosticCandidates[0] || result.subtype_risks[0];
+}
+
+function diagnosisSeverityRank(risk) {
+  const confidenceRank = {
+    high: 4,
+    diagnostic_signal: 3,
+    borderline: 2,
+    low: 1,
+  }[risk.diagnosis_confidence] || 0;
+  const riskRank = { high: 3, medium: 2, low: 1 }[risk.risk_level] || 0;
+  return confidenceRank * 10 + riskRank;
+}
+
+function sortByClinicalSeverity(risks) {
+  return [...risks].sort((a, b) => {
+    const severityDelta = diagnosisSeverityRank(b) - diagnosisSeverityRank(a);
+    if (severityDelta) return severityDelta;
+    return (b.diagnosis_probability ?? b.risk_probability) - (a.diagnosis_probability ?? a.risk_probability);
+  });
 }
 
 function renderProbabilityMeter(risk) {
@@ -846,11 +907,12 @@ function renderDecisionSummary() {
   if (!result?.subtype_risks?.length) return "";
   const topRisk = getPrimaryDiagnosticRisk();
   const secondRisk = result.subtype_risks.find((risk) => risk.target_name !== topRisk.target_name);
+  const ecgContext = ecgResultContext();
 
   return `
     <div class="decision-summary">
       <div class="decision-topline">
-        <span>ყველაზე ძლიერი კლინიკური სიგნალი</span>
+        <span>მთავარი სავარაუდო მიმართულება</span>
         <em class="status-pill ${confidenceClass(topRisk.diagnosis_confidence)}">${diagnosisConfidenceLabel(topRisk.diagnosis_confidence)}</em>
       </div>
       <strong>${escapeHtml(topRisk.diagnosis_label || topRisk.display_name)}</strong>
@@ -860,13 +922,18 @@ function renderDecisionSummary() {
       </div>
       ${renderProbabilityMeter(topRisk)}
       <div class="clinical-driver-block">
-        <span>რა განსაზღვრავს ამ სიგნალს</span>
+        <span>3 მთავარი მიზეზი</span>
         <div class="driver-list">${renderReasonChips(topRisk)}</div>
       </div>
+      <div class="clinical-driver-block resemblance-block">
+        <span>რატომ ჰგავს ამ დიაგნოზს</span>
+        <p>${escapeHtml(clinicalResemblanceText(topRisk))}</p>
+      </div>
+      ${ecgContext ? `<div class="ecg-context-note">${escapeHtml(ecgContext)}</div>` : ""}
       <p>${escapeHtml(topRisk.diagnosis_interpretation || "სისტემა ამ პაციენტის მონაცემებში ხედავს მსგავსებას შესაბამის ICD-კოდირებულ შემთხვევებთან.")}</p>
       ${
         secondRisk
-          ? `<small>შემდეგი შესადარებელი მიმართულება: ${escapeHtml(secondRisk.display_name)} (${formatPercent(secondRisk.risk_probability)}).</small>`
+          ? `<small>შემდეგი შესადარებელი მიმართულება: ${escapeHtml(secondRisk.display_name)} (${formatPercent(secondRisk.risk_probability)}). ეს არ ნიშნავს საბოლოო დიაგნოზს.</small>`
           : ""
       }
     </div>
@@ -876,7 +943,9 @@ function renderDecisionSummary() {
 function renderSubtypeRisks() {
   if (!result?.subtype_risks?.length) return "";
   const topRisk = getPrimaryDiagnosticRisk();
-  const otherRisks = result.subtype_risks.filter((risk) => risk.target_name !== topRisk.target_name);
+  const otherRisks = sortByClinicalSeverity(result.subtype_risks.filter((risk) => risk.target_name !== topRisk.target_name));
+  const visibleRisks = isAllDiagnosesOpen ? otherRisks : otherRisks.slice(0, 4);
+  const hiddenCount = Math.max(0, otherRisks.length - visibleRisks.length);
 
   return `
     <div class="subtype-section">
@@ -891,8 +960,21 @@ function renderSubtypeRisks() {
         ${renderProbabilityMeter(topRisk)}
         <div class="driver-list compact">${renderReasonChips(topRisk, 3)}</div>
       </div>
+      <div class="subtype-list-header">
+        <div>
+          <strong>${isAllDiagnosesOpen ? "ყველა დიაგნოზის ჯგუფი" : "მნიშვნელოვანი შედარებითი მიმართულებები"}</strong>
+          <span>${isAllDiagnosesOpen ? "ნაჩვენებია ყველა მოდელირებული ICD-ჯგუფი." : "ნაჩვენებია მხოლოდ top 4, რომ მთავარი დასკვნა არ გადაიტვირთოს."}</span>
+        </div>
+        ${
+          otherRisks.length > 4
+            ? `<button class="secondary-button compact-button" id="toggle-diagnoses-button">
+                ${isAllDiagnosesOpen ? "მხოლოდ top 4" : `ყველა ჯგუფის ნახვა (${hiddenCount} მეტი)`}
+              </button>`
+            : ""
+        }
+      </div>
       <div class="subtype-grid">
-        ${otherRisks
+        ${visibleRisks
           .map(
             (risk) => `
               <div class="subtype-card ${risk.risk_level}">
@@ -908,7 +990,7 @@ function renderSubtypeRisks() {
           )
           .join("")}
       </div>
-      <p class="diagnosis-note">ეს არის ICD-კოდირებული სავარაუდო დიაგნოზის ჯგუფის პროგნოზი, არა ექიმის საბოლოო დიაგნოზის ჩანაცვლება.</p>
+      <p class="diagnosis-note">შეზღუდვა: სისტემა არ სვამს საბოლოო დიაგნოზს. ის აჩვენებს სავარაუდო ICD-კოდირებულ მიმართულებებს MIMIC-IV მონაცემებზე ნასწავლი მსგავსებების მიხედვით და საჭიროებს ექიმის დადასტურებას.</p>
       ${renderClinicalChecks(topRisk)}
     </div>
   `;
@@ -1036,6 +1118,7 @@ function patientReportText() {
     .map((risk, index) => `${index + 1}. ${risk.display_name}: ${formatPercent(risk.diagnosis_probability ?? risk.risk_probability)} (${risk.diagnosis_status})`)
     .join("\n");
   const reasons = clinicalReasonList(topRisk, 5).map((item) => `- ${item}`).join("\n") || "- მკვეთრი განმსაზღვრელი ფაქტორი არ გამოიკვეთა";
+  const ecgContext = ecgResultContext();
   const checks =
     [...(topRisk.suggested_clinical_checks || []).slice(0, 4), ...ecgClinicalChecks()]
       .map((item) => `- ${item}`)
@@ -1052,6 +1135,10 @@ function patientReportText() {
     "რა განსაზღვრავს ამ რისკს:",
     reasons,
     "",
+    "რატომ ჰგავს ამ დიაგნოზს:",
+    clinicalResemblanceText(topRisk),
+    ...(ecgContext ? ["", ecgContext] : []),
+    "",
     "სხვა შესადარებელი მიმართულებები:",
     topThree,
     "",
@@ -1059,7 +1146,7 @@ function patientReportText() {
     checks,
     "",
     `საერთო გულ-სისხლძარღვთა სიგნალი: ${formatPercent(result.risk_probability)} (${riskLabel(result.risk_level)}).`,
-    "შენიშვნა: ეს არის კლინიკური გადაწყვეტილების დამხმარე პროგნოზი. იგი არ ცვლის ექიმის საბოლოო დიაგნოზს და საჭიროებს პაციენტის სრულ კლინიკურ შეფასებას.",
+    "შეზღუდვა: სისტემა არ სვამს საბოლოო დიაგნოზს; ის აჩვენებს სავარაუდო დიაგნოსტიკურ მიმართულებებს MIMIC-IV მონაცემებზე ნასწავლი მსგავსებების მიხედვით.",
   ].join("\n");
 }
 
@@ -1180,7 +1267,14 @@ function render() {
     <main class="app-shell">
       <section class="topbar">
         <div class="topbar-title">
-          <div class="clinical-mark" aria-hidden="true"><span></span></div>
+          <div class="clinical-mark" aria-hidden="true">
+            <svg viewBox="0 0 64 64" role="img">
+              <path class="heart-shadow" d="M32 53s-19.5-11.4-24-26.1C5.3 18.1 10.2 11 18.5 11c5 0 8.8 2.8 11.1 6.2C31.9 13.8 35.7 11 40.7 11c8.3 0 13.2 7.1 10.5 15.9C46.7 41.6 32 53 32 53Z" />
+              <path class="heart-shape" d="M32 50.5s-18.2-10.7-22.4-24.4C7.1 18 11.7 11.5 19.4 11.5c4.7 0 8.2 2.6 10.3 5.8C31.8 14.1 35.3 11.5 40 11.5c7.7 0 12.3 6.5 9.8 14.6C45.6 39.8 32 50.5 32 50.5Z" />
+              <path class="heart-highlight" d="M19.8 16.6c-4.3 0-6.8 3.7-5.4 8.1" />
+              <path class="heart-pulse" d="M12.5 33h10.1l3.8-7.6 5.5 15.6 5.2-19 4.3 11h10.1" />
+            </svg>
+          </div>
           <div>
             <p class="eyebrow">კლინიკური გადაწყვეტილების დამხმარე პროტოტიპი</p>
             <h1>გულ-სისხლძარღვთა სავარაუდო დიაგნოზის პროგნოზირება</h1>
@@ -1196,7 +1290,15 @@ function render() {
               <h2>პაციენტის მონაცემები</h2>
               <p>არასავალდებულო ველები ცარიელი დატოვეთ; დიახ/არა ველები გამოიყენება დიაგნოსტიკურ ახსნაში.</p>
             </div>
-            <button class="secondary-button" id="reset-button" ${sample ? "" : "disabled"}>საწყისზე დაბრუნება</button>
+            <div class="panel-actions">
+              <select class="sample-select" id="sample-select" aria-label="სატესტო პაციენტის არჩევა">
+                ${samplePatientOptions
+                  .map((option) => `<option value="${option.value}" ${selectedSampleId === option.value ? "selected" : ""}>${option.label}</option>`)
+                  .join("")}
+              </select>
+              <button class="secondary-button compact-button" id="load-sample-button">ჩატვირთვა</button>
+              <button class="secondary-button compact-button" id="clear-data-button" ${features ? "" : "disabled"}>გასუფთავება</button>
+            </div>
           </div>
 
           ${renderFormSections()}
@@ -1218,10 +1320,9 @@ function render() {
           </div>
 
           <div class="action-row">
-            <button class="primary-button" id="predict-button" ${!features || isPredicting ? "disabled" : ""}>
+            <button class="primary-button" id="predict-button" ${!features || isPredicting || hasBlockingClearedFields() ? "disabled" : ""}>
               ${isPredicting ? "მიმდინარეობს პროგნოზირება..." : "პროგნოზის გაშვება"}
             </button>
-            <span id="changed-count">შეცვლილია ${changedFieldCount()} ველი</span>
           </div>
         </div>
 
@@ -1249,7 +1350,6 @@ function render() {
     input.addEventListener("input", (event) => {
       updateFeatureFromInput(event.target.dataset.feature, event.target.value);
       result = null;
-      updateChangedCountDisplay();
     });
   });
 
@@ -1276,16 +1376,14 @@ function render() {
     if (status) status.textContent = ecgClinicalText();
   });
 
-  document.getElementById("reset-button")?.addEventListener("click", () => {
-    if (!sample) return;
-    symptomText = "";
-    ecgFinding = "not_available";
-    ecgNote = "";
-    features = recomputeDerivedFeatures({ ...sample.features });
-    result = null;
-    statusText = "სატესტო პაციენტის საწყისი მონაცემები აღდგა.";
+  document.getElementById("clear-data-button")?.addEventListener("click", () => {
+    clearPatientData();
     render();
   });
+  document.getElementById("sample-select")?.addEventListener("change", (event) => {
+    selectedSampleId = event.target.value;
+  });
+  document.getElementById("load-sample-button")?.addEventListener("click", loadSample);
 
   document.getElementById("predict-button")?.addEventListener("click", runPrediction);
   document.getElementById("copy-report-button")?.addEventListener("click", copyPatientReport);
@@ -1295,6 +1393,10 @@ function render() {
   });
   document.getElementById("model-trust-button")?.addEventListener("click", () => {
     isModelTrustOpen = true;
+    render();
+  });
+  document.getElementById("toggle-diagnoses-button")?.addEventListener("click", () => {
+    isAllDiagnosesOpen = !isAllDiagnosesOpen;
     render();
   });
   document.getElementById("close-lab-reference")?.addEventListener("click", () => {
@@ -1318,10 +1420,15 @@ function render() {
 
 async function loadSample() {
   try {
-    const response = await fetch(`${API_BASE}/sample-patient`);
+    const response = await fetch(`${API_BASE}/sample-patient?sample_id=${encodeURIComponent(selectedSampleId)}`);
     if (!response.ok) throw new Error(`API-მ დააბრუნა ${response.status}`);
     sample = await response.json();
-    symptomText = "";
+    selectedSampleId = sample.sample_id || selectedSampleId;
+    symptomText = sample.symptom_text || "";
+    ecgFinding = sample.ecg_finding || "not_available";
+    ecgNote = sample.ecg_note || "";
+    clearedFieldKeys = new Set();
+    isAllDiagnosesOpen = false;
     features = recomputeDerivedFeatures({ ...sample.features });
     statusText = "სატესტო პაციენტი ჩაიტვირთა.";
   } catch (error) {

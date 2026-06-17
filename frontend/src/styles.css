@@ -86,46 +86,67 @@ textarea {
 
 .clinical-mark {
   align-items: center;
-  background: #ffffff;
-  border: 1px solid #b7d2dc;
+  background:
+    radial-gradient(circle at 28% 24%, #ffffff 0 22%, transparent 23%),
+    linear-gradient(145deg, #ffffff 0, #eef9fb 100%);
+  border: 1px solid #aed0da;
   border-radius: 8px;
-  box-shadow: 0 8px 18px rgba(20, 58, 76, 0.12);
+  box-shadow: 0 10px 22px rgba(20, 58, 76, 0.16), 0 1px 0 rgba(255, 255, 255, 0.95) inset;
   display: flex;
   flex: 0 0 auto;
   height: 52px;
   justify-content: center;
+  overflow: hidden;
   position: relative;
   width: 52px;
 }
 
-.clinical-mark::before,
 .clinical-mark::after {
-  background: var(--accent);
-  border-radius: 999px;
+  background:
+    linear-gradient(90deg, rgba(10, 120, 144, 0.07) 0 1px, transparent 1px 100%),
+    linear-gradient(180deg, rgba(10, 120, 144, 0.06) 0 1px, transparent 1px 100%);
+  background-size: 9px 9px;
   content: "";
+  inset: 0;
+  opacity: 0.5;
+  pointer-events: none;
   position: absolute;
 }
 
-.clinical-mark::before {
-  height: 26px;
-  width: 6px;
+.clinical-mark svg {
+  display: block;
+  height: 42px;
+  position: relative;
+  width: 42px;
+  z-index: 1;
 }
 
-.clinical-mark::after {
-  height: 6px;
-  width: 26px;
+.heart-shadow {
+  fill: rgba(10, 79, 97, 0.12);
+  transform: translateY(1.5px);
 }
 
-.clinical-mark span {
-  background: #ffffff;
-  border-left: 2px solid var(--danger);
-  border-top: 2px solid var(--danger);
-  height: 9px;
-  position: absolute;
-  right: 8px;
-  top: 12px;
-  transform: skewX(-22deg);
-  width: 18px;
+.heart-shape {
+  fill: #d84f43;
+  stroke: #9f332a;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.heart-highlight {
+  fill: none;
+  opacity: 0.72;
+  stroke: #ffd5d0;
+  stroke-linecap: round;
+  stroke-width: 3;
+}
+
+.heart-pulse {
+  fill: none;
+  stroke: #ffffff;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 3.8;
 }
 
 .eyebrow {
@@ -218,6 +239,35 @@ h3 {
 
 .panel-header h2 {
   color: #143044;
+}
+
+.panel-actions {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.sample-select,
+.compact-button {
+  font-size: 12px;
+  min-height: 32px;
+}
+
+.sample-select {
+  background: #ffffff;
+  border: 1px solid #cbd9e2;
+  border-radius: 6px;
+  color: #263645;
+  font-weight: 700;
+  max-width: 170px;
+  padding: 6px 8px;
+}
+
+.compact-button {
+  padding: 6px 9px;
 }
 
 .sample-meta {
@@ -919,6 +969,30 @@ h3 {
   text-transform: uppercase;
 }
 
+.clinical-driver-block p {
+  color: #263645;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.resemblance-block {
+  border-left: 3px solid var(--clinical-blue);
+}
+
+.ecg-context-note {
+  background: #fffdf4;
+  border: 1px solid #dfcf84;
+  border-left: 3px solid #b28418;
+  border-radius: 8px;
+  color: #5a4612;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.45;
+  padding: 11px 12px;
+}
+
 .driver-list {
   display: flex;
   flex-wrap: wrap;
@@ -1118,6 +1192,30 @@ h3 {
 .subtype-grid {
   display: grid;
   gap: 8px;
+}
+
+.subtype-list-header {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  margin: 14px 0 10px;
+}
+
+.subtype-list-header div {
+  display: grid;
+  gap: 3px;
+}
+
+.subtype-list-header strong {
+  color: #263645;
+  font-size: 13px;
+}
+
+.subtype-list-header span {
+  color: #687a8a;
+  font-size: 12px;
+  line-height: 1.35;
 }
 
 .top-disease {
@@ -1559,6 +1657,11 @@ h3 {
     grid-template-columns: 1fr;
   }
 
+  .subtype-list-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
   .subtype-card b {
     max-width: none;
     text-align: left;
@@ -1583,10 +1686,20 @@ h3 {
     flex-direction: column;
   }
 
+  .panel-header,
   .section-heading,
   .reference-header {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .panel-actions {
+    justify-content: stretch;
+  }
+
+  .sample-select {
+    max-width: none;
+    width: 100%;
   }
 
   .section-action {

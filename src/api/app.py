@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.api.model_service import FeatureValidationError, service
@@ -50,8 +50,8 @@ def features() -> list[FeatureInfo]:
 
 
 @app.get("/sample-patient", response_model=SamplePatientResponse)
-def sample_patient() -> SamplePatientResponse:
-    return SamplePatientResponse(**service.sample_patient)
+def sample_patient(sample_id: str = Query("demo-1")) -> SamplePatientResponse:
+    return SamplePatientResponse(**service.sample_patient_by_id(sample_id))
 
 
 @app.post("/predict", response_model=PredictionResponse)

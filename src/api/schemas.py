@@ -74,10 +74,15 @@ class PredictionResponse(BaseModel):
 
 class SamplePatientResponse(BaseModel):
     source: str
+    sample_id: str | None = None
+    sample_label: str | None = None
     row_index: int
     original_csv_index: int
     actual_target: int
     features: dict[str, float]
+    symptom_text: str | None = None
+    ecg_finding: str | None = None
+    ecg_note: str | None = None
 
 
 class HealthResponse(BaseModel):
