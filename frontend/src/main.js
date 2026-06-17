@@ -149,14 +149,14 @@ const labReferenceRanges = [
 const bmiReference = { key: "omr_bmi_mean", label: "BMI", low: 18.5, high: 24.9, unit: "kg/m2" };
 
 const samplePatientOptions = [
-  { value: "demo-1", label: "სატესტო პაციენტი 1" },
-  { value: "demo-2", label: "სატესტო პაციენტი 2" },
-  { value: "demo-3", label: "სატესტო პაციენტი 3" },
-  { value: "demo-4", label: "სატესტო პაციენტი 4" },
-  { value: "demo-5", label: "სატესტო პაციენტი 5" },
-  { value: "demo-6", label: "სატესტო პაციენტი 6" },
-  { value: "demo-7", label: "სატესტო პაციენტი 7" },
-  { value: "demo-8", label: "სატესტო პაციენტი 8" },
+  { value: "demo-1", label: "პაციენტი 1 - გულის უკმარისობა" },
+  { value: "demo-2", label: "პაციენტი 2 - ინფარქტი" },
+  { value: "demo-3", label: "პაციენტი 3 - არითმია" },
+  { value: "demo-4", label: "პაციენტი 4 - დაბალი რისკი" },
+  { value: "demo-5", label: "პაციენტი 5 - ჰიპერტენზიული გული" },
+  { value: "demo-6", label: "პაციენტი 6 - ჰიპერტენზიული კრიზი" },
+  { value: "demo-7", label: "პაციენტი 7 - ქრონიკული იშემია" },
+  { value: "demo-8", label: "პაციენტი 8 - ინსულტი" },
 ];
 
 const featureLabels = {
@@ -379,7 +379,7 @@ function diseaseRiskLabel(level) {
 function diagnosisConfidenceLabel(confidence) {
   if (confidence === "high") return "ძლიერი სავარაუდო დიაგნოზი";
   if (confidence === "diagnostic_signal") return "სავარაუდო დიაგნოზის ჯგუფი";
-  if (confidence === "borderline") return "საზღვრული სიგნალი";
+  if (confidence === "borderline") return "სუსტი/საზღვრული სიგნალი";
   return "დაბალი მხარდაჭერა";
 }
 
@@ -841,6 +841,21 @@ function renderReasonChips(risk, limit = 4) {
   return reasons.map((item) => `<span class="driver-chip">${escapeHtml(item)}</span>`).join("");
 }
 
+function clinicalResemblanceText(risk) {
+  const reasons = clinicalReasonList(risk, 5);
+  if (!reasons.length) return "მკვეთრი განმსაზღვრელი კლინიკური კომბინაცია არ გამოიკვეთა";
+  return reasons.join(" + ");
+}
+
+function ecgResultContext() {
+  const selected = selectedEcgOption();
+  if (selected.value === "not_available") return "";
+  if (selected.value === "normal") {
+    return "ECG კონტექსტი: ნორმალური ECG ამ ეტაპზე მწვავე ECG-სიგნალს არ ამატებს, თუმცა კლინიკურ შეფასებას სრულად არ ცვლის.";
+  }
+  return `ECG კონტექსტი: ${selected.label} აძლიერებს შესაბამისი კარდიოლოგიური მიმართულების გადამოწმების საჭიროებას.`;
+}
+
 function getPrimaryDiagnosticRisk() {
   if (!result?.subtype_risks?.length) return null;
   const diagnosticCandidates = result.subtype_risks.filter((risk) =>
@@ -870,11 +885,12 @@ function renderDecisionSummary() {
   if (!result?.subtype_risks?.length) return "";
   const topRisk = getPrimaryDiagnosticRisk();
   const secondRisk = result.subtype_risks.find((risk) => risk.target_name !== topRisk.target_name);
+  const ecgContext = ecgResultContext();
 
   return `
     <div class="decision-summary">
       <div class="decision-topline">
-        <span>ყველაზე ძლიერი კლინიკური სიგნალი</span>
+        <span>მთავარი სავარაუდო მიმართულება</span>
         <em class="status-pill ${confidenceClass(topRisk.diagnosis_confidence)}">${diagnosisConfidenceLabel(topRisk.diagnosis_confidence)}</em>
       </div>
       <strong>${escapeHtml(topRisk.diagnosis_label || topRisk.display_name)}</strong>
@@ -884,13 +900,18 @@ function renderDecisionSummary() {
       </div>
       ${renderProbabilityMeter(topRisk)}
       <div class="clinical-driver-block">
-        <span>რა განსაზღვრავს ამ სიგნალს</span>
+        <span>3 მთავარი მიზეზი</span>
         <div class="driver-list">${renderReasonChips(topRisk)}</div>
       </div>
+      <div class="clinical-driver-block resemblance-block">
+        <span>რატომ ჰგავს ამ დიაგნოზს</span>
+        <p>${escapeHtml(clinicalResemblanceText(topRisk))}</p>
+      </div>
+      ${ecgContext ? `<div class="ecg-context-note">${escapeHtml(ecgContext)}</div>` : ""}
       <p>${escapeHtml(topRisk.diagnosis_interpretation || "სისტემა ამ პაციენტის მონაცემებში ხედავს მსგავსებას შესაბამის ICD-კოდირებულ შემთხვევებთან.")}</p>
       ${
         secondRisk
-          ? `<small>შემდეგი შესადარებელი მიმართულება: ${escapeHtml(secondRisk.display_name)} (${formatPercent(secondRisk.risk_probability)}).</small>`
+          ? `<small>შემდეგი შესადარებელი მიმართულება: ${escapeHtml(secondRisk.display_name)} (${formatPercent(secondRisk.risk_probability)}). ეს არ ნიშნავს საბოლოო დიაგნოზს.</small>`
           : ""
       }
     </div>
@@ -932,7 +953,7 @@ function renderSubtypeRisks() {
           )
           .join("")}
       </div>
-      <p class="diagnosis-note">ეს არის ICD-კოდირებული სავარაუდო დიაგნოზის ჯგუფის პროგნოზი, არა ექიმის საბოლოო დიაგნოზის ჩანაცვლება.</p>
+      <p class="diagnosis-note">შეზღუდვა: სისტემა არ სვამს საბოლოო დიაგნოზს. ის აჩვენებს სავარაუდო ICD-კოდირებულ მიმართულებებს MIMIC-IV მონაცემებზე ნასწავლი მსგავსებების მიხედვით და საჭიროებს ექიმის დადასტურებას.</p>
       ${renderClinicalChecks(topRisk)}
     </div>
   `;
@@ -1060,6 +1081,7 @@ function patientReportText() {
     .map((risk, index) => `${index + 1}. ${risk.display_name}: ${formatPercent(risk.diagnosis_probability ?? risk.risk_probability)} (${risk.diagnosis_status})`)
     .join("\n");
   const reasons = clinicalReasonList(topRisk, 5).map((item) => `- ${item}`).join("\n") || "- მკვეთრი განმსაზღვრელი ფაქტორი არ გამოიკვეთა";
+  const ecgContext = ecgResultContext();
   const checks =
     [...(topRisk.suggested_clinical_checks || []).slice(0, 4), ...ecgClinicalChecks()]
       .map((item) => `- ${item}`)
@@ -1076,6 +1098,10 @@ function patientReportText() {
     "რა განსაზღვრავს ამ რისკს:",
     reasons,
     "",
+    "რატომ ჰგავს ამ დიაგნოზს:",
+    clinicalResemblanceText(topRisk),
+    ...(ecgContext ? ["", ecgContext] : []),
+    "",
     "სხვა შესადარებელი მიმართულებები:",
     topThree,
     "",
@@ -1083,7 +1109,7 @@ function patientReportText() {
     checks,
     "",
     `საერთო გულ-სისხლძარღვთა სიგნალი: ${formatPercent(result.risk_probability)} (${riskLabel(result.risk_level)}).`,
-    "შენიშვნა: ეს არის კლინიკური გადაწყვეტილების დამხმარე პროგნოზი. იგი არ ცვლის ექიმის საბოლოო დიაგნოზს და საჭიროებს პაციენტის სრულ კლინიკურ შეფასებას.",
+    "შეზღუდვა: სისტემა არ სვამს საბოლოო დიაგნოზს; ის აჩვენებს სავარაუდო დიაგნოსტიკურ მიმართულებებს MIMIC-IV მონაცემებზე ნასწავლი მსგავსებების მიხედვით.",
   ].join("\n");
 }
 

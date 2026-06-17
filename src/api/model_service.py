@@ -230,7 +230,7 @@ def diagnosis_status(confidence: str) -> str:
     if confidence == "diagnostic_signal":
         return "სავარაუდო დიაგნოზის ჯგუფი"
     if confidence == "borderline":
-        return "საზღვრული დიაგნოსტიკური სიგნალი"
+        return "სუსტი/საზღვრული დამხმარე სიგნალი"
     return "დაბალი დიაგნოსტიკური მხარდაჭერა"
 
 
@@ -244,25 +244,22 @@ def diagnosis_interpretation(
     probability_text = f"{round(probability * 100, 1)}%"
     threshold_text = f"{round(threshold * 100, 1)}%"
     increasing = [factor for factor in factors if factor["shap_value"] > 0]
-    increasing_text = join_phrases([factor_phrase(factor) for factor in increasing[:3]])
+    increasing_text = join_phrases([factor_phrase(factor) for factor in increasing[:4]])
 
     if confidence in {"high", "diagnostic_signal"}:
         return (
-            f"{display_name}: მოდელის ალბათობა არის {probability_text}, რაც აჭარბებს "
-            f"დიაგნოსტიკურ threshold-ს ({threshold_text}). ამიტომ სისტემა ამ შემთხვევას "
-            f"აფასებს როგორც სავარაუდო ICD-კოდირებულ დიაგნოზის ჯგუფს. მხარდამჭერი ნიშნებია: "
-            f"{increasing_text}."
+            f"{display_name}: სიგნალი threshold-ს აჭარბებს ({probability_text} / ზღვარი {threshold_text}). "
+            f"მთავარი დამხმარე ნიშნებია: {increasing_text}."
         )
     if confidence == "borderline":
         return (
-            f"{display_name}: მოდელის ალბათობა არის {probability_text}; ეს ახლოსაა "
-            f"დიაგნოსტიკურ threshold-თან ({threshold_text}), მაგრამ საკმარისად არ აჭარბებს მას. "
-            f"შედეგი უნდა ჩაითვალოს საზღვრულ სიგნალად. მხარდამჭერი ნიშნებია: {increasing_text}."
+            f"{display_name}: სიგნალი ახლოსაა threshold-თან, მაგრამ საკმარისად არ აჭარბებს მას "
+            f"({probability_text} / ზღვარი {threshold_text}). ეს არის სუსტი/საზღვრული დამხმარე სიგნალი. "
+            f"დამხმარე ნიშნებია: {increasing_text}."
         )
     return (
-        f"{display_name}: მოდელის ალბათობა არის {probability_text}, რაც დაბალია "
-        f"დიაგნოსტიკურ threshold-ზე ({threshold_text}). ამ მონაცემებით დიაგნოზის ჯგუფის "
-        f"მხარდაჭერა სუსტია."
+        f"{display_name}: სიგნალი threshold-ზე დაბალია ({probability_text} / ზღვარი {threshold_text}); "
+        "ამ მონაცემებით ამ დიაგნოზის მხარდაჭერა სუსტია."
     )
 
 

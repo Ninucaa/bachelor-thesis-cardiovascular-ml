@@ -969,6 +969,30 @@ h3 {
   text-transform: uppercase;
 }
 
+.clinical-driver-block p {
+  color: #263645;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.resemblance-block {
+  border-left: 3px solid var(--clinical-blue);
+}
+
+.ecg-context-note {
+  background: #fffdf4;
+  border: 1px solid #dfcf84;
+  border-left: 3px solid #b28418;
+  border-radius: 8px;
+  color: #5a4612;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.45;
+  padding: 11px 12px;
+}
+
 .driver-list {
   display: flex;
   flex-wrap: wrap;
