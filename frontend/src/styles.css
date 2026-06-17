@@ -946,6 +946,98 @@ h3 {
   justify-content: space-between;
 }
 
+.clinical-support {
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid #ccdfe7;
+  border-radius: 8px;
+  display: grid;
+  gap: 9px;
+  padding: 12px;
+}
+
+.support-heading {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.support-heading div {
+  display: grid;
+  gap: 3px;
+}
+
+.support-heading span {
+  color: #405668;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.support-heading strong {
+  color: #263645;
+  font-size: 14px;
+}
+
+.support-heading b {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.clinical-support.support-strong .support-heading b {
+  color: var(--success);
+}
+
+.clinical-support.support-partial .support-heading b {
+  color: var(--warning);
+}
+
+.clinical-support.support-weak .support-heading b {
+  color: var(--danger);
+}
+
+.support-meter {
+  background: #e5edf2;
+  border-radius: 999px;
+  height: 8px;
+  overflow: hidden;
+}
+
+.support-meter span {
+  background: linear-gradient(90deg, var(--accent), var(--success));
+  border-radius: inherit;
+  display: block;
+  height: 100%;
+}
+
+.support-partial .support-meter span {
+  background: linear-gradient(90deg, #b28418, #d79b22);
+}
+
+.support-weak .support-meter span {
+  background: linear-gradient(90deg, #a7372c, #d35c4f);
+}
+
+.clinical-support ul {
+  color: #4d6172;
+  font-size: 13px;
+  line-height: 1.45;
+  margin: 0;
+  padding-left: 18px;
+}
+
+.clinical-support em,
+.clinical-support small {
+  color: #536879;
+  font-size: 12px;
+  font-style: normal;
+  line-height: 1.4;
+}
+
+.clinical-support em {
+  font-weight: 850;
+}
+
 .decision-summary p,
 .decision-summary small {
   color: #4d6172;
@@ -1312,6 +1404,13 @@ h3 {
   font-size: 12px;
   font-style: normal;
   font-weight: 800;
+}
+
+.subtype-card small {
+  color: #667989;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.3;
 }
 
 .subtype-card span {

@@ -446,6 +446,18 @@ function confidenceClass(confidence) {
   return "confidence-low";
 }
 
+function supportClass(level) {
+  if (level === "strong") return "support-strong";
+  if (level === "partial") return "support-partial";
+  return "support-weak";
+}
+
+function supportLabel(level) {
+  if (level === "strong") return "ძლიერი კლინიკური მხარდაჭერა";
+  if (level === "partial") return "ნაწილობრივი კლინიკური მხარდაჭერა";
+  return "სუსტი კლინიკური მხარდაჭერა";
+}
+
 function formatPercent(value) {
   return `${Math.round(value * 1000) / 10}%`;
 }
@@ -1025,7 +1037,8 @@ function diagnosisSeverityRank(risk) {
     low: 1,
   }[risk.diagnosis_confidence] || 0;
   const riskRank = { high: 3, medium: 2, low: 1 }[risk.risk_level] || 0;
-  return confidenceRank * 10 + riskRank;
+  const supportRank = { strong: 3, partial: 2, weak: 1 }[risk.clinical_support_level] || 0;
+  return confidenceRank * 100 + supportRank * 10 + riskRank;
 }
 
 function sortByClinicalSeverity(risks) {
@@ -1053,6 +1066,31 @@ function renderProbabilityMeter(risk) {
   `;
 }
 
+function renderClinicalSupport(risk) {
+  const score = Number(risk.clinical_support_score ?? 0);
+  const level = risk.clinical_support_level || "weak";
+  const reasons = risk.clinical_support_reasons || [];
+  return `
+    <div class="clinical-support ${supportClass(level)}">
+      <div class="support-heading">
+        <div>
+          <span>კლინიკური მხარდაჭერა</span>
+          <strong>${escapeHtml(supportLabel(level))}</strong>
+        </div>
+        <b>${Math.round(score)}%</b>
+      </div>
+      <div class="support-meter" aria-label="კლინიკური მხარდაჭერა ${Math.round(score)}%">
+        <span style="width: ${Math.max(0, Math.min(100, score))}%"></span>
+      </div>
+      <ul>
+        ${reasons.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+      </ul>
+      ${risk.verification_priority ? `<em>${escapeHtml(risk.verification_priority)}</em>` : ""}
+      ${risk.reliability_note ? `<small>${escapeHtml(risk.reliability_note)}</small>` : ""}
+    </div>
+  `;
+}
+
 function renderDecisionSummary() {
   if (!result?.subtype_risks?.length) return "";
   const topRisk = getPrimaryDiagnosticRisk();
@@ -1071,6 +1109,7 @@ function renderDecisionSummary() {
         <em>დიაგნოსტიკური ზღვარი ${formatPercent(topRisk.diagnosis_threshold ?? 0.5)}</em>
       </div>
       ${renderProbabilityMeter(topRisk)}
+      ${renderClinicalSupport(topRisk)}
       <div class="clinical-driver-block">
         <span>3 მთავარი მიზეზი</span>
         <div class="driver-list">${renderReasonChips(topRisk)}</div>
@@ -1108,6 +1147,7 @@ function renderSubtypeRisks() {
         <strong>${escapeHtml(topRisk.display_name)}</strong>
         <b>${formatPercent(topRisk.diagnosis_probability ?? topRisk.risk_probability)}</b>
         ${renderProbabilityMeter(topRisk)}
+        ${renderClinicalSupport(topRisk)}
         <div class="driver-list compact">${renderReasonChips(topRisk, 3)}</div>
       </div>
       <div class="subtype-list-header">
@@ -1131,6 +1171,7 @@ function renderSubtypeRisks() {
                 <div class="subtype-main">
                   <strong>${escapeHtml(risk.display_name)}</strong>
                   <em>${risk.diagnosis_status || diseaseRiskLabel(risk.risk_level)}</em>
+                  <small>${escapeHtml(risk.verification_priority || supportLabel(risk.clinical_support_level))}</small>
                   <span>${escapeHtml(riskReasonText(risk, 2))}</span>
                   ${renderProbabilityMeter(risk)}
                 </div>
@@ -1311,6 +1352,8 @@ function patientReportText() {
     .map((risk, index) => `${index + 1}. ${risk.display_name}: ${formatPercent(risk.diagnosis_probability ?? risk.risk_probability)} (${risk.diagnosis_status})`)
     .join("\n");
   const reasons = clinicalReasonList(topRisk, 5).map((item) => `- ${item}`).join("\n") || "- მკვეთრი განმსაზღვრელი ფაქტორი არ გამოიკვეთა";
+  const supportReasons =
+    (topRisk.clinical_support_reasons || []).map((item) => `- ${item}`).join("\n") || "- სპეციფიკური კლინიკური დამადასტურებელი ნიშანი მკვეთრად არ ჩანს";
   const ecgContext = ecgResultContext();
   const checks = actionGroups
     .map((group) => [`${group.title}:`, ...group.items.map((item) => `- ${item}`)].join("\n"))
@@ -1329,6 +1372,12 @@ function patientReportText() {
     "",
     "რატომ ჰგავს ამ დიაგნოზს:",
     clinicalResemblanceText(topRisk),
+    "",
+    "კლინიკური მხარდაჭერა:",
+    `${supportLabel(topRisk.clinical_support_level)} - ${Math.round(Number(topRisk.clinical_support_score ?? 0))}%.`,
+    supportReasons,
+    topRisk.reliability_note || "",
+    topRisk.verification_priority ? `პრიორიტეტი: ${topRisk.verification_priority}` : "",
     ...(ecgContext ? ["", ecgContext] : []),
     "",
     "მონაცემების ხარისხი:",
