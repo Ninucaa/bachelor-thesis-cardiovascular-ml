@@ -865,6 +865,25 @@ function getPrimaryDiagnosticRisk() {
   return diagnosticCandidates[0] || result.subtype_risks[0];
 }
 
+function diagnosisSeverityRank(risk) {
+  const confidenceRank = {
+    high: 4,
+    diagnostic_signal: 3,
+    borderline: 2,
+    low: 1,
+  }[risk.diagnosis_confidence] || 0;
+  const riskRank = { high: 3, medium: 2, low: 1 }[risk.risk_level] || 0;
+  return confidenceRank * 10 + riskRank;
+}
+
+function sortByClinicalSeverity(risks) {
+  return [...risks].sort((a, b) => {
+    const severityDelta = diagnosisSeverityRank(b) - diagnosisSeverityRank(a);
+    if (severityDelta) return severityDelta;
+    return (b.diagnosis_probability ?? b.risk_probability) - (a.diagnosis_probability ?? a.risk_probability);
+  });
+}
+
 function renderProbabilityMeter(risk) {
   const probability = clampPercent(risk.diagnosis_probability ?? risk.risk_probability);
   const threshold = clampPercent(risk.diagnosis_threshold ?? 0.5);
@@ -922,7 +941,7 @@ function renderDecisionSummary() {
 function renderSubtypeRisks() {
   if (!result?.subtype_risks?.length) return "";
   const topRisk = getPrimaryDiagnosticRisk();
-  const otherRisks = result.subtype_risks.filter((risk) => risk.target_name !== topRisk.target_name);
+  const otherRisks = sortByClinicalSeverity(result.subtype_risks.filter((risk) => risk.target_name !== topRisk.target_name));
   const visibleRisks = isAllDiagnosesOpen ? otherRisks : otherRisks.slice(0, 4);
   const hiddenCount = Math.max(0, otherRisks.length - visibleRisks.length);
 

@@ -368,7 +368,7 @@ def clinical_factor_label(factor: dict[str, Any]) -> str:
     if feature == "gender_male":
         return f"სქესი: {format_feature_value(feature, value)}"
     if feature.startswith("history_") or feature.startswith("symptom_") or feature == "ed_arrived_by_ambulance":
-        return f"{label}: {format_feature_value(feature, value)}"
+        return label if value >= 0.5 else f"{label}: არა"
     if feature == "ed_triage_acuity_mean":
         return f"triage სიმძიმე: {round(value)} / 5"
     if feature == "triage_pain_mean":
