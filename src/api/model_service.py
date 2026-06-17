@@ -586,7 +586,7 @@ class ModelService:
                     "გულის წასვლა არ ჰქონია."
                 ),
                 "ecg_finding": "st_depression",
-                "ecg_note": "ST depression lateral leads; irregular rhythm noted, atrial fibrillation should be ruled out.",
+                "ecg_note": "ლატერალურ განხრებში აღინიშნება ST სეგმენტის დაწევა; აღწერილია არარეგულარული რიტმი და საჭიროა წინაგულთა ფიბრილაციის გამორიცხვა.",
             },
             "demo-2": {
                 "label": "სატესტო პაციენტი 2",
@@ -635,7 +635,7 @@ class ModelService:
                 },
                 "symptom_text": "პაციენტს აქვს მწვავე, ძლიერი გულმკერდის ტკივილი, ქოშინი და ცივი ოფლიანობა. ტკივილი დაიწყო ბოლო საათებში.",
                 "ecg_finding": "st_elevation",
-                "ecg_note": "ST elevation inferior leads; serial Troponin T is markedly elevated.",
+                "ecg_note": "ქვედა განხრებში აღინიშნება ST სეგმენტის აწევა; სერიული Troponin T მკვეთრად მომატებულია.",
             },
             "demo-3": {
                 "label": "სატესტო პაციენტი 3",
@@ -684,7 +684,7 @@ class ModelService:
                 },
                 "symptom_text": "პაციენტს აქვს გულის ფრიალი, თავბრუსხვევა და მოკლე სინკოპე. გულმკერდის ტკივილს უარყოფს.",
                 "ecg_finding": "atrial_fibrillation",
-                "ecg_note": "Irregularly irregular rhythm; atrial fibrillation pattern described.",
+                "ecg_note": "აღწერილია არარეგულარულად არარეგულარული რიტმი, რაც წინაგულთა ფიბრილაციის სურათს შეესაბამება.",
             },
             "demo-4": {
                 "label": "სატესტო პაციენტი 4",
@@ -733,7 +733,7 @@ class ModelService:
                 },
                 "symptom_text": "პაციენტი უარყოფს გულმკერდის ტკივილს, ქოშინს, გულის ფრიალს, თავბრუსხვევას და შეშუპებას.",
                 "ecg_finding": "normal",
-                "ecg_note": "Sinus rhythm; acute ischemic changes are not described.",
+                "ecg_note": "სინუსური რიტმი; მწვავე იშემიური ცვლილებები აღწერილი არ არის.",
             },
             "demo-5": {
                 "label": "სატესტო პაციენტი 5",
@@ -782,7 +782,7 @@ class ModelService:
                 },
                 "symptom_text": "პაციენტს აქვს ხანგრძლივი მაღალი წნევა, ქოშინი კიბეზე ასვლისას, თავბრუსხვევა და მსუბუქი შეშუპება. მკვეთრ გულმკერდის ტკივილს უარყოფს.",
                 "ecg_finding": "other_abnormal",
-                "ecg_note": "Left ventricular strain pattern is suspected; acute ST elevation is not described.",
+                "ecg_note": "სავარაუდოა მარცხენა პარკუჭის დატვირთვის სურათი; მწვავე ST სეგმენტის აწევა აღწერილი არ არის.",
             },
             "demo-6": {
                 "label": "სატესტო პაციენტი 6",
@@ -831,7 +831,7 @@ class ModelService:
                 },
                 "symptom_text": "პაციენტი სასწრაფოთი მოყვანილია ძალიან მაღალი წნევით, ძლიერი თავის ტკივილით, თავბრუსხვევით, ქოშინით და გულმკერდის დისკომფორტით.",
                 "ecg_finding": "st_depression",
-                "ecg_note": "Nonspecific ST-T changes; severe hypertension at triage.",
+                "ecg_note": "აღინიშნება არასპეციფიკური ST-T ცვლილებები; triage-ზე დაფიქსირდა მძიმე ჰიპერტენზია.",
             },
             "demo-7": {
                 "label": "სატესტო პაციენტი 7",
@@ -880,7 +880,7 @@ class ModelService:
                 },
                 "symptom_text": "პაციენტს აქვს განმეორებითი გულმკერდის ტკივილი დატვირთვაზე, ქოშინი სიარულისას და მაღალი ქოლესტერინის ისტორია.",
                 "ecg_finding": "st_depression",
-                "ecg_note": "ST depression during symptoms; chronic ischemic pattern should be considered.",
+                "ecg_note": "სიმპტომების დროს აღინიშნება ST სეგმენტის დაწევა; გასათვალისწინებელია ქრონიკული იშემიური სურათი.",
             },
             "demo-8": {
                 "label": "სატესტო პაციენტი 8",
@@ -929,7 +929,7 @@ class ModelService:
                 },
                 "symptom_text": "პაციენტი სასწრაფოთი მოყვანილია უეცარი თავბრუსხვევით, სისუსტით და მეტყველების გაძნელებით. გულმკერდის ტკივილს უარყოფს.",
                 "ecg_finding": "atrial_fibrillation",
-                "ecg_note": "Atrial fibrillation pattern; cerebrovascular event risk should be considered clinically.",
+                "ecg_note": "აღწერილია წინაგულთა ფიბრილაციის სურათი; კლინიკურად გასათვალისწინებელია ცერებროვასკულური მოვლენის რისკი.",
             },
         }
 

@@ -44,7 +44,7 @@ const editableFields = [
   { key: "ed_triage_dbp_mean", label: "დიასტოლური წნევა", min: 30, max: 140, step: 1, unit: "mmHg", optional: true },
   { key: "ed_triage_resp_rate_mean", label: "სუნთქვის სიხშირე", min: 4, max: 80, step: 1, unit: "breaths/min", optional: true },
   { key: "ed_triage_spo2_mean", label: "SpO2", min: 50, max: 100, step: 1, unit: "%", optional: true },
-  { key: "ed_triage_temperature_f_mean", label: "ტემპერატურა", min: 80, max: 110, step: 0.1, unit: "F", optional: true },
+  { key: "ed_triage_temperature_f_mean", label: "ტემპერატურა", min: 26.7, max: 43.3, step: 0.1, unit: "°C", optional: true, displayUnit: "celsius" },
   { key: "ed_triage_acuity_mean", label: "triage სიმძიმე", min: 1, max: 5, step: 1, unit: "1-5", optional: true },
   { key: "ed_arrived_by_ambulance", label: "სასწრაფოთი მოყვანა", type: "boolean" },
 ];
@@ -424,6 +424,7 @@ function inputValue(field) {
   if (Number.isNaN(value)) return "";
   if (field.displayUnit === "kg") value /= 2.20462;
   if (field.displayUnit === "cm") value *= 2.54;
+  if (field.displayUnit === "celsius") value = (value - 32) * (5 / 9);
   if (field.precision !== undefined) return value.toFixed(field.precision);
   if (field.step && Number(field.step) < 1) return String(Math.round(value * 10) / 10);
   return String(Math.round(value));
@@ -646,6 +647,7 @@ function updateFeatureFromInput(key, rawValue) {
     if (!Number.isFinite(value)) return;
     if (field?.displayUnit === "kg") value *= 2.20462;
     if (field?.displayUnit === "cm") value /= 2.54;
+    if (field?.displayUnit === "celsius") value = value * (9 / 5) + 32;
     nextFeatures[key] = value;
     syncMeasurementMetadata(nextFeatures, key, false);
   }
