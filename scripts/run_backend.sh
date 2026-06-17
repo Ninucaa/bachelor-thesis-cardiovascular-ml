@@ -10,4 +10,4 @@ if [ ! -x ".venv/bin/python" ]; then
   exit 1
 fi
 
-exec .venv/bin/python -m uvicorn src.api.app:app --host 127.0.0.1 --port 8765
+exec .venv/bin/python -m uvicorn src.api.app:app --host 127.0.0.1 --port 8765 --reload

@@ -317,6 +317,61 @@ const symptomTextRules = [
   },
 ];
 
+const dataQualityGroups = [
+  {
+    title: "დემოგრაფია",
+    keys: ["age", "gender_male"],
+    weight: 2,
+    fix: "დაადასტურეთ ასაკი და სქესი.",
+  },
+  {
+    title: "ფიზიკური მონაცემები",
+    keys: ["omr_bmi_mean", "omr_sbp_mean", "omr_dbp_mean"],
+    weight: 1.5,
+    fix: "შეავსეთ BMI ან წონა/სიმაღლე და ამბულატორიული წნევა, თუ ცნობილია.",
+  },
+  {
+    title: "სიმპტომები",
+    keys: [
+      "symptom_chest_pain",
+      "symptom_shortness_of_breath",
+      "symptom_palpitations",
+      "symptom_syncope",
+      "symptom_dizziness",
+      "symptom_edema",
+      "triage_pain_mean",
+    ],
+    weight: 1,
+    fix: "დაამატეთ ამჟამინდელი ჩივილები ან მიუთითეთ, რომ სიმპტომები არ არის.",
+  },
+  {
+    title: "ლაბორატორია",
+    keys: ["lab_creatinine_mean", "lab_hemoglobin_mean", "lab_glucose_mean", "lab_ntprobnp_mean", "lab_troponin_t_mean"],
+    weight: 2,
+    fix: "გადაამოწმეთ ძირითადი ანალიზები, განსაკუთრებით Troponin T და NT-proBNP კარდიოლოგიური ეჭვისას.",
+  },
+  {
+    title: "გადაუდებელი vital ნიშნები",
+    keys: [
+      "ed_triage_heart_rate_mean",
+      "ed_triage_sbp_mean",
+      "ed_triage_dbp_mean",
+      "ed_triage_resp_rate_mean",
+      "ed_triage_spo2_mean",
+      "ed_triage_temperature_f_mean",
+      "ed_triage_acuity_mean",
+    ],
+    weight: 2,
+    fix: "შეავსეთ triage vital ნიშნები: წნევა, პულსი, SpO2, სუნთქვა და ტემპერატურა.",
+  },
+  {
+    title: "ECG კონტექსტი",
+    customPresent: () => ecgFinding !== "not_available" || Boolean(ecgNote.trim()),
+    weight: 1.5,
+    fix: "დაამატეთ ECG შეფასება ან მოკლე ECG აღწერა, თუ პასუხი არსებობს.",
+  },
+];
+
 const negationPatterns = [
   /არ\s+(აქვს|აღენიშნება|უჩივის|აფიქსირებს|არის|ქონდა|ჰქონდა)/i,
   /უარყოფს/i,
@@ -563,6 +618,101 @@ function ecgClinicalChecks() {
     other_abnormal: ["ECG-ის პათოლოგიური აღწერის ექიმის მიერ ინტერპრეტაცია", "ECG ცვლილებების შედარება სიმპტომებთან და ლაბორატორიულ პასუხებთან"],
   };
   return checksByFinding[selected.value] || checksByFinding.other_abnormal;
+}
+
+function uniqueItems(items) {
+  const seen = new Set();
+  return items
+    .map((item) => String(item || "").replace(/\s+/g, " ").trim())
+    .filter(Boolean)
+    .filter((item) => {
+      const key = item.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+}
+
+function isFeaturePresent(key) {
+  if (!features || clearedFieldKeys.has(key)) return false;
+  if (Number(features[`${key}_missing`] ?? 0) === 1) return false;
+  const value = features[key];
+  if (value === null || value === undefined || value === "") return false;
+  if (typeof value === "number" && !Number.isFinite(value)) return false;
+  return true;
+}
+
+function dataQualitySummary() {
+  if (!features) {
+    return {
+      score: 0,
+      label: "მონაცემები არ არის ჩატვირთული",
+      className: "low",
+      missingGroups: dataQualityGroups,
+      presentGroups: [],
+      recommendation: "ჩატვირთეთ სატესტო პაციენტი ან შეავსეთ ფორმა.",
+    };
+  }
+
+  const groupResults = dataQualityGroups.map((group) => {
+    const presentRatio = group.customPresent
+      ? group.customPresent()
+        ? 1
+        : 0
+      : group.keys.filter((key) => isFeaturePresent(key)).length / group.keys.length;
+    return { ...group, presentRatio };
+  });
+  const totalWeight = groupResults.reduce((sum, group) => sum + group.weight, 0);
+  const weightedScore = groupResults.reduce((sum, group) => sum + group.weight * group.presentRatio, 0);
+  const score = Math.round((weightedScore / totalWeight) * 100);
+  const missingGroups = groupResults.filter((group) => group.presentRatio < 0.75);
+  const presentGroups = groupResults.filter((group) => group.presentRatio >= 0.75);
+
+  let label = "საკმარისი მონაცემები";
+  let className = "good";
+  if (score < 55) {
+    label = "სუსტი მონაცემები";
+    className = "low";
+  } else if (score < 80) {
+    label = "ნაწილობრივ სრული მონაცემები";
+    className = "medium";
+  }
+
+  return {
+    score,
+    label,
+    className,
+    missingGroups,
+    presentGroups,
+    recommendation: missingGroups.length
+      ? missingGroups[0].fix
+      : "მონაცემები საკმარისად სრულად გამოიყურება; ახლა მთავარი ყურადღება კლინიკურ დადასტურებაზე გადადის.",
+  };
+}
+
+function clinicalActionGroups(risk) {
+  const quality = dataQualitySummary();
+  const diagnosisChecks = uniqueItems([...(risk?.suggested_clinical_checks || []).slice(0, 4), ...ecgClinicalChecks()]);
+  const dataChecks = uniqueItems(quality.missingGroups.slice(0, 3).map((group) => group.fix));
+  const safetyChecks = [
+    "ეს პასუხი გამოიყენეთ როგორც decision-support; საბოლოო დიაგნოზი და მკურნალობა ექიმმა უნდა განსაზღვროს.",
+    "მაღალი ან ECG-ით გამყარებული სიგნალისას გადაამოწმეთ პაციენტის მიმდინარე მდგომარეობა, vital ნიშნები და მწვავე რისკი.",
+  ];
+
+  return [
+    {
+      title: "დიაგნოზის გადამოწმება",
+      items: diagnosisChecks.length ? diagnosisChecks : ["მთავარი სავარაუდო მიმართულება შეადარეთ პაციენტის ჩივილებს, ანამნეზს და ფიზიკურ გასინჯვას."],
+    },
+    {
+      title: "მონაცემების შევსება",
+      items: dataChecks.length ? dataChecks : ["მონაცემების ძირითადი ჯგუფები შევსებულია; გადაამოწმეთ მხოლოდ საეჭვო ან უკიდურესი მნიშვნელობები."],
+    },
+    {
+      title: "უსაფრთხოების შეზღუდვა",
+      items: safetyChecks,
+    },
+  ];
 }
 
 function applySymptomText(nextFeatures, text) {
@@ -996,15 +1146,56 @@ function renderSubtypeRisks() {
   `;
 }
 
+function renderDataQualityPanel() {
+  const quality = dataQualitySummary();
+  return `
+    <div class="data-quality-card ${quality.className}">
+      <div class="data-quality-header">
+        <div>
+          <span>მონაცემების ხარისხი</span>
+          <strong>${quality.label}</strong>
+        </div>
+        <b>${quality.score}%</b>
+      </div>
+      <div class="quality-meter" aria-label="მონაცემების ხარისხი ${quality.score}%">
+        <span style="width: ${quality.score}%"></span>
+      </div>
+      <p>${escapeHtml(quality.recommendation)}</p>
+      <div class="quality-groups">
+        ${
+          quality.presentGroups.length
+            ? `<span>შევსებულია: ${escapeHtml(quality.presentGroups.map((group) => group.title).slice(0, 3).join(", "))}</span>`
+            : ""
+        }
+        ${
+          quality.missingGroups.length
+            ? `<span>დასამატებელია: ${escapeHtml(quality.missingGroups.map((group) => group.title).slice(0, 3).join(", "))}</span>`
+            : ""
+        }
+      </div>
+    </div>
+  `;
+}
+
 function renderClinicalChecks(risk) {
-  const checks = [...(risk?.suggested_clinical_checks || []).slice(0, 4), ...ecgClinicalChecks()];
-  if (!checks.length) return "";
+  const actionGroups = clinicalActionGroups(risk);
   return `
     <div class="clinical-checks">
       <h4>ექიმმა დამატებით გადაამოწმოს</h4>
-      <ul>
-        ${checks.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
-      </ul>
+      <div class="clinical-check-groups">
+        ${actionGroups
+          .map(
+            (group) => `
+              <section class="check-group">
+                <strong>${escapeHtml(group.title)}</strong>
+                <ul>
+                  ${group.items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+                </ul>
+              </section>
+            `,
+          )
+          .join("")}
+      </div>
     </div>
   `;
 }
@@ -1113,16 +1304,17 @@ function patientProfileText() {
 function patientReportText() {
   if (!result?.subtype_risks?.length) return "";
   const topRisk = getPrimaryDiagnosticRisk();
+  const quality = dataQualitySummary();
+  const actionGroups = clinicalActionGroups(topRisk);
   const topThree = result.subtype_risks
     .slice(0, 3)
     .map((risk, index) => `${index + 1}. ${risk.display_name}: ${formatPercent(risk.diagnosis_probability ?? risk.risk_probability)} (${risk.diagnosis_status})`)
     .join("\n");
   const reasons = clinicalReasonList(topRisk, 5).map((item) => `- ${item}`).join("\n") || "- მკვეთრი განმსაზღვრელი ფაქტორი არ გამოიკვეთა";
   const ecgContext = ecgResultContext();
-  const checks =
-    [...(topRisk.suggested_clinical_checks || []).slice(0, 4), ...ecgClinicalChecks()]
-      .map((item) => `- ${item}`)
-      .join("\n") || "- ექიმის კლინიკური შეფასება და საჭიროების მიხედვით დამატებითი კვლევები";
+  const checks = actionGroups
+    .map((group) => [`${group.title}:`, ...group.items.map((item) => `- ${item}`)].join("\n"))
+    .join("\n\n");
 
   return [
     "პაციენტის სავარაუდო დიაგნოსტიკური ანგარიში",
@@ -1138,6 +1330,9 @@ function patientReportText() {
     "რატომ ჰგავს ამ დიაგნოზს:",
     clinicalResemblanceText(topRisk),
     ...(ecgContext ? ["", ecgContext] : []),
+    "",
+    "მონაცემების ხარისხი:",
+    `${quality.label} - ${quality.score}%. ${quality.recommendation}`,
     "",
     "სხვა შესადარებელი მიმართულებები:",
     topThree,
@@ -1336,7 +1531,7 @@ function render() {
 
           ${
             result
-              ? `${renderDecisionSummary()}${renderSubtypeRisks()}${renderModelTrustAction()}${renderPatientReport()}`
+              ? `${renderDecisionSummary()}${renderDataQualityPanel()}${renderSubtypeRisks()}${renderModelTrustAction()}${renderPatientReport()}`
               : `<div class="empty-state">სავარაუდო დიაგნოსტიკური მიმართულების სანახავად გაუშვით პროგნოზი.</div>`
           }
         </div>
