@@ -1194,6 +1194,30 @@ h3 {
   gap: 8px;
 }
 
+.subtype-list-header {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  margin: 14px 0 10px;
+}
+
+.subtype-list-header div {
+  display: grid;
+  gap: 3px;
+}
+
+.subtype-list-header strong {
+  color: #263645;
+  font-size: 13px;
+}
+
+.subtype-list-header span {
+  color: #687a8a;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
 .top-disease {
   border: 1px solid #cad9e2;
   border-radius: 8px;
@@ -1631,6 +1655,11 @@ h3 {
   .subtype-card {
     display: grid;
     grid-template-columns: 1fr;
+  }
+
+  .subtype-list-header {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .subtype-card b {

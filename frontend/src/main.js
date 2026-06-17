@@ -353,6 +353,7 @@ let ecgFinding = "not_available";
 let ecgNote = "";
 let isLabReferenceOpen = false;
 let isModelTrustOpen = false;
+let isAllDiagnosesOpen = false;
 let clearedFieldKeys = new Set();
 let selectedSampleId = "demo-1";
 
@@ -922,6 +923,8 @@ function renderSubtypeRisks() {
   if (!result?.subtype_risks?.length) return "";
   const topRisk = getPrimaryDiagnosticRisk();
   const otherRisks = result.subtype_risks.filter((risk) => risk.target_name !== topRisk.target_name);
+  const visibleRisks = isAllDiagnosesOpen ? otherRisks : otherRisks.slice(0, 4);
+  const hiddenCount = Math.max(0, otherRisks.length - visibleRisks.length);
 
   return `
     <div class="subtype-section">
@@ -936,8 +939,21 @@ function renderSubtypeRisks() {
         ${renderProbabilityMeter(topRisk)}
         <div class="driver-list compact">${renderReasonChips(topRisk, 3)}</div>
       </div>
+      <div class="subtype-list-header">
+        <div>
+          <strong>${isAllDiagnosesOpen ? "ყველა დიაგნოზის ჯგუფი" : "მნიშვნელოვანი შედარებითი მიმართულებები"}</strong>
+          <span>${isAllDiagnosesOpen ? "ნაჩვენებია ყველა მოდელირებული ICD-ჯგუფი." : "ნაჩვენებია მხოლოდ top 4, რომ მთავარი დასკვნა არ გადაიტვირთოს."}</span>
+        </div>
+        ${
+          otherRisks.length > 4
+            ? `<button class="secondary-button compact-button" id="toggle-diagnoses-button">
+                ${isAllDiagnosesOpen ? "მხოლოდ top 4" : `ყველა ჯგუფის ნახვა (${hiddenCount} მეტი)`}
+              </button>`
+            : ""
+        }
+      </div>
       <div class="subtype-grid">
-        ${otherRisks
+        ${visibleRisks
           .map(
             (risk) => `
               <div class="subtype-card ${risk.risk_level}">
@@ -1358,6 +1374,10 @@ function render() {
     isModelTrustOpen = true;
     render();
   });
+  document.getElementById("toggle-diagnoses-button")?.addEventListener("click", () => {
+    isAllDiagnosesOpen = !isAllDiagnosesOpen;
+    render();
+  });
   document.getElementById("close-lab-reference")?.addEventListener("click", () => {
     isLabReferenceOpen = false;
     render();
@@ -1387,6 +1407,7 @@ async function loadSample() {
     ecgFinding = sample.ecg_finding || "not_available";
     ecgNote = sample.ecg_note || "";
     clearedFieldKeys = new Set();
+    isAllDiagnosesOpen = false;
     features = recomputeDerivedFeatures({ ...sample.features });
     statusText = "სატესტო პაციენტი ჩაიტვირთა.";
   } catch (error) {
