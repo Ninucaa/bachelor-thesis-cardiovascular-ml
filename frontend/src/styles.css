@@ -1038,6 +1038,65 @@ h3 {
   font-weight: 850;
 }
 
+.triage-panel {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.triage-card {
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid #ccdfe7;
+  border-left: 4px solid var(--accent);
+  border-radius: 8px;
+  display: grid;
+  gap: 7px;
+  padding: 12px;
+}
+
+.triage-card.urgent,
+.triage-card.ecg-match {
+  border-left-color: var(--danger);
+}
+
+.triage-card.soon,
+.triage-card.ecg-caution {
+  border-left-color: var(--warning);
+}
+
+.triage-card.routine,
+.triage-card.ecg-neutral {
+  border-left-color: var(--success);
+}
+
+.triage-card span {
+  color: #405668;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.triage-card strong {
+  color: #263645;
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+.triage-card p {
+  color: #4d6172;
+  font-size: 13px;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.triage-card ul {
+  color: #4d6172;
+  font-size: 12px;
+  line-height: 1.4;
+  margin: 0;
+  padding-left: 18px;
+}
+
 .decision-summary p,
 .decision-summary small {
   color: #4d6172;
@@ -1862,6 +1921,10 @@ h3 {
 
   .subtype-card {
     display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .triage-panel {
     grid-template-columns: 1fr;
   }
 

@@ -632,6 +632,147 @@ function ecgClinicalChecks() {
   return checksByFinding[selected.value] || checksByFinding.other_abnormal;
 }
 
+function numericFeature(key, defaultValue = 0) {
+  if (!features || Number(features[`${key}_missing`] ?? 0) === 1) return defaultValue;
+  const value = Number(features[key]);
+  return Number.isFinite(value) ? value : defaultValue;
+}
+
+function booleanFeature(key) {
+  return numericFeature(key) >= 0.5;
+}
+
+function ecgAlignment(risk) {
+  const selected = selectedEcgOption();
+  const target = risk?.target_name || "";
+  const ischemicTargets = new Set([
+    "target_myocardial_infarction",
+    "target_acute_ischemic_heart_disease",
+    "target_angina_pectoris",
+    "target_chronic_ischemic_heart_disease",
+  ]);
+  const arrhythmiaTargets = new Set([
+    "target_atrial_fibrillation_flutter",
+    "target_paroxysmal_tachycardia",
+    "target_other_arrhythmia",
+    "target_av_conduction_block",
+  ]);
+  const strokeTargets = new Set([
+    "target_ischemic_stroke",
+    "target_other_cerebrovascular_disease",
+    "target_subarachnoid_hemorrhage",
+    "target_intracerebral_hemorrhage",
+  ]);
+
+  if (selected.value === "not_available") {
+    return {
+      className: "neutral",
+      label: "ECG არ არის მითითებული",
+      text: "ECG პასუხი არ არის შეყვანილი, ამიტომ მთავარი სავარაუდო მიმართულება ECG-ით ვერ მყარდება.",
+    };
+  }
+
+  if (selected.value === "normal") {
+    if (ischemicTargets.has(target) || arrhythmiaTargets.has(target)) {
+      return {
+        className: "caution",
+        label: "ECG პირდაპირ არ ამყარებს",
+        text: "ნორმალური ECG ამ ეტაპზე არ ამყარებს მწვავე იშემიურ ან რიტმის სიგნალს, თუმცა დიაგნოზს სრულად არ გამორიცხავს.",
+      };
+    }
+    return {
+      className: "neutral",
+      label: "ECG ნეიტრალურია",
+      text: "ნორმალური ECG მთავარ სავარაუდო მიმართულებას მკვეთრად არც ამყარებს და არც გამორიცხავს.",
+    };
+  }
+
+  if (["st_elevation", "st_depression"].includes(selected.value)) {
+    if (ischemicTargets.has(target)) {
+      return {
+        className: "match",
+        label: "ECG ემთხვევა მთავარ მიმართულებას",
+        text: "ST ცვლილება აძლიერებს იშემიური/კორონარული მიმართულების კლინიკურ გადამოწმებას.",
+      };
+    }
+    return {
+      className: "caution",
+      label: "ECG სხვა მიმართულებასაც აძლიერებს",
+      text: "ST ცვლილება მოითხოვს იშემიური მიზეზის პარალელურ გამორიცხვას, თუნდაც მთავარი მოდელური მიმართულება სხვა იყოს.",
+    };
+  }
+
+  if (["arrhythmia", "atrial_fibrillation", "wide_qrs", "long_qt"].includes(selected.value)) {
+    if (arrhythmiaTargets.has(target) || (selected.value === "atrial_fibrillation" && strokeTargets.has(target))) {
+      return {
+        className: "match",
+        label: "ECG ემთხვევა მთავარ მიმართულებას",
+        text: "რიტმის/გამტარობის ცვლილება ამყარებს შესაბამის კარდიოლოგიურ ან ინსულტის რისკის გადამოწმებას.",
+      };
+    }
+    return {
+      className: "caution",
+      label: "ECG დამატებით გადასამოწმებელია",
+      text: "რიტმის/გამტარობის ცვლილება შეიძლება იყოს თანმხლები პრობლემა და ექიმმა ცალკე უნდა შეაფასოს.",
+    };
+  }
+
+  return {
+    className: "caution",
+    label: "ECG პათოლოგიურია",
+    text: "პათოლოგიური ECG აღწერა უნდა შეედაროს სიმპტომებს, ლაბორატორიას და მთავარ სავარაუდო დიაგნოზს.",
+  };
+}
+
+function urgencyAssessment(risk) {
+  const reasons = [];
+  const probability = Number(risk?.diagnosis_probability ?? risk?.risk_probability ?? 0);
+  const supportScore = Number(risk?.clinical_support_score ?? 0);
+  const ecg = selectedEcgOption().value;
+  const troponin = numericFeature("lab_troponin_t_mean");
+  const ntprobnp = numericFeature("lab_ntprobnp_mean");
+  const spo2 = numericFeature("ed_triage_spo2_mean", 100);
+  const heartRate = numericFeature("ed_triage_heart_rate_mean");
+  const respRate = numericFeature("ed_triage_resp_rate_mean");
+  const sbp = Math.max(numericFeature("omr_sbp_mean"), numericFeature("ed_triage_sbp_mean"));
+  const dbp = Math.max(numericFeature("omr_dbp_mean"), numericFeature("ed_triage_dbp_mean"));
+  const acuity = numericFeature("ed_triage_acuity_mean", 5);
+
+  if (["st_elevation", "st_depression"].includes(ecg)) reasons.push("ECG-ზე არის ST ცვლილება");
+  if (troponin > 0.01) reasons.push("Troponin T მომატებულია");
+  if (spo2 < 90) reasons.push(`SpO2 დაბალია (${Math.round(spo2)}%)`);
+  if (sbp >= 180 || dbp >= 120) reasons.push(`წნევა ძალიან მაღალია (${Math.round(sbp)}/${Math.round(dbp)} mmHg)`);
+  if (heartRate >= 130 || heartRate <= 45) reasons.push(`გულისცემა უკიდურესია (${Math.round(heartRate)} bpm)`);
+  if (respRate >= 28) reasons.push(`სუნთქვის სიხშირე მაღალია (${Math.round(respRate)} / min)`);
+  if (acuity <= 2) reasons.push(`triage სიმძიმე მაღალია (${Math.round(acuity)} / 5)`);
+  if (ntprobnp > 1800 && (booleanFeature("symptom_shortness_of_breath") || booleanFeature("symptom_edema"))) {
+    reasons.push("NT-proBNP და გულის უკმარისობის სიმპტომები გამოკვეთილია");
+  }
+
+  if (reasons.length >= 2 || (probability >= 0.75 && supportScore >= 70)) {
+    return {
+      className: "urgent",
+      label: "გადაუდებელი შეფასება",
+      text: "პაციენტის პროფილში ჩანს ნიშნები, რომლებიც საჭიროებს სწრაფ კლინიკურ გადამოწმებას.",
+      reasons: reasons.slice(0, 4),
+    };
+  }
+  if (reasons.length === 1 || probability >= 0.5 || supportScore >= 40) {
+    return {
+      className: "soon",
+      label: "სწრაფი კარდიოლოგიური გადამოწმება",
+      text: "მოდელის პასუხი და კლინიკური ნიშნები საჭიროებს მიზანმიმართულ, მაგრამ არა ავტომატურად საბოლოო დიაგნოზად გამოყენებულ შეფასებას.",
+      reasons: reasons.length ? reasons.slice(0, 4) : ["მოდელის ან კლინიკური მხარდაჭერის სიგნალი საშუალო დონეზეა"],
+    };
+  }
+  return {
+    className: "routine",
+    label: "გეგმიური გადამოწმება",
+    text: "ამ მონაცემებით მწვავე სიგნალი მკვეთრად არ ჩანს, თუმცა შედეგი დაავადებას სრულად არ გამორიცხავს.",
+    reasons: reasons.length ? reasons.slice(0, 4) : ["მწვავე vital/ECG/ბიომარკერის სიგნალი არ ჩანს"],
+  };
+}
+
 function uniqueItems(items) {
   const seen = new Set();
   return items
@@ -704,11 +845,14 @@ function dataQualitySummary() {
 
 function clinicalActionGroups(risk) {
   const quality = dataQualitySummary();
+  const urgency = urgencyAssessment(risk);
+  const ecg = ecgAlignment(risk);
   const diagnosisChecks = uniqueItems([...(risk?.suggested_clinical_checks || []).slice(0, 4), ...ecgClinicalChecks()]);
   const dataChecks = uniqueItems(quality.missingGroups.slice(0, 3).map((group) => group.fix));
   const safetyChecks = [
-    "ეს პასუხი გამოიყენეთ როგორც decision-support; საბოლოო დიაგნოზი და მკურნალობა ექიმმა უნდა განსაზღვროს.",
-    "მაღალი ან ECG-ით გამყარებული სიგნალისას გადაამოწმეთ პაციენტის მიმდინარე მდგომარეობა, vital ნიშნები და მწვავე რისკი.",
+    `${urgency.label}: ${urgency.text}`,
+    ecg.text,
+    "ეს პასუხი გამოიყენეთ როგორც კლინიკური დამხმარე სიგნალი; საბოლოო დიაგნოზი და მკურნალობა ექიმმა უნდა განსაზღვროს.",
   ];
 
   return [
@@ -914,13 +1058,13 @@ function renderLabReferenceWindow() {
       <div class="reference-window">
         <div class="reference-header">
           <div>
-            <h2>ლაბორატორიული და BMI ნორმები</h2>
+            <h2>ლაბორატორიული ნორმები</h2>
             <p>საორიენტაციო დიაპაზონები. ზუსტი ნორმები შეიძლება პაციენტის მდგომარეობისა და ლაბორატორიის მიხედვით განსხვავდებოდეს.</p>
           </div>
           <button class="icon-button" id="close-lab-reference" aria-label="დახურვა">×</button>
         </div>
         <div class="reference-table">
-          ${[...labReferenceRanges, bmiReference]
+          ${labReferenceRanges
             .map((reference) => {
               const status = labStatus(reference);
               return `
@@ -1091,6 +1235,28 @@ function renderClinicalSupport(risk) {
   `;
 }
 
+function renderClinicalTriagePanel(risk) {
+  const urgency = urgencyAssessment(risk);
+  const ecg = ecgAlignment(risk);
+  return `
+    <div class="triage-panel">
+      <section class="triage-card ${urgency.className}">
+        <span>სასწრაფოობის დონე</span>
+        <strong>${escapeHtml(urgency.label)}</strong>
+        <p>${escapeHtml(urgency.text)}</p>
+        <ul>
+          ${urgency.reasons.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+        </ul>
+      </section>
+      <section class="triage-card ecg-${ecg.className}">
+        <span>ECG შესაბამისობა</span>
+        <strong>${escapeHtml(ecg.label)}</strong>
+        <p>${escapeHtml(ecg.text)}</p>
+      </section>
+    </div>
+  `;
+}
+
 function renderDecisionSummary() {
   if (!result?.subtype_risks?.length) return "";
   const topRisk = getPrimaryDiagnosticRisk();
@@ -1110,6 +1276,7 @@ function renderDecisionSummary() {
       </div>
       ${renderProbabilityMeter(topRisk)}
       ${renderClinicalSupport(topRisk)}
+      ${renderClinicalTriagePanel(topRisk)}
       <div class="clinical-driver-block">
         <span>3 მთავარი მიზეზი</span>
         <div class="driver-list">${renderReasonChips(topRisk)}</div>
@@ -1354,6 +1521,8 @@ function patientReportText() {
   const reasons = clinicalReasonList(topRisk, 5).map((item) => `- ${item}`).join("\n") || "- მკვეთრი განმსაზღვრელი ფაქტორი არ გამოიკვეთა";
   const supportReasons =
     (topRisk.clinical_support_reasons || []).map((item) => `- ${item}`).join("\n") || "- სპეციფიკური კლინიკური დამადასტურებელი ნიშანი მკვეთრად არ ჩანს";
+  const urgency = urgencyAssessment(topRisk);
+  const ecgAlignmentSummary = ecgAlignment(topRisk);
   const ecgContext = ecgResultContext();
   const checks = actionGroups
     .map((group) => [`${group.title}:`, ...group.items.map((item) => `- ${item}`)].join("\n"))
@@ -1378,6 +1547,13 @@ function patientReportText() {
     supportReasons,
     topRisk.reliability_note || "",
     topRisk.verification_priority ? `პრიორიტეტი: ${topRisk.verification_priority}` : "",
+    "",
+    "სასწრაფოობის დონე:",
+    `${urgency.label}. ${urgency.text}`,
+    ...urgency.reasons.map((item) => `- ${item}`),
+    "",
+    "ECG შესაბამისობა:",
+    `${ecgAlignmentSummary.label}. ${ecgAlignmentSummary.text}`,
     ...(ecgContext ? ["", ecgContext] : []),
     "",
     "მონაცემების ხარისხი:",
