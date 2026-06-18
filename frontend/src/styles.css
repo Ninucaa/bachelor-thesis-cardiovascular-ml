@@ -946,6 +946,157 @@ h3 {
   justify-content: space-between;
 }
 
+.clinical-support {
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid #ccdfe7;
+  border-radius: 8px;
+  display: grid;
+  gap: 9px;
+  padding: 12px;
+}
+
+.support-heading {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.support-heading div {
+  display: grid;
+  gap: 3px;
+}
+
+.support-heading span {
+  color: #405668;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.support-heading strong {
+  color: #263645;
+  font-size: 14px;
+}
+
+.support-heading b {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.clinical-support.support-strong .support-heading b {
+  color: var(--success);
+}
+
+.clinical-support.support-partial .support-heading b {
+  color: var(--warning);
+}
+
+.clinical-support.support-weak .support-heading b {
+  color: var(--danger);
+}
+
+.support-meter {
+  background: #e5edf2;
+  border-radius: 999px;
+  height: 8px;
+  overflow: hidden;
+}
+
+.support-meter span {
+  background: linear-gradient(90deg, var(--accent), var(--success));
+  border-radius: inherit;
+  display: block;
+  height: 100%;
+}
+
+.support-partial .support-meter span {
+  background: linear-gradient(90deg, #b28418, #d79b22);
+}
+
+.support-weak .support-meter span {
+  background: linear-gradient(90deg, #a7372c, #d35c4f);
+}
+
+.clinical-support ul {
+  color: #4d6172;
+  font-size: 13px;
+  line-height: 1.45;
+  margin: 0;
+  padding-left: 18px;
+}
+
+.clinical-support em,
+.clinical-support small {
+  color: #536879;
+  font-size: 12px;
+  font-style: normal;
+  line-height: 1.4;
+}
+
+.clinical-support em {
+  font-weight: 850;
+}
+
+.triage-panel {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.triage-card {
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid #ccdfe7;
+  border-left: 4px solid var(--accent);
+  border-radius: 8px;
+  display: grid;
+  gap: 7px;
+  padding: 12px;
+}
+
+.triage-card.urgent,
+.triage-card.ecg-match {
+  border-left-color: var(--danger);
+}
+
+.triage-card.soon,
+.triage-card.ecg-caution {
+  border-left-color: var(--warning);
+}
+
+.triage-card.routine,
+.triage-card.ecg-neutral {
+  border-left-color: var(--success);
+}
+
+.triage-card span {
+  color: #405668;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.triage-card strong {
+  color: #263645;
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+.triage-card p {
+  color: #4d6172;
+  font-size: 13px;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.triage-card ul {
+  color: #4d6172;
+  font-size: 12px;
+  line-height: 1.4;
+  margin: 0;
+  padding-left: 18px;
+}
+
 .decision-summary p,
 .decision-summary small {
   color: #4d6172;
@@ -1314,6 +1465,13 @@ h3 {
   font-weight: 800;
 }
 
+.subtype-card small {
+  color: #667989;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
 .subtype-card span {
   color: #687a8a;
   font-size: 12px;
@@ -1354,6 +1512,95 @@ h3 {
   margin-top: 12px;
 }
 
+.data-quality-card {
+  background: #fbfdfe;
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  gap: 10px;
+  padding: 16px 20px;
+}
+
+.data-quality-header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.data-quality-header div {
+  display: grid;
+  gap: 3px;
+}
+
+.data-quality-header span {
+  color: var(--clinical-blue);
+  font-size: 12px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.data-quality-header strong {
+  color: #263645;
+  font-size: 16px;
+}
+
+.data-quality-header b {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.data-quality-card.good .data-quality-header b {
+  color: var(--success);
+}
+
+.data-quality-card.medium .data-quality-header b {
+  color: var(--warning);
+}
+
+.data-quality-card.low .data-quality-header b {
+  color: var(--danger);
+}
+
+.quality-meter {
+  background: #e5edf2;
+  border-radius: 999px;
+  height: 9px;
+  overflow: hidden;
+}
+
+.quality-meter span {
+  background: linear-gradient(90deg, var(--accent), var(--success));
+  border-radius: inherit;
+  display: block;
+  height: 100%;
+}
+
+.data-quality-card.medium .quality-meter span {
+  background: linear-gradient(90deg, #b28418, #d79b22);
+}
+
+.data-quality-card.low .quality-meter span {
+  background: linear-gradient(90deg, #a7372c, #d35c4f);
+}
+
+.data-quality-card p {
+  color: #4d6172;
+  font-size: 13px;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.quality-groups {
+  display: grid;
+  gap: 5px;
+}
+
+.quality-groups span {
+  color: #607484;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
 .clinical-checks {
   background: #f7fafb;
   border: 1px solid #d2dfe7;
@@ -1366,6 +1613,25 @@ h3 {
   color: #263645;
   font-size: 13px;
   margin: 0 0 8px;
+}
+
+.clinical-check-groups {
+  display: grid;
+  gap: 8px;
+}
+
+.check-group {
+  background: #ffffff;
+  border: 1px solid #dce6ec;
+  border-radius: 6px;
+  padding: 10px;
+}
+
+.check-group strong {
+  color: #263645;
+  display: block;
+  font-size: 12px;
+  margin-bottom: 6px;
 }
 
 .clinical-checks ul {
@@ -1634,6 +1900,7 @@ h3 {
   .ecg-box,
   .action-row,
   .decision-summary,
+  .data-quality-card,
   .subtype-section,
   .model-trust,
   .patient-report {
@@ -1654,6 +1921,10 @@ h3 {
 
   .subtype-card {
     display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .triage-panel {
     grid-template-columns: 1fr;
   }
 

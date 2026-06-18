@@ -43,6 +43,11 @@ class SubtypeRisk(BaseModel):
     diagnosis_confidence: str
     diagnosis_interpretation: str
     suggested_clinical_checks: list[str]
+    clinical_support_score: int
+    clinical_support_level: str
+    clinical_support_reasons: list[str]
+    reliability_note: str
+    verification_priority: str
     explanation: str
     reason_factors: list[str]
 

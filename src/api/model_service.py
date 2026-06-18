@@ -257,28 +257,214 @@ def diagnosis_status(confidence: str) -> str:
     return "დაბალი დიაგნოსტიკური მხარდაჭერა"
 
 
+def is_available(row: dict[str, float], feature: str) -> bool:
+    if feature not in row:
+        return False
+    if float(row.get(f"{feature}_missing", 0.0)) >= 0.5:
+        return False
+    value = row.get(feature)
+    return value is not None and pd.notna(value)
+
+
+def feature_value(row: dict[str, float], feature: str, default: float = 0.0) -> float:
+    if not is_available(row, feature):
+        return default
+    return float(row[feature])
+
+
+def flag(row: dict[str, float], feature: str) -> bool:
+    return feature_value(row, feature) >= 0.5
+
+
+def add_signal(signals: list[tuple[int, str]], condition: bool, score: int, text: str) -> None:
+    if condition:
+        signals.append((score, text))
+
+
+def clinical_support_for_target(target: str, row: dict[str, float]) -> dict[str, Any]:
+    troponin = feature_value(row, "lab_troponin_t_mean")
+    ntprobnp = feature_value(row, "lab_ntprobnp_mean")
+    creatinine = feature_value(row, "lab_creatinine_mean")
+    sbp = max(feature_value(row, "omr_sbp_mean"), feature_value(row, "ed_triage_sbp_mean"))
+    dbp = max(feature_value(row, "omr_dbp_mean"), feature_value(row, "ed_triage_dbp_mean"))
+    heart_rate = feature_value(row, "ed_triage_heart_rate_mean")
+    resp_rate = feature_value(row, "ed_triage_resp_rate_mean")
+    spo2 = feature_value(row, "ed_triage_spo2_mean", 100.0)
+    acuity = feature_value(row, "ed_triage_acuity_mean", 5.0)
+    pain = feature_value(row, "triage_pain_mean")
+
+    chest_pain = flag(row, "symptom_chest_pain")
+    dyspnea = flag(row, "symptom_shortness_of_breath")
+    palpitations = flag(row, "symptom_palpitations")
+    syncope = flag(row, "symptom_syncope")
+    dizziness = flag(row, "symptom_dizziness")
+    edema = flag(row, "symptom_edema")
+    diabetes = flag(row, "history_diabetes")
+    kidney_history = flag(row, "history_chronic_kidney_disease")
+    tobacco = flag(row, "history_tobacco_or_nicotine")
+    ambulance = flag(row, "ed_arrived_by_ambulance")
+
+    lipid_signal = any(
+        [
+            is_available(row, "lab_ldl_calc_mean") and feature_value(row, "lab_ldl_calc_mean") > 130,
+            is_available(row, "lab_ldl_measured_mean") and feature_value(row, "lab_ldl_measured_mean") > 130,
+            is_available(row, "lab_chol_total_mean") and feature_value(row, "lab_chol_total_mean") > 200,
+            is_available(row, "lab_hdl_mean") and feature_value(row, "lab_hdl_mean") < 40,
+            is_available(row, "lab_triglycerides_mean") and feature_value(row, "lab_triglycerides_mean") > 150,
+        ]
+    )
+
+    signals: list[tuple[int, str]] = []
+
+    if target in {"target_myocardial_infarction", "target_acute_ischemic_heart_disease"}:
+        add_signal(signals, troponin > 0.01, 35, f"Troponin T მომატებულია ({format_numeric_value('lab_troponin_t_mean', troponin, 'ng/mL')})")
+        add_signal(signals, chest_pain, 25, "მითითებულია გულმკერდის ტკივილი")
+        add_signal(signals, pain >= 5, 10, f"ტკივილის შეფასება მაღალია ({round(pain, 1)} / 10)")
+        add_signal(signals, dyspnea, 10, "თან ახლავს ქოშინი")
+        add_signal(signals, diabetes or tobacco or lipid_signal, 10, "არსებობს კორონარული რისკ-ფაქტორები")
+    elif target == "target_heart_failure":
+        add_signal(signals, ntprobnp > 450, 35, f"NT-proBNP მომატებულია ({format_numeric_value('lab_ntprobnp_mean', ntprobnp, 'pg/mL')})")
+        add_signal(signals, dyspnea, 25, "მითითებულია ქოშინი")
+        add_signal(signals, edema, 20, "მითითებულია შეშუპება")
+        add_signal(signals, spo2 < 95, 10, f"SpO2 დაბალია ({round(spo2)}%)")
+        add_signal(signals, resp_rate > 20, 10, f"სუნთქვის სიხშირე მომატებულია ({round(resp_rate)} / min)")
+    elif target in {"target_atrial_fibrillation_flutter", "target_paroxysmal_tachycardia", "target_other_arrhythmia"}:
+        add_signal(signals, palpitations, 25, "მითითებულია გულის ფრიალი")
+        add_signal(signals, heart_rate >= 110, 25, f"გულისცემა მაღალია ({round(heart_rate)} bpm)")
+        add_signal(signals, syncope or dizziness, 20, "არის სინკოპე ან თავბრუსხვევა")
+        add_signal(signals, dyspnea, 10, "თან ახლავს ქოშინი")
+    elif target == "target_av_conduction_block":
+        add_signal(signals, syncope or dizziness, 30, "არის სინკოპე ან თავბრუსხვევა")
+        add_signal(signals, heart_rate and heart_rate <= 55, 25, f"გულისცემა დაბალია ({round(heart_rate)} bpm)")
+        add_signal(signals, palpitations, 10, "მითითებულია გულის ფრიალი")
+    elif target == "target_cardiac_arrest":
+        add_signal(signals, acuity <= 2, 25, f"triage სიმძიმე მაღალია ({round(acuity)} / 5)")
+        add_signal(signals, ambulance, 20, "პაციენტი სასწრაფოთი არის მოყვანილი")
+        add_signal(signals, spo2 < 90, 20, f"SpO2 მკვეთრად დაბალია ({round(spo2)}%)")
+        add_signal(signals, troponin > 0.01, 15, "Troponin T მომატებულია")
+        add_signal(signals, heart_rate >= 130 or heart_rate <= 45, 10, "გულისცემის უკიდურესი მაჩვენებელია")
+    elif target in {
+        "target_primary_hypertension",
+        "target_hypertensive_heart_disease",
+        "target_hypertensive_kidney_disease",
+        "target_hypertensive_heart_kidney_disease",
+        "target_hypertensive_crisis",
+    }:
+        severe_pressure = sbp >= 180 or dbp >= 120
+        high_pressure = sbp >= 140 or dbp >= 90
+        add_signal(signals, severe_pressure, 35, f"წნევა ძალიან მაღალია ({round(sbp)}/{round(dbp)} mmHg)")
+        add_signal(signals, high_pressure and not severe_pressure, 25, f"წნევა მომატებულია ({round(sbp)}/{round(dbp)} mmHg)")
+        add_signal(signals, kidney_history or creatinine > 1.3, 20, "არსებობს თირკმლის დაზიანების/კრეატინინის სიგნალი")
+        add_signal(signals, target in {"target_hypertensive_heart_disease", "target_hypertensive_heart_kidney_disease"} and (dyspnea or edema or ntprobnp > 450), 20, "არის გულის დატვირთვის ან უკმარისობის დამხმარე ნიშნები")
+        add_signal(signals, target == "target_hypertensive_crisis" and (chest_pain or dyspnea or dizziness or troponin > 0.01), 25, "მაღალ წნევას ახლავს ორგანული დაზიანების შესაძლო ნიშნები")
+    elif target in {"target_angina_pectoris", "target_chronic_ischemic_heart_disease"}:
+        add_signal(signals, chest_pain, 30, "მითითებულია გულმკერდის ტკივილი")
+        add_signal(signals, diabetes or tobacco or lipid_signal, 25, "არის კორონარული რისკ-ფაქტორები")
+        add_signal(signals, pain >= 4, 10, f"ტკივილის შეფასება მომატებულია ({round(pain, 1)} / 10)")
+        add_signal(signals, dyspnea, 10, "თან ახლავს ქოშინი")
+        add_signal(signals, troponin <= 0.01 and is_available(row, "lab_troponin_t_mean"), 10, "Troponin T მწვავე ინფარქტის სასარგებლოდ არ არის მკვეთრად მომატებული")
+    elif target in {
+        "target_subarachnoid_hemorrhage",
+        "target_intracerebral_hemorrhage",
+        "target_ischemic_stroke",
+        "target_other_cerebrovascular_disease",
+    }:
+        add_signal(signals, dizziness or syncope, 25, "არის ნევროლოგიურად საყურადღებო თავბრუსხვევა/სინკოპე")
+        add_signal(signals, sbp >= 160 or dbp >= 100, 20, f"წნევა მაღალია ({round(sbp)}/{round(dbp)} mmHg)")
+        add_signal(signals, palpitations, 15, "არის არითმიის შესაძლო სიმპტომი")
+        add_signal(signals, diabetes or kidney_history, 10, "არსებობს სისხლძარღვოვანი რისკ-ფაქტორები")
+
+    if not signals:
+        add_signal(signals, True, 10, "სპეციფიკური კლინიკური დამადასტურებელი ნიშანი მკვეთრად არ ჩანს")
+
+    signals.sort(key=lambda item: item[0], reverse=True)
+    score = min(100, sum(score for score, _text in signals))
+    if score >= 70:
+        level = "strong"
+    elif score >= 40:
+        level = "partial"
+    else:
+        level = "weak"
+
+    return {
+        "score": score,
+        "level": level,
+        "reasons": [text for _score, text in signals[:4]],
+    }
+
+
+def subtype_precision(thresholds: dict[str, Any], target: str) -> float | None:
+    value = thresholds.get(target, {}).get("test", {}).get("precision")
+    if value is None:
+        return None
+    return float(value)
+
+
+def reliability_note(precision: float | None) -> str:
+    if precision is None:
+        return "ამ subtype-ის test precision ხელმისაწვდომი არ არის; პასუხი აუცილებლად გადაამოწმეთ კლინიკურად."
+    if precision >= 0.5:
+        level = "შედარებით მაღალი"
+    elif precision >= 0.3:
+        level = "საშუალო"
+    else:
+        level = "დაბალი"
+    return f"ამ subtype-ზე test precision არის {precision:.2f} ({level}); დადებითი პასუხი გამოიყენეთ როგორც გადასამოწმებელი სიგნალი."
+
+
+def verification_priority(confidence: str, support_level: str, precision: float | None) -> str:
+    if confidence in {"high", "diagnostic_signal"} and support_level == "strong" and (precision is None or precision >= 0.3):
+        return "კლინიკურად გამყარებული სავარაუდო მიმართულება"
+    if confidence in {"high", "diagnostic_signal"} and support_level in {"strong", "partial"}:
+        return "სასწრაფოდ გადასამოწმებელი სიგნალი"
+    if confidence in {"high", "diagnostic_signal"}:
+        return "მოდელის სიგნალი სუსტი კლინიკური მხარდაჭერით"
+    if confidence == "borderline":
+        return "საზღვრული სიგნალი"
+    return "დაბალი პრიორიტეტი"
+
+
+def calibrated_diagnosis_status(confidence: str, support_level: str, precision: float | None) -> str:
+    if confidence in {"high", "diagnostic_signal"} and support_level == "strong" and (precision is None or precision >= 0.3):
+        return "კლინიკურად გამყარებული სავარაუდო დიაგნოზის ჯგუფი"
+    if confidence in {"high", "diagnostic_signal"} and support_level in {"strong", "partial"}:
+        return "სავარაუდო დიაგნოზის ჯგუფი - საჭიროებს დადასტურებას"
+    if confidence in {"high", "diagnostic_signal"}:
+        return "მოდელის სიგნალი - კლინიკური მხარდაჭერა სუსტია"
+    return diagnosis_status(confidence)
+
+
 def diagnosis_interpretation(
     display_name: str,
     probability: float,
     threshold: float,
     confidence: str,
     factors: list[dict[str, Any]],
+    support: dict[str, Any] | None = None,
+    precision: float | None = None,
 ) -> str:
     probability_text = f"{round(probability * 100, 1)}%"
     threshold_text = f"{round(threshold * 100, 1)}%"
     increasing = [factor for factor in factors if factor["shap_value"] > 0]
     increasing_text = join_phrases([factor_phrase(factor) for factor in increasing[:4]])
+    support_text = ""
+    if support:
+        support_text = (
+            f" კლინიკური დამხმარე ქულა არის {support['score']}% "
+            f"({', '.join(support['reasons'][:2])})."
+        )
+    precision_text = f" subtype-ის test precision არის {precision:.2f}." if precision is not None else ""
 
     if confidence in {"high", "diagnostic_signal"}:
         return (
             f"{display_name}: სიგნალი threshold-ს აჭარბებს ({probability_text} / ზღვარი {threshold_text}). "
-            f"მთავარი დამხმარე ნიშნებია: {increasing_text}."
+            f"მთავარი დამხმარე ნიშნებია: {increasing_text}.{support_text}{precision_text}"
         )
     if confidence == "borderline":
         return (
             f"{display_name}: სიგნალი ახლოსაა threshold-თან, მაგრამ საკმარისად არ აჭარბებს მას "
             f"({probability_text} / ზღვარი {threshold_text}). ეს არის სუსტი/საზღვრული დამხმარე სიგნალი. "
-            f"დამხმარე ნიშნებია: {increasing_text}."
+            f"დამხმარე ნიშნებია: {increasing_text}.{support_text}"
         )
     return (
         f"{display_name}: სიგნალი threshold-ზე დაბალია ({probability_text} / ზღვარი {threshold_text}); "
@@ -1030,12 +1216,15 @@ class ModelService:
 
     def predict_subtypes(self, patient: pd.DataFrame) -> list[dict[str, Any]]:
         risks = []
+        row = {column: float(patient.iloc[0][column]) for column in patient.columns}
         for target, model in self.subtype_models.items():
             probability = float(model.predict_proba(patient)[:, 1][0])
             level = risk_level(probability)
             display_name = SUBTYPE_LABELS[target]
             threshold = float(self.diagnosis_thresholds.get(target, {}).get("threshold", 0.5))
             confidence = diagnosis_confidence(probability, threshold)
+            support = clinical_support_for_target(target, row)
+            precision = subtype_precision(self.diagnosis_thresholds, target)
             factors = self.explain_with(self.subtype_explainers[target], patient, 12)
             reason_factors = [
                 short_factor_label(factor)
@@ -1052,18 +1241,37 @@ class ModelService:
                     "diagnosis_label": display_name,
                     "diagnosis_probability": round(probability, 4),
                     "diagnosis_threshold": round(threshold, 4),
-                    "diagnosis_status": diagnosis_status(confidence),
+                    "diagnosis_status": calibrated_diagnosis_status(confidence, support["level"], precision),
                     "diagnosis_confidence": confidence,
                     "diagnosis_interpretation": diagnosis_interpretation(
-                        display_name, probability, threshold, confidence, clinical_factors
+                        display_name, probability, threshold, confidence, clinical_factors, support, precision
                     ),
                     "suggested_clinical_checks": CLINICAL_CHECKS.get(target, []),
+                    "clinical_support_score": support["score"],
+                    "clinical_support_level": support["level"],
+                    "clinical_support_reasons": support["reasons"],
+                    "reliability_note": reliability_note(precision),
+                    "verification_priority": verification_priority(confidence, support["level"], precision),
                     "explanation": self.subtype_explanation(display_name, probability, level, clinical_factors),
                     "reason_factors": reason_factors,
                 }
             )
 
-        risks.sort(key=lambda item: item["risk_probability"], reverse=True)
+        priority_rank = {
+            "კლინიკურად გამყარებული სავარაუდო მიმართულება": 4,
+            "სასწრაფოდ გადასამოწმებელი სიგნალი": 3,
+            "მოდელის სიგნალი სუსტი კლინიკური მხარდაჭერით": 2,
+            "საზღვრული სიგნალი": 1,
+            "დაბალი პრიორიტეტი": 0,
+        }
+        risks.sort(
+            key=lambda item: (
+                priority_rank.get(item["verification_priority"], 0),
+                item["clinical_support_score"],
+                item["risk_probability"],
+            ),
+            reverse=True,
+        )
         return risks
 
     def patient_counterfactual_analysis(
