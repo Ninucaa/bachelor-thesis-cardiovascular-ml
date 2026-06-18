@@ -406,6 +406,8 @@ let isPredicting = false;
 let symptomText = "";
 let ecgFinding = "not_available";
 let ecgNote = "";
+let baselineSbp = "";
+let baselineDbp = "";
 let isLabReferenceOpen = false;
 let isModelTrustOpen = false;
 let isAllDiagnosesOpen = false;
@@ -525,6 +527,29 @@ function labRangeText(reference) {
   return `${reference.low}-${reference.high} ${reference.unit}`;
 }
 
+function fieldStatus(field) {
+  if (!features || field.type === "boolean" || field.type === "select" || field.type === "computed") return null;
+  if (Number(features[`${field.key}_missing`] ?? 0) === 1 || clearedFieldKeys.has(field.key)) return null;
+  const reference =
+    labReferenceRanges.find((item) => item.key === field.key) ||
+    [
+      { key: "omr_sbp_mean", low: 90, high: 120 },
+      { key: "omr_dbp_mean", low: 60, high: 80 },
+      { key: "ed_triage_sbp_mean", low: 90, high: 120 },
+      { key: "ed_triage_dbp_mean", low: 60, high: 80 },
+      { key: "ed_triage_heart_rate_mean", low: 60, high: 100 },
+      { key: "ed_triage_resp_rate_mean", low: 12, high: 20 },
+      { key: "ed_triage_spo2_mean", low: 95, high: 100, lowLabel: "დაბალი" },
+      { key: "ed_triage_temperature_f_mean", low: 97, high: 99.5 },
+    ].find((item) => item.key === field.key);
+  if (!reference) return null;
+  const value = Number(features[field.key]);
+  if (!Number.isFinite(value)) return null;
+  if (value < reference.low) return { label: reference.lowLabel || "დაბალი", className: "field-low" };
+  if (value > reference.high) return { label: "საყურადღებო", className: "field-high" };
+  return { label: "ნორმაში", className: "field-normal" };
+}
+
 function bmiStatus() {
   if (!features || Number(features.omr_bmi_mean_missing ?? 0) === 1) {
     return { label: "არ არის გამოთვლილი", className: "missing" };
@@ -642,6 +667,61 @@ function booleanFeature(key) {
   return numericFeature(key) >= 0.5;
 }
 
+function baselineBpValues() {
+  const sbp = Number(String(baselineSbp).replace(",", "."));
+  const dbp = Number(String(baselineDbp).replace(",", "."));
+  return {
+    hasBaseline: Number.isFinite(sbp) && Number.isFinite(dbp) && sbp > 0 && dbp > 0,
+    sbp,
+    dbp,
+  };
+}
+
+function currentBpValues() {
+  return {
+    sbp: Math.max(numericFeature("omr_sbp_mean"), numericFeature("ed_triage_sbp_mean")),
+    dbp: Math.max(numericFeature("omr_dbp_mean"), numericFeature("ed_triage_dbp_mean")),
+  };
+}
+
+function baselineBpAssessment() {
+  const current = currentBpValues();
+  const baseline = baselineBpValues();
+  const absoluteHigh = current.sbp >= 180 || current.dbp >= 120;
+  const high = current.sbp >= 140 || current.dbp >= 90;
+
+  if (!baseline.hasBaseline) {
+    return {
+      className: high ? "caution" : "neutral",
+      label: "ჩვეულებრივი წნევა არ არის მითითებული",
+      text: high
+        ? "წნევა მაღალია ზოგად კლინიკურ დიაპაზონთან შედარებით; შეადარეთ პაციენტის ჩვეულებრივ მაჩვენებელს, თუ ეს მოგვიანებით გახდება ცნობილი."
+        : "შეფასება ეფუძნება ზოგად კლინიკურ დიაპაზონს, რადგან პაციენტის ჩვეულებრივი წნევა მითითებული არ არის.",
+      reason: high ? `წნევა ზოგად ზღვართან შედარებით მაღალია (${Math.round(current.sbp)}/${Math.round(current.dbp)} mmHg)` : "",
+      absoluteHigh,
+      aboveBaseline: false,
+    };
+  }
+
+  const sbpDelta = current.sbp - baseline.sbp;
+  const dbpDelta = current.dbp - baseline.dbp;
+  const aboveBaseline = sbpDelta >= 20 || dbpDelta >= 10;
+  const nearBaseline = Math.abs(sbpDelta) < 15 && Math.abs(dbpDelta) < 8;
+
+  return {
+    className: absoluteHigh || aboveBaseline ? "caution" : "neutral",
+    label: "შედარებულია პაციენტის ჩვეულებრივ წნევასთან",
+    text: nearBaseline
+      ? `მიმდინარე წნევა ახლოსაა პაციენტის ჩვეულებრივ მაჩვენებელთან (${Math.round(baseline.sbp)}/${Math.round(baseline.dbp)} mmHg).`
+      : `მიმდინარე წნევა პაციენტის ჩვეულებრივ მაჩვენებელთან შედარებით შეცვლილია: ${sbpDelta >= 0 ? "+" : ""}${Math.round(sbpDelta)}/${dbpDelta >= 0 ? "+" : ""}${Math.round(dbpDelta)} mmHg.`,
+    reason: aboveBaseline
+      ? `წნევა პაციენტის ჩვეულებრივ მაჩვენებელზე მაღალია (${sbpDelta >= 0 ? "+" : ""}${Math.round(sbpDelta)}/${dbpDelta >= 0 ? "+" : ""}${Math.round(dbpDelta)} mmHg)`
+      : "",
+    absoluteHigh,
+    aboveBaseline,
+  };
+}
+
 function ecgAlignment(risk) {
   const selected = selectedEcgOption();
   const target = risk?.target_name || "";
@@ -734,14 +814,15 @@ function urgencyAssessment(risk) {
   const spo2 = numericFeature("ed_triage_spo2_mean", 100);
   const heartRate = numericFeature("ed_triage_heart_rate_mean");
   const respRate = numericFeature("ed_triage_resp_rate_mean");
-  const sbp = Math.max(numericFeature("omr_sbp_mean"), numericFeature("ed_triage_sbp_mean"));
-  const dbp = Math.max(numericFeature("omr_dbp_mean"), numericFeature("ed_triage_dbp_mean"));
+  const bp = currentBpValues();
+  const bpAssessment = baselineBpAssessment();
   const acuity = numericFeature("ed_triage_acuity_mean", 5);
 
   if (["st_elevation", "st_depression"].includes(ecg)) reasons.push("ECG-ზე არის ST ცვლილება");
   if (troponin > 0.01) reasons.push("Troponin T მომატებულია");
   if (spo2 < 90) reasons.push(`SpO2 დაბალია (${Math.round(spo2)}%)`);
-  if (sbp >= 180 || dbp >= 120) reasons.push(`წნევა ძალიან მაღალია (${Math.round(sbp)}/${Math.round(dbp)} mmHg)`);
+  if (bpAssessment.absoluteHigh) reasons.push(`წნევა ძალიან მაღალია (${Math.round(bp.sbp)}/${Math.round(bp.dbp)} mmHg)`);
+  else if (bpAssessment.reason) reasons.push(bpAssessment.reason);
   if (heartRate >= 130 || heartRate <= 45) reasons.push(`გულისცემა უკიდურესია (${Math.round(heartRate)} bpm)`);
   if (respRate >= 28) reasons.push(`სუნთქვის სიხშირე მაღალია (${Math.round(respRate)} / min)`);
   if (acuity <= 2) reasons.push(`triage სიმძიმე მაღალია (${Math.round(acuity)} / 5)`);
@@ -771,6 +852,37 @@ function urgencyAssessment(risk) {
     text: "ამ მონაცემებით მწვავე სიგნალი მკვეთრად არ ჩანს, თუმცა შედეგი დაავადებას სრულად არ გამორიცხავს.",
     reasons: reasons.length ? reasons.slice(0, 4) : ["მწვავე vital/ECG/ბიომარკერის სიგნალი არ ჩანს"],
   };
+}
+
+function missingForBetterAssessment(risk) {
+  const target = risk?.target_name || "";
+  const items = [];
+  const addIfMissing = (key, text) => {
+    if (!isFeaturePresent(key)) items.push(text);
+  };
+
+  if (["target_myocardial_infarction", "target_acute_ischemic_heart_disease", "target_angina_pectoris"].includes(target)) {
+    addIfMissing("lab_troponin_t_mean", "Troponin T უკეთ ამყარებს ან ასუსტებს კორონარულ/ინფარქტის ეჭვს.");
+    if (selectedEcgOption().value === "not_available" && !ecgNote.trim()) items.push("ECG საჭიროა იშემიური ცვლილებების შესადარებლად.");
+    addIfMissing("symptom_chest_pain", "გულმკერდის ტკივილის არსებობა/უარყოფა მნიშვნელოვანია.");
+  }
+  if (target === "target_heart_failure") {
+    addIfMissing("lab_ntprobnp_mean", "NT-proBNP უკეთ აფასებს გულის დატვირთვას/უკმარისობის ეჭვს.");
+    addIfMissing("ed_triage_spo2_mean", "SpO2 და სუნთქვის მაჩვენებლები საჭიროა სიმძიმის შესაფასებლად.");
+  }
+  if (target.includes("hypertensive")) {
+    if (!baselineBpValues().hasBaseline) items.push("პაციენტის ჩვეულებრივი არტერიული წნევა დაეხმარება მიმდინარე წნევის სწორად შეფასებას.");
+    addIfMissing("lab_creatinine_mean", "კრეატინინი საჭიროა თირკმლის დაზიანების/ჰიპერტენზიული გართულების შესაფასებლად.");
+  }
+  if (target.includes("arrhythmia") || target.includes("fibrillation") || target.includes("tachycardia") || target.includes("conduction")) {
+    if (selectedEcgOption().value === "not_available" && !ecgNote.trim()) items.push("ECG rhythm strip საჭიროა რიტმის/გამტარობის დასადასტურებლად.");
+    addIfMissing("ed_triage_heart_rate_mean", "გულისცემის მაჩვენებელი საჭიროა რიტმის სიმძიმის შესაფასებლად.");
+  }
+  if (!baselineBpValues().hasBaseline && (numericFeature("ed_triage_sbp_mean") >= 140 || numericFeature("omr_sbp_mean") >= 140)) {
+    items.push("თუ ცნობილია, დაამატეთ პაციენტის ჩვეულებრივი წნევა, რათა მაღალი წნევა baseline-ს შევადაროთ.");
+  }
+
+  return uniqueItems(items).slice(0, 4);
 }
 
 function uniqueItems(items) {
@@ -848,7 +960,7 @@ function clinicalActionGroups(risk) {
   const urgency = urgencyAssessment(risk);
   const ecg = ecgAlignment(risk);
   const diagnosisChecks = uniqueItems([...(risk?.suggested_clinical_checks || []).slice(0, 4), ...ecgClinicalChecks()]);
-  const dataChecks = uniqueItems(quality.missingGroups.slice(0, 3).map((group) => group.fix));
+  const dataChecks = uniqueItems([...missingForBetterAssessment(risk), ...quality.missingGroups.slice(0, 3).map((group) => group.fix)]);
   const safetyChecks = [
     `${urgency.label}: ${urgency.text}`,
     ecg.text,
@@ -971,6 +1083,8 @@ function clearPatientData() {
   symptomText = "";
   ecgFinding = "not_available";
   ecgNote = "";
+  baselineSbp = "";
+  baselineDbp = "";
   features = recomputeDerivedFeatures(baseFeatures);
   result = null;
   statusText = "ყველა მონაცემი გასუფთავდა.";
@@ -981,11 +1095,12 @@ function fieldDisabled(field) {
 }
 
 function renderInputField(field) {
+  const status = fieldStatus(field);
   return `
-    <label class="field">
+    <label class="field ${status ? status.className : ""}">
       <span>
         ${field.label}
-        ${field.unit ? `<small>${field.unit}</small>` : ""}
+        ${status ? `<small class="field-status">${status.label}</small>` : field.unit ? `<small>${field.unit}</small>` : ""}
       </span>
       ${
         field.type === "computed"
@@ -1023,6 +1138,31 @@ function renderInputField(field) {
             />`
       }
     </label>
+  `;
+}
+
+function renderBaselineBpInput() {
+  const assessment = baselineBpAssessment();
+  return `
+    <section class="form-section baseline-bp-section">
+      <div class="section-heading">
+        <div>
+          <h3>პაციენტის ჩვეულებრივი არტერიული წნევა (თუ ცნობილია)</h3>
+          <p>არასავალდებულოა. თუ მითითებულია, სისტემა მიმდინარე წნევას პაციენტის საკუთარ baseline მაჩვენებელს შეადარებს.</p>
+        </div>
+      </div>
+      <div class="field-grid baseline-grid">
+        <label class="field">
+          <span>ჩვეულებრივი სისტოლური წნევა <small>mmHg</small></span>
+          <input id="baseline-sbp" type="text" inputmode="decimal" placeholder="არასავალდებულო" value="${escapeHtml(baselineSbp)}" ${features ? "" : "disabled"} />
+        </label>
+        <label class="field">
+          <span>ჩვეულებრივი დიასტოლური წნევა <small>mmHg</small></span>
+          <input id="baseline-dbp" type="text" inputmode="decimal" placeholder="არასავალდებულო" value="${escapeHtml(baselineDbp)}" ${features ? "" : "disabled"} />
+        </label>
+      </div>
+      <p class="baseline-note ${assessment.className}">${escapeHtml(assessment.text)}</p>
+    </section>
   `;
 }
 
@@ -1257,6 +1397,19 @@ function renderClinicalTriagePanel(risk) {
   `;
 }
 
+function renderMissingAssessmentPanel(risk) {
+  const missing = missingForBetterAssessment(risk);
+  if (!missing.length) return "";
+  return `
+    <div class="missing-assessment">
+      <span>რა გააუმჯობესებს შეფასებას</span>
+      <ul>
+        ${missing.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+      </ul>
+    </div>
+  `;
+}
+
 function renderDecisionSummary() {
   if (!result?.subtype_risks?.length) return "";
   const topRisk = getPrimaryDiagnosticRisk();
@@ -1277,6 +1430,7 @@ function renderDecisionSummary() {
       ${renderProbabilityMeter(topRisk)}
       ${renderClinicalSupport(topRisk)}
       ${renderClinicalTriagePanel(topRisk)}
+      ${renderMissingAssessmentPanel(topRisk)}
       <div class="clinical-driver-block">
         <span>3 მთავარი მიზეზი</span>
         <div class="driver-list">${renderReasonChips(topRisk)}</div>
@@ -1523,6 +1677,8 @@ function patientReportText() {
     (topRisk.clinical_support_reasons || []).map((item) => `- ${item}`).join("\n") || "- სპეციფიკური კლინიკური დამადასტურებელი ნიშანი მკვეთრად არ ჩანს";
   const urgency = urgencyAssessment(topRisk);
   const ecgAlignmentSummary = ecgAlignment(topRisk);
+  const bpAssessment = baselineBpAssessment();
+  const missingAssessment = missingForBetterAssessment(topRisk);
   const ecgContext = ecgResultContext();
   const checks = actionGroups
     .map((group) => [`${group.title}:`, ...group.items.map((item) => `- ${item}`)].join("\n"))
@@ -1551,6 +1707,10 @@ function patientReportText() {
     "სასწრაფოობის დონე:",
     `${urgency.label}. ${urgency.text}`,
     ...urgency.reasons.map((item) => `- ${item}`),
+    "",
+    "წნევის baseline შედარება:",
+    bpAssessment.text,
+    ...(missingAssessment.length ? ["", "რა გააუმჯობესებს შეფასებას:", ...missingAssessment.map((item) => `- ${item}`)] : []),
     "",
     "ECG შესაბამისობა:",
     `${ecgAlignmentSummary.label}. ${ecgAlignmentSummary.text}`,
@@ -1722,6 +1882,7 @@ function render() {
           </div>
 
           ${renderFormSections()}
+          ${renderBaselineBpInput()}
           ${renderEcgInput()}
 
           <div class="symptom-text-box">
@@ -1795,6 +1956,14 @@ function render() {
     const status = document.querySelector(".ecg-status");
     if (status) status.textContent = ecgClinicalText();
   });
+  document.getElementById("baseline-sbp")?.addEventListener("input", (event) => {
+    baselineSbp = event.target.value;
+    result = null;
+  });
+  document.getElementById("baseline-dbp")?.addEventListener("input", (event) => {
+    baselineDbp = event.target.value;
+    result = null;
+  });
 
   document.getElementById("clear-data-button")?.addEventListener("click", () => {
     clearPatientData();
@@ -1847,6 +2016,8 @@ async function loadSample() {
     symptomText = sample.symptom_text || "";
     ecgFinding = sample.ecg_finding || "not_available";
     ecgNote = sample.ecg_note || "";
+    baselineSbp = sample.features?.omr_sbp_mean ? String(Math.round(Number(sample.features.omr_sbp_mean))) : "";
+    baselineDbp = sample.features?.omr_dbp_mean ? String(Math.round(Number(sample.features.omr_dbp_mean))) : "";
     clearedFieldKeys = new Set();
     isAllDiagnosesOpen = false;
     features = recomputeDerivedFeatures({ ...sample.features });

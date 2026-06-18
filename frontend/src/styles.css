@@ -486,6 +486,43 @@ h3 {
   box-shadow: 0 6px 14px rgba(24, 66, 86, 0.06);
 }
 
+.field.field-high {
+  background: #fff8f6;
+  border-color: #efc5bd;
+}
+
+.field.field-low {
+  background: #fffaf0;
+  border-color: #ead58f;
+}
+
+.field.field-normal {
+  background: #fbfffc;
+  border-color: #d6eadc;
+}
+
+.field-status {
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 7px;
+}
+
+.field-high .field-status {
+  background: #fff0ee;
+  color: #8d2f22;
+}
+
+.field-low .field-status {
+  background: #fff8e6;
+  color: #72530c;
+}
+
+.field-normal .field-status {
+  background: #eef9f1;
+  color: #245b32;
+}
+
 .field span {
   align-items: baseline;
   color: #223848;
@@ -521,6 +558,20 @@ h3 {
 .field select:hover,
 .field textarea:hover {
   border-color: #9fb5c3;
+}
+
+.baseline-note {
+  border-top: 1px solid #e2e8ee;
+  color: #4d6172;
+  font-size: 13px;
+  font-weight: 750;
+  line-height: 1.45;
+  margin: 0;
+  padding: 10px 20px 14px;
+}
+
+.baseline-note.caution {
+  color: #72530c;
 }
 
 .computed-field {
@@ -1093,6 +1144,31 @@ h3 {
   color: #4d6172;
   font-size: 12px;
   line-height: 1.4;
+  margin: 0;
+  padding-left: 18px;
+}
+
+.missing-assessment {
+  background: #fffdf4;
+  border: 1px solid #dfcf84;
+  border-left: 4px solid #b28418;
+  border-radius: 8px;
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+}
+
+.missing-assessment span {
+  color: #5a4612;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.missing-assessment ul {
+  color: #4d6172;
+  font-size: 13px;
+  line-height: 1.45;
   margin: 0;
   padding-left: 18px;
 }
