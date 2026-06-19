@@ -46,6 +46,13 @@ class SubtypeRisk(BaseModel):
     clinical_support_score: int
     clinical_support_level: str
     clinical_support_reasons: list[str]
+    subtype_test_precision: float | None = None
+    subtype_test_recall: float | None = None
+    subtype_reliability_level: str | None = None
+    high_precision_threshold: float | None = None
+    high_precision_test_precision: float | None = None
+    high_precision_test_recall: float | None = None
+    high_precision_signal: bool = False
     reliability_note: str
     verification_priority: str
     explanation: str

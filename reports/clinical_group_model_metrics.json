@@ -1,0 +1,631 @@
+{
+  "group_ischemic_heart_disease": {
+    "label": "იშემიური გულის დაავადებები",
+    "members": [
+      "target_myocardial_infarction",
+      "target_angina_pectoris",
+      "target_acute_ischemic_heart_disease",
+      "target_chronic_ischemic_heart_disease"
+    ],
+    "selected_config": {
+      "name": "deeper_regularized",
+      "n_estimators": 300,
+      "max_depth": 5,
+      "learning_rate": 0.035,
+      "min_child_weight": 6,
+      "subsample": 0.85,
+      "colsample_bytree": 0.85,
+      "reg_lambda": 2.5,
+      "gamma": 0.2,
+      "scale_pos_weight_multiplier": 0.9
+    },
+    "train_positive_rows": 75885,
+    "train_negative_rows": 307068,
+    "validation": {
+      "auc_roc": 0.8484,
+      "average_precision": 0.6074,
+      "f1": 0.5597,
+      "recall_sensitivity": 0.7695,
+      "precision": 0.4398,
+      "positive_rate": 0.2027,
+      "confusion_matrix": [
+        [
+          64627,
+          21445
+        ],
+        [
+          5044,
+          16836
+        ]
+      ]
+    },
+    "test": {
+      "auc_roc": 0.8535,
+      "average_precision": 0.6141,
+      "f1": 0.5634,
+      "recall_sensitivity": 0.7802,
+      "precision": 0.4408,
+      "positive_rate": 0.2008,
+      "confusion_matrix": [
+        [
+          33103,
+          10953
+        ],
+        [
+          2432,
+          8635
+        ]
+      ]
+    }
+  },
+  "group_heart_failure": {
+    "label": "გულის უკმარისობა",
+    "members": [
+      "target_heart_failure"
+    ],
+    "selected_config": {
+      "name": "deeper_regularized",
+      "n_estimators": 300,
+      "max_depth": 5,
+      "learning_rate": 0.035,
+      "min_child_weight": 6,
+      "subsample": 0.85,
+      "colsample_bytree": 0.85,
+      "reg_lambda": 2.5,
+      "gamma": 0.2,
+      "scale_pos_weight_multiplier": 0.9
+    },
+    "train_positive_rows": 56827,
+    "train_negative_rows": 326126,
+    "validation": {
+      "auc_roc": 0.8739,
+      "average_precision": 0.5815,
+      "f1": 0.5211,
+      "recall_sensitivity": 0.7749,
+      "precision": 0.3925,
+      "positive_rate": 0.1444,
+      "confusion_matrix": [
+        [
+          73683,
+          18686
+        ],
+        [
+          3508,
+          12075
+        ]
+      ]
+    },
+    "test": {
+      "auc_roc": 0.8813,
+      "average_precision": 0.6038,
+      "f1": 0.5347,
+      "recall_sensitivity": 0.7849,
+      "precision": 0.4055,
+      "positive_rate": 0.1488,
+      "confusion_matrix": [
+        [
+          37483,
+          9439
+        ],
+        [
+          1764,
+          6437
+        ]
+      ]
+    }
+  },
+  "group_arrhythmia_conduction": {
+    "label": "არითმია და გამტარობის დარღვევები",
+    "members": [
+      "target_atrial_fibrillation_flutter",
+      "target_paroxysmal_tachycardia",
+      "target_av_conduction_block",
+      "target_other_arrhythmia"
+    ],
+    "selected_config": {
+      "name": "deeper_regularized",
+      "n_estimators": 300,
+      "max_depth": 5,
+      "learning_rate": 0.035,
+      "min_child_weight": 6,
+      "subsample": 0.85,
+      "colsample_bytree": 0.85,
+      "reg_lambda": 2.5,
+      "gamma": 0.2,
+      "scale_pos_weight_multiplier": 0.9
+    },
+    "train_positive_rows": 74818,
+    "train_negative_rows": 308135,
+    "validation": {
+      "auc_roc": 0.8201,
+      "average_precision": 0.5224,
+      "f1": 0.5265,
+      "recall_sensitivity": 0.7586,
+      "precision": 0.4031,
+      "positive_rate": 0.1933,
+      "confusion_matrix": [
+        [
+          63645,
+          23439
+        ],
+        [
+          5038,
+          15830
+        ]
+      ]
+    },
+    "test": {
+      "auc_roc": 0.8188,
+      "average_precision": 0.5252,
+      "f1": 0.5254,
+      "recall_sensitivity": 0.7562,
+      "precision": 0.4025,
+      "positive_rate": 0.1928,
+      "confusion_matrix": [
+        [
+          32565,
+          11930
+        ],
+        [
+          2591,
+          8037
+        ]
+      ]
+    }
+  },
+  "group_hypertensive_disease": {
+    "label": "ჰიპერტენზიული დაავადებები",
+    "members": [
+      "target_primary_hypertension",
+      "target_hypertensive_heart_disease",
+      "target_hypertensive_kidney_disease",
+      "target_hypertensive_heart_kidney_disease",
+      "target_hypertensive_crisis"
+    ],
+    "selected_config": {
+      "name": "deeper_regularized",
+      "n_estimators": 300,
+      "max_depth": 5,
+      "learning_rate": 0.035,
+      "min_child_weight": 6,
+      "subsample": 0.85,
+      "colsample_bytree": 0.85,
+      "reg_lambda": 2.5,
+      "gamma": 0.2,
+      "scale_pos_weight_multiplier": 0.9
+    },
+    "train_positive_rows": 194797,
+    "train_negative_rows": 188156,
+    "validation": {
+      "auc_roc": 0.8465,
+      "average_precision": 0.8311,
+      "f1": 0.7743,
+      "recall_sensitivity": 0.7926,
+      "precision": 0.7568,
+      "positive_rate": 0.5097,
+      "confusion_matrix": [
+        [
+          38921,
+          14011
+        ],
+        [
+          11409,
+          43611
+        ]
+      ]
+    },
+    "test": {
+      "auc_roc": 0.8477,
+      "average_precision": 0.8322,
+      "f1": 0.776,
+      "recall_sensitivity": 0.7954,
+      "precision": 0.7575,
+      "positive_rate": 0.5086,
+      "confusion_matrix": [
+        [
+          19949,
+          7138
+        ],
+        [
+          5737,
+          22299
+        ]
+      ]
+    }
+  },
+  "group_cerebrovascular_disease": {
+    "label": "ცერებროვასკულური დაავადებები",
+    "members": [
+      "target_subarachnoid_hemorrhage",
+      "target_intracerebral_hemorrhage",
+      "target_ischemic_stroke",
+      "target_other_cerebrovascular_disease"
+    ],
+    "selected_config": {
+      "name": "deeper_regularized",
+      "n_estimators": 300,
+      "max_depth": 5,
+      "learning_rate": 0.035,
+      "min_child_weight": 6,
+      "subsample": 0.85,
+      "colsample_bytree": 0.85,
+      "reg_lambda": 2.5,
+      "gamma": 0.2,
+      "scale_pos_weight_multiplier": 0.9
+    },
+    "train_positive_rows": 20011,
+    "train_negative_rows": 362942,
+    "validation": {
+      "auc_roc": 0.8162,
+      "average_precision": 0.3425,
+      "f1": 0.2475,
+      "recall_sensitivity": 0.6474,
+      "precision": 0.153,
+      "positive_rate": 0.053,
+      "confusion_matrix": [
+        [
+          81716,
+          20513
+        ],
+        [
+          2018,
+          3705
+        ]
+      ]
+    },
+    "test": {
+      "auc_roc": 0.8193,
+      "average_precision": 0.3464,
+      "f1": 0.2507,
+      "recall_sensitivity": 0.6497,
+      "precision": 0.1553,
+      "positive_rate": 0.0534,
+      "confusion_matrix": [
+        [
+          41779,
+          10401
+        ],
+        [
+          1031,
+          1912
+        ]
+      ]
+    }
+  },
+  "group_critical_cardiac_event": {
+    "label": "კრიტიკული კარდიული მოვლენა",
+    "members": [
+      "target_cardiac_arrest"
+    ],
+    "selected_config": {
+      "name": "regularized_precision",
+      "n_estimators": 360,
+      "max_depth": 3,
+      "learning_rate": 0.04,
+      "min_child_weight": 8,
+      "subsample": 0.9,
+      "colsample_bytree": 0.9,
+      "reg_lambda": 3.0,
+      "gamma": 0.5,
+      "scale_pos_weight_multiplier": 0.75
+    },
+    "train_positive_rows": 1852,
+    "train_negative_rows": 381101,
+    "validation": {
+      "auc_roc": 0.8955,
+      "average_precision": 0.1591,
+      "f1": 0.0644,
+      "recall_sensitivity": 0.716,
+      "precision": 0.0337,
+      "positive_rate": 0.0046,
+      "confusion_matrix": [
+        [
+          97189,
+          10263
+        ],
+        [
+          142,
+          358
+        ]
+      ]
+    },
+    "test": {
+      "auc_roc": 0.8972,
+      "average_precision": 0.2448,
+      "f1": 0.0777,
+      "recall_sensitivity": 0.7342,
+      "precision": 0.041,
+      "positive_rate": 0.0055,
+      "confusion_matrix": [
+        [
+          49656,
+          5166
+        ],
+        [
+          80,
+          221
+        ]
+      ]
+    }
+  },
+  "group_venous_thromboembolism": {
+    "label": "ვენური თრომბოემბოლია / ფილტვის ემბოლია",
+    "members": [
+      "target_venous_thromboembolism"
+    ],
+    "selected_config": {
+      "name": "deeper_regularized",
+      "n_estimators": 300,
+      "max_depth": 5,
+      "learning_rate": 0.035,
+      "min_child_weight": 6,
+      "subsample": 0.85,
+      "colsample_bytree": 0.85,
+      "reg_lambda": 2.5,
+      "gamma": 0.2,
+      "scale_pos_weight_multiplier": 0.9
+    },
+    "train_positive_rows": 13439,
+    "train_negative_rows": 369514,
+    "validation": {
+      "auc_roc": 0.7353,
+      "average_precision": 0.0979,
+      "f1": 0.1339,
+      "recall_sensitivity": 0.6061,
+      "precision": 0.0753,
+      "positive_rate": 0.0357,
+      "confusion_matrix": [
+        [
+          75362,
+          28731
+        ],
+        [
+          1520,
+          2339
+        ]
+      ]
+    },
+    "test": {
+      "auc_roc": 0.742,
+      "average_precision": 0.1014,
+      "f1": 0.1367,
+      "recall_sensitivity": 0.6128,
+      "precision": 0.0769,
+      "positive_rate": 0.0356,
+      "confusion_matrix": [
+        [
+          38725,
+          14435
+        ],
+        [
+          760,
+          1203
+        ]
+      ]
+    }
+  },
+  "group_peripheral_vascular_disease": {
+    "label": "პერიფერიული სისხლძარღვოვანი დაავადება",
+    "members": [
+      "target_peripheral_vascular_disease"
+    ],
+    "selected_config": {
+      "name": "recall_balanced",
+      "n_estimators": 320,
+      "max_depth": 4,
+      "learning_rate": 0.04,
+      "min_child_weight": 3,
+      "subsample": 0.9,
+      "colsample_bytree": 0.8,
+      "reg_lambda": 1.5,
+      "gamma": 0.0,
+      "scale_pos_weight_multiplier": 1.2
+    },
+    "train_positive_rows": 25296,
+    "train_negative_rows": 357657,
+    "validation": {
+      "auc_roc": 0.7776,
+      "average_precision": 0.1906,
+      "f1": 0.211,
+      "recall_sensitivity": 0.8149,
+      "precision": 0.1212,
+      "positive_rate": 0.0644,
+      "confusion_matrix": [
+        [
+          59900,
+          41099
+        ],
+        [
+          1287,
+          5666
+        ]
+      ]
+    },
+    "test": {
+      "auc_roc": 0.7829,
+      "average_precision": 0.1894,
+      "f1": 0.2114,
+      "recall_sensitivity": 0.8298,
+      "precision": 0.1211,
+      "positive_rate": 0.0632,
+      "confusion_matrix": [
+        [
+          30654,
+          20984
+        ],
+        [
+          593,
+          2892
+        ]
+      ]
+    }
+  },
+  "group_valvular_heart_disease": {
+    "label": "ვალვულარული გულის დაავადებები",
+    "members": [
+      "target_valvular_heart_disease"
+    ],
+    "selected_config": {
+      "name": "deeper_regularized",
+      "n_estimators": 300,
+      "max_depth": 5,
+      "learning_rate": 0.035,
+      "min_child_weight": 6,
+      "subsample": 0.85,
+      "colsample_bytree": 0.85,
+      "reg_lambda": 2.5,
+      "gamma": 0.2,
+      "scale_pos_weight_multiplier": 0.9
+    },
+    "train_positive_rows": 23791,
+    "train_negative_rows": 359162,
+    "validation": {
+      "auc_roc": 0.8203,
+      "average_precision": 0.2794,
+      "f1": 0.2635,
+      "recall_sensitivity": 0.7401,
+      "precision": 0.1603,
+      "positive_rate": 0.0617,
+      "confusion_matrix": [
+        [
+          75447,
+          25840
+        ],
+        [
+          1732,
+          4933
+        ]
+      ]
+    },
+    "test": {
+      "auc_roc": 0.8216,
+      "average_precision": 0.2835,
+      "f1": 0.2576,
+      "recall_sensitivity": 0.7337,
+      "precision": 0.1562,
+      "positive_rate": 0.0603,
+      "confusion_matrix": [
+        [
+          38630,
+          13170
+        ],
+        [
+          885,
+          2438
+        ]
+      ]
+    }
+  },
+  "group_cardiomyopathy": {
+    "label": "კარდიომიოპათია",
+    "members": [
+      "target_cardiomyopathy"
+    ],
+    "selected_config": {
+      "name": "baseline_balanced",
+      "n_estimators": 260,
+      "max_depth": 4,
+      "learning_rate": 0.05,
+      "min_child_weight": 1,
+      "subsample": 0.85,
+      "colsample_bytree": 0.85,
+      "reg_lambda": 1.0,
+      "gamma": 0.0,
+      "scale_pos_weight_multiplier": 1.0
+    },
+    "train_positive_rows": 10274,
+    "train_negative_rows": 372679,
+    "validation": {
+      "auc_roc": 0.7867,
+      "average_precision": 0.1511,
+      "f1": 0.127,
+      "recall_sensitivity": 0.684,
+      "precision": 0.07,
+      "positive_rate": 0.0292,
+      "confusion_matrix": [
+        [
+          76149,
+          28651
+        ],
+        [
+          996,
+          2156
+        ]
+      ]
+    },
+    "test": {
+      "auc_roc": 0.7878,
+      "average_precision": 0.1436,
+      "f1": 0.1188,
+      "recall_sensitivity": 0.688,
+      "precision": 0.065,
+      "positive_rate": 0.0269,
+      "confusion_matrix": [
+        [
+          38950,
+          14689
+        ],
+        [
+          463,
+          1021
+        ]
+      ]
+    }
+  },
+  "group_inflammatory_heart_disease": {
+    "label": "ანთებითი გულის დაავადებები",
+    "members": [
+      "target_inflammatory_heart_disease"
+    ],
+    "selected_config": {
+      "name": "deeper_regularized",
+      "n_estimators": 300,
+      "max_depth": 5,
+      "learning_rate": 0.035,
+      "min_child_weight": 6,
+      "subsample": 0.85,
+      "colsample_bytree": 0.85,
+      "reg_lambda": 2.5,
+      "gamma": 0.2,
+      "scale_pos_weight_multiplier": 0.9
+    },
+    "train_positive_rows": 4379,
+    "train_negative_rows": 378574,
+    "validation": {
+      "auc_roc": 0.7848,
+      "average_precision": 0.0763,
+      "f1": 0.0672,
+      "recall_sensitivity": 0.6162,
+      "precision": 0.0356,
+      "positive_rate": 0.0118,
+      "confusion_matrix": [
+        [
+          85383,
+          21295
+        ],
+        [
+          489,
+          785
+        ]
+      ]
+    },
+    "test": {
+      "auc_roc": 0.7835,
+      "average_precision": 0.0723,
+      "f1": 0.066,
+      "recall_sensitivity": 0.6151,
+      "precision": 0.0349,
+      "positive_rate": 0.0115,
+      "confusion_matrix": [
+        [
+          43700,
+          10789
+        ],
+        [
+          244,
+          390
+        ]
+      ]
+    }
+  }
+}

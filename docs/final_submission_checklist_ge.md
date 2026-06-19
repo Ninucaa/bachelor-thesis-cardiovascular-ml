@@ -119,10 +119,10 @@ PDF-ში ნახსენებია რამდენიმე კომ�
 
 - React/Tailwind: რეალურად გამოყენებულია Vite + vanilla JavaScript + CSS.
 - Docker: backend configuration დამატებულია, local build საჭიროებს გაშვებულ Docker daemon-ს.
-- PostgreSQL: ამ ეტაპზე არ გამოიყენება.
-- SMOTE: საბოლოო pipeline-ში არ გამოიყენება.
-- UCI external validation: არ არის შესრულებული.
-- ECG digital features: საბოლოო time-aware მოდელში ძირითადი input არ არის; ECG გამოიყენება კლინიკური შემოწმების რეკომენდაციებში/მომავალი განვითარების ნაწილში.
+- PostgreSQL: გამოყენებული იყო მონაცემთა საწყისი მომზადებისა და `cardio_training_features.csv` feature export-ისთვის; მიმდინარე web app runtime-ში PostgreSQL database-ს არ უკავშირდება.
+- SMOTE: საბოლოო time-aware pipeline-ში არ გამოიყენება; class imbalance იმართება real-record training-ით, patient-level split-ით, validation thresholds-ით და subtype metrics-ით.
+- UCI external validation: არ არის შესრულებული, რადგან UCI feature schema პირდაპირ არ ემთხვევა MIMIC-IV admission-level feature schema-ს; გადატანილია future work-ში.
+- ECG digital features: საბოლოო time-aware მოდელში probability input არ არის; ECG გამოიყენება clinical context/report/verification ნაწილში.
 
 ეს პუნქტები უნდა აიხსნას ტექნიკურ დოკუმენტაციაში როგორც პროექტის გეგმისგან განსხვავებული საბოლოო არქიტექტურული გადაწყვეტილებები ან მომავალი განვითარების ნაწილი.
 
@@ -130,5 +130,6 @@ PDF-ში ნახსენებია რამდენიმე კომ�
 
 - საბოლოო report-ის Word/PDF ფორმატში გადატანა.
 - სქრინშოტების ჩასმა report-ში.
+- CITI/PhysioNet მონაცემებზე წვდომის სერტიფიკატის დართვა ცალკე PDF ფაილად.
 - პრეზენტაციის slide deck-ის შექმნა.
 - დაცვის წინ live demo-ს ერთხელ თავიდან ბოლომდე გაშვება.

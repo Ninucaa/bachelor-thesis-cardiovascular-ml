@@ -44,7 +44,7 @@ const editableFields = [
   { key: "ed_triage_dbp_mean", label: "დიასტოლური წნევა", min: 30, max: 140, step: 1, unit: "mmHg", optional: true },
   { key: "ed_triage_resp_rate_mean", label: "სუნთქვის სიხშირე", min: 4, max: 80, step: 1, unit: "breaths/min", optional: true },
   { key: "ed_triage_spo2_mean", label: "SpO2", min: 50, max: 100, step: 1, unit: "%", optional: true },
-  { key: "ed_triage_temperature_f_mean", label: "ტემპერატურა", min: 26.7, max: 43.3, step: 0.1, unit: "°C", optional: true, displayUnit: "celsius" },
+  { key: "ed_triage_temperature_c_mean", label: "ტემპერატურა", min: 26.7, max: 43.3, step: 0.1, unit: "°C", optional: true },
   { key: "ed_triage_acuity_mean", label: "triage სიმძიმე", min: 1, max: 5, step: 1, unit: "1-5", optional: true },
   { key: "ed_arrived_by_ambulance", label: "სასწრაფოთი მოყვანა", type: "boolean" },
 ];
@@ -112,7 +112,7 @@ const formSections = [
       "ed_triage_dbp_mean",
       "ed_triage_resp_rate_mean",
       "ed_triage_spo2_mean",
-      "ed_triage_temperature_f_mean",
+      "ed_triage_temperature_c_mean",
       "ed_triage_acuity_mean",
       "ed_arrived_by_ambulance",
     ],
@@ -150,13 +150,12 @@ const bmiReference = { key: "omr_bmi_mean", label: "BMI", low: 18.5, high: 24.9,
 
 const samplePatientOptions = [
   { value: "demo-1", label: "პაციენტი 1 - გულის უკმარისობა" },
-  { value: "demo-2", label: "პაციენტი 2 - ინფარქტი" },
-  { value: "demo-3", label: "პაციენტი 3 - არითმია" },
+  { value: "demo-2", label: "პაციენტი 2 - იშემიური გულის დაავადება" },
+  { value: "demo-3", label: "პაციენტი 3 - არითმია / გამტარობა" },
   { value: "demo-4", label: "პაციენტი 4 - დაბალი რისკი" },
-  { value: "demo-5", label: "პაციენტი 5 - ჰიპერტენზიული გული" },
-  { value: "demo-6", label: "პაციენტი 6 - ჰიპერტენზიული კრიზი" },
-  { value: "demo-7", label: "პაციენტი 7 - ქრონიკული იშემია" },
-  { value: "demo-8", label: "პაციენტი 8 - ინსულტი" },
+  { value: "demo-5", label: "პაციენტი 5 - ჰიპერტენზიული დაავადება" },
+  { value: "demo-6", label: "პაციენტი 6 - ცერებროვასკულური დაავადება" },
+  { value: "demo-7", label: "პაციენტი 7 - ვალვულარული გულის დაავადება" },
 ];
 
 const featureLabels = {
@@ -195,7 +194,7 @@ const featureLabels = {
   lab_chol_total_mean_missing: "საერთო ქოლესტერინის მნიშვნელობა აკლდა",
   lab_platelets_mean: "თრომბოციტები",
   ed_arrived_by_ambulance: "სასწრაფო დახმარებით მიყვანა",
-  ed_triage_temperature_f_mean: "triage ტემპერატურა",
+  ed_triage_temperature_c_mean: "triage ტემპერატურა",
   ed_triage_resp_rate_mean: "triage სუნთქვის სიხშირე",
   ed_triage_heart_rate_mean: "triage გულისცემის საშუალო მაჩვენებელი",
   ed_triage_sbp_mean: "triage სისტოლური წნევის საშუალო მაჩვენებელი",
@@ -227,31 +226,18 @@ const optionalDefaults = {
   ed_triage_dbp_mean: 80,
   ed_triage_resp_rate_mean: 18,
   ed_triage_spo2_mean: 98,
-  ed_triage_temperature_f_mean: 98.6,
+  ed_triage_temperature_c_mean: 37,
   ed_triage_acuity_mean: 3,
 };
 
 const modelMetrics = [
-  { label: "საერთო გულ-სისხლძარღვთა დიაგნოსტიკური სიგნალი", auc: "0.8871", recall: "0.8134", precision: "0.8511" },
-  { label: "მიოკარდიუმის ინფარქტი", auc: "0.9337", recall: "0.8054", precision: "0.2072" },
-  { label: "გულის უკმარისობა", auc: "0.8801", recall: "0.8087", precision: "0.3905" },
-  { label: "სუბარაქნოიდული სისხლჩაქცევა", auc: "0.9275", recall: "0.7867", precision: "0.0256" },
-  { label: "ინტრაცერებრული სისხლჩაქცევა", auc: "0.9107", recall: "0.7675", precision: "0.0574" },
-  { label: "იშემიური ინსულტი / ცერებრული ინფარქტი", auc: "0.8600", recall: "0.7159", precision: "0.0780" },
-  { label: "სხვა ცერებროვასკულური დაავადება", auc: "0.7988", recall: "0.7290", precision: "0.0674" },
-  { label: "AV ბლოკადა / გამტარობის დარღვევა", auc: "0.7709", recall: "0.7162", precision: "0.0639" },
-  { label: "გულის გაჩერება", auc: "0.8950", recall: "0.7508", precision: "0.0349" },
-  { label: "პაროქსიზმული ტაქიკარდია", auc: "0.7866", recall: "0.7232", precision: "0.0518" },
-  { label: "წინაგულთა ფიბრილაცია / flutter", auc: "0.8410", recall: "0.8334", precision: "0.3173" },
-  { label: "სხვა გულის არითმია", auc: "0.7247", recall: "0.6436", precision: "0.0627" },
-  { label: "პირველადი ჰიპერტენზია", auc: "0.7929", recall: "0.8020", precision: "0.5496" },
-  { label: "ჰიპერტენზიული გულის დაავადება", auc: "0.8507", recall: "0.8127", precision: "0.0842" },
-  { label: "ჰიპერტენზიული თირკმლის დაავადება", auc: "0.9363", recall: "0.9001", precision: "0.4041" },
-  { label: "ჰიპერტენზიული გულის და თირკმლის დაავადება", auc: "0.9430", recall: "0.9062", precision: "0.1642" },
-  { label: "ჰიპერტენზიული კრიზი", auc: "0.8946", recall: "0.7663", precision: "0.0257" },
-  { label: "სტენოკარდია", auc: "0.8042", recall: "0.6868", precision: "0.0174" },
-  { label: "მწვავე იშემიური გულის დაავადება", auc: "0.8769", recall: "0.7764", precision: "0.0429" },
-  { label: "ქრონიკული იშემიური გულის დაავადება", auc: "0.8457", recall: "0.8092", precision: "0.3977" },
+  { label: "საერთო გულ-სისხლძარღვთა დიაგნოსტიკური სიგნალი", auc: "0.8863", recall: "0.8085", precision: "0.8648" },
+  { label: "იშემიური გულის დაავადებები", auc: "0.8535", recall: "0.3060", precision: "0.7213" },
+  { label: "გულის უკმარისობა", auc: "0.8813", recall: "0.3017", precision: "0.7434" },
+  { label: "არითმია და გამტარობის დარღვევები", auc: "0.8188", recall: "0.1135", precision: "0.7426" },
+  { label: "ჰიპერტენზიული დაავადებები", auc: "0.8477", recall: "0.8759", precision: "0.7195" },
+  { label: "ცერებროვასკულური დაავადებები", auc: "0.8193", recall: "0.1312", precision: "0.7109" },
+  { label: "ვალვულარული გულის დაავადებები", auc: "0.8216", recall: "0.0196", precision: "0.7831" },
 ];
 
 const metricDescriptions = [
@@ -267,13 +253,20 @@ const modelTrustNotes = [
   },
   {
     title: "როგორ წავიკითხოთ",
-    text: "გარჩევის უნარი აჩვენებს საერთო ხარისხს, აღმოჩენის უნარი - რამდენ შემთხვევას პოულობს, დადებითი პასუხის სიზუსტე - რამდენად სანდოა დადებითი სიგნალი.",
+    text: "გარჩევის უნარი აჩვენებს საერთო ხარისხს, აღმოჩენის უნარი - რამდენ შემთხვევას პოულობს, დადებითი პასუხის სიზუსტე - რამდენად სანდოა დადებითი სიგნალი. მთავარ კლინიკურ ჯგუფებში ზღვარი შერჩეულია balanced წესით, დაახლოებით 0.70 ან მეტი precision-ის მისაღწევად, რათა recall ზედმეტად დაბალი არ დარჩეს; 0.80 tier გამოიყენება უფრო მკაცრ მეორად სიგნალებად.",
   },
   {
     title: "კლინიკური შეზღუდვა",
     text: "ეს რიცხვები არ ნიშნავს, რომ მოდელი ექიმზე უკეთ სვამს დიაგნოზს. ისინი აჩვენებს prototype-ის ტექნიკურ ხარისხს კონკრეტულ dataset-ზე.",
   },
 ];
+
+const ACTIVE_SUBTYPE_PRECISION_MIN = 0.79;
+const ACTIVE_SUBTYPE_RECALL_MIN = 0.04;
+const SUPPORTIVE_SUBTYPE_PRECISION_MIN = 0.79;
+const SUPPORTIVE_SUBTYPE_RECALL_MIN = 0.04;
+const HIGH_PRECISION_SIGNAL_MIN = 0.7;
+const HIGH_PRECISION_RECALL_MIN = 0.01;
 
 const symptomTextRules = [
   {
@@ -282,6 +275,9 @@ const symptomTextRules = [
     patterns: [
       /გულმკერდ(ის)?\s*ტკივილ/i,
       /მკერდ(ის)?\s*ტკივილ/i,
+      /მკერდ(ში)?\s*(წვა|მოჭერ|ზეწოლ|დაწოლ|სიმძიმ)/i,
+      /გულ(ზე|თან)\s*(აწვებ|მაწვებ|მოჭერ|ტკივ)/i,
+      /გულის\s*არეში\s*(ტკივილ|წვა|მოჭერ)/i,
       /chest pain|chest pressure|\bcp\b/i,
     ],
   },
@@ -291,19 +287,34 @@ const symptomTextRules = [
     patterns: [
       /ქოშინ/i,
       /სუნთქვ(ის)?\s*(გაძნელ|უკმარ|პრობლემ)/i,
+      /სუნთქვ(ა)?\s*(უჭირს|მიჭირს|უჭირდ)/i,
       /ჰაერ(ი)?\s*არ\s*ყოფნ/i,
+      /ჰაერ(ის)?\s*(უკმარის|ნაკლებობ)/i,
       /shortness of breath|\bsob\b|dyspnea|difficulty breathing|trouble breathing/i,
     ],
   },
   {
     key: "symptom_palpitations",
     label: "გულის ფრიალი",
-    patterns: [/გულის\s*ფრიალ/i, /პალპიტაცი/i, /palpitation/i],
+    patterns: [
+      /გულის\s*ფრიალ/i,
+      /პალპიტაცი/i,
+      /გულ(ი)?\s*(უჩქარ|უცემს|მიფრიალ|აფრიალ)/i,
+      /აჩქარებულ(ი)?\s*გულისცემ/i,
+      /palpitation/i,
+    ],
   },
   {
     key: "symptom_syncope",
     label: "გულის წასვლა / სინკოპე",
-    patterns: [/გულის\s*წასვლ/i, /გონებ(ის)?\s*დაკარგ/i, /სინკოპ/i, /syncope|faint|passed out/i],
+    patterns: [
+      /გულის\s*წასვლ/i,
+      /გონებ(ის)?\s*დაკარგ/i,
+      /გონება\s*(დაკარგ|წაუვიდ)/i,
+      /წაიქც/i,
+      /სინკოპ/i,
+      /syncope|faint|passed out/i,
+    ],
   },
   {
     key: "symptom_dizziness",
@@ -313,7 +324,46 @@ const symptomTextRules = [
   {
     key: "symptom_edema",
     label: "შეშუპება",
-    patterns: [/შეშუპ/i, /ფეხ(ების)?\s*შეშუპ/i, /edema|swelling|leg swelling/i],
+    patterns: [
+      /შეშუპ/i,
+      /ფეხ(ების)?\s*შეშუპ/i,
+      /ფეხ(ები)?\s*უსივდ/i,
+      /კოჭ(ებ)?ი?\s*შეშუპ/i,
+      /edema|swelling|leg swelling/i,
+    ],
+  },
+];
+
+const additionalClinicalTextRules = [
+  {
+    key: "text_high_blood_pressure",
+    label: "მაღალი წნევა",
+    patterns: [
+      /მაღალ(ი)?\s*წნევ/i,
+      /წნევ(ა)?\s*(მაღალ|აწეულ|მომატებულ)/i,
+      /ჰიპერტენზ/i,
+      /hypertension|high blood pressure/i,
+    ],
+  },
+  {
+    key: "text_low_blood_pressure",
+    label: "დაბალი წნევა",
+    patterns: [
+      /დაბალ(ი)?\s*წნევ/i,
+      /წნევ(ა)?\s*(დაბალ|დაწეულ)/i,
+      /ჰიპოტენზ/i,
+      /hypotension|low blood pressure/i,
+    ],
+  },
+  {
+    key: "text_headache",
+    label: "თავის ტკივილი",
+    patterns: [
+      /თავ(ის)?\s*ტკივილ/i,
+      /თავი\s*(ტკივა|მტკივა|სტკივა)/i,
+      /ძლიერ(ი)?\s*თავის\s*ტკივილ/i,
+      /headache/i,
+    ],
   },
 ];
 
@@ -358,7 +408,7 @@ const dataQualityGroups = [
       "ed_triage_dbp_mean",
       "ed_triage_resp_rate_mean",
       "ed_triage_spo2_mean",
-      "ed_triage_temperature_f_mean",
+      "ed_triage_temperature_c_mean",
       "ed_triage_acuity_mean",
     ],
     weight: 2,
@@ -406,9 +456,12 @@ let isPredicting = false;
 let symptomText = "";
 let ecgFinding = "not_available";
 let ecgNote = "";
+let baselineSbp = "";
+let baselineDbp = "";
 let isLabReferenceOpen = false;
 let isModelTrustOpen = false;
 let isAllDiagnosesOpen = false;
+let isPatientReportOpen = false;
 let clearedFieldKeys = new Set();
 let selectedSampleId = "demo-1";
 
@@ -435,8 +488,8 @@ function diseaseRiskLabel(level) {
 function diagnosisConfidenceLabel(confidence) {
   if (confidence === "high") return "ძლიერი სავარაუდო დიაგნოზი";
   if (confidence === "diagnostic_signal") return "სავარაუდო დიაგნოზის ჯგუფი";
-  if (confidence === "borderline") return "სუსტი/საზღვრული სიგნალი";
-  return "დაბალი მხარდაჭერა";
+  if (confidence === "borderline") return "დამატებით გადასამოწმებელი სიგნალი";
+  return "დაბალი ალბათობის მიმართულება";
 }
 
 function confidenceClass(confidence) {
@@ -453,9 +506,27 @@ function supportClass(level) {
 }
 
 function supportLabel(level) {
-  if (level === "strong") return "ძლიერი კლინიკური მხარდაჭერა";
-  if (level === "partial") return "ნაწილობრივი კლინიკური მხარდაჭერა";
-  return "სუსტი კლინიკური მხარდაჭერა";
+  if (level === "strong") return "კლინიკური ნიშნები კარგად ამყარებს";
+  if (level === "partial") return "კლინიკური ნიშნები ნაწილობრივ ამყარებს";
+  return "დამატებით გადასამოწმებელი";
+}
+
+function supportExplanation(level) {
+  if (level === "strong") {
+    return "მოდელის სავარაუდო მიმართულება ემთხვევა რამდენიმე მნიშვნელოვან კლინიკურ ნიშანს.";
+  }
+  if (level === "partial") {
+    return "მოდელის სავარაუდო მიმართულებას აქვს დამხმარე ნიშნები, მაგრამ ექიმმა დამატებით უნდა გადაამოწმოს.";
+  }
+  return "მოდელმა სტატისტიკური მსგავსება იპოვა, მაგრამ შეყვანილ მონაცემებში დამადასტურებელი კლინიკური ნიშნები ჯერ არასაკმარისია.";
+}
+
+function displayDiagnosisStatus(risk) {
+  const status = risk?.diagnosis_status || diseaseRiskLabel(risk?.risk_level);
+  if (String(status).includes("კლინიკური მხარდაჭერა სუსტია")) {
+    return "მოდელის სიგნალი - საჭიროა დამატებითი დადასტურება";
+  }
+  return status;
 }
 
 function formatPercent(value) {
@@ -483,6 +554,58 @@ function hasBlockingClearedFields() {
   return editableFields.some((field) => !field.optional && field.type !== "computed" && clearedFieldKeys.has(field.key));
 }
 
+function displayValueForKey(key, value) {
+  const field = editableFieldByKey[key];
+  let displayValue = Number(value);
+  if (!Number.isFinite(displayValue)) return "";
+  if (field?.displayUnit === "kg") displayValue /= 2.20462;
+  if (field?.displayUnit === "cm") displayValue *= 2.54;
+  if (field?.precision !== undefined) return displayValue.toFixed(field.precision);
+  if (field?.step && Number(field.step) < 1) return String(Math.round(displayValue * 10) / 10);
+  return String(Math.round(displayValue));
+}
+
+function featureWarningText(key) {
+  if (!features || clearedFieldKeys.has(key) || Number(features[`${key}_missing`] ?? 0) === 1) return "";
+  const field = editableFieldByKey[key];
+  const value = Number(features[key]);
+  if (!field || !Number.isFinite(value)) return "";
+  const displayValue = Number(displayValueForKey(key, value));
+  const unit = field.unit || "";
+
+  if (field.min !== undefined && displayValue < field.min) {
+    return `${field.label}: მნიშვნელობა მინიმალურ დასაშვებ ზღვარზე დაბალია (${displayValue} ${unit}).`;
+  }
+  if (field.max !== undefined && displayValue > field.max) {
+    return `${field.label}: მნიშვნელობა მაქსიმალურ დასაშვებ ზღვარზე მაღალია (${displayValue} ${unit}).`;
+  }
+
+  const clinicalWarnings = {
+    lab_troponin_t_mean: value > 10 ? "Troponin T ძალიან მაღალია; გადაამოწმეთ ერთეული და ლაბორატორიული პასუხი." : "",
+    lab_ntprobnp_mean: value > 30000 ? "NT-proBNP ძალიან მაღალია; გადაამოწმეთ ერთეული და პასუხის სისწორე." : "",
+    lab_glucose_mean: value < 50 || value > 500 ? "გლუკოზა უკიდურეს დიაპაზონშია; გადაამოწმეთ მნიშვნელობა და ერთეული." : "",
+    lab_creatinine_mean: value > 8 ? "კრეატინინი ძალიან მაღალია; გადაამოწმეთ პასუხი და პაციენტის თირკმლის სტატუსი." : "",
+    ed_triage_sbp_mean: value >= 220 ? "სისტოლური წნევა უკიდურესად მაღალია; გადაამოწმეთ ჩანაწერი და კლინიკური მდგომარეობა." : "",
+    ed_triage_dbp_mean: value >= 130 ? "დიასტოლური წნევა უკიდურესად მაღალია; გადაამოწმეთ ჩანაწერი და კლინიკური მდგომარეობა." : "",
+    omr_sbp_mean: value >= 220 ? "ამბულატორიული სისტოლური წნევა უკიდურესად მაღალია; გადაამოწმეთ ჩანაწერი." : "",
+    omr_dbp_mean: value >= 130 ? "ამბულატორიული დიასტოლური წნევა უკიდურესად მაღალია; გადაამოწმეთ ჩანაწერი." : "",
+    ed_triage_spo2_mean: value < 85 ? "SpO2 ძალიან დაბალია; გადაამოწმეთ გაზომვა და პაციენტის კლინიკური მდგომარეობა." : "",
+    ed_triage_heart_rate_mean: value < 45 || value > 140 ? "გულისცემა უკიდურეს დიაპაზონშია; გადაამოწმეთ ჩანაწერი." : "",
+    ed_triage_resp_rate_mean: value < 8 || value > 35 ? "სუნთქვის სიხშირე უკიდურეს დიაპაზონშია; გადაამოწმეთ ჩანაწერი." : "",
+    ed_triage_temperature_c_mean: value < 34 || value > 40 ? "ტემპერატურა საყურადღებო დიაპაზონშია; გადაამოწმეთ, რომ მნიშვნელობა Celsius-ით არის შეყვანილი." : "",
+  };
+  return clinicalWarnings[key] || "";
+}
+
+function inputWarnings() {
+  if (!features) return [];
+  const warnings = editableFields
+    .filter((field) => field.type !== "computed" && field.type !== "select" && field.type !== "boolean")
+    .map((field) => featureWarningText(field.key))
+    .filter(Boolean);
+  return uniqueItems(warnings).slice(0, 8);
+}
+
 function inputValue(field) {
   if (!features) return "";
   if (clearedFieldKeys.has(field.key)) return "";
@@ -491,14 +614,28 @@ function inputValue(field) {
   if (Number.isNaN(value)) return "";
   if (field.displayUnit === "kg") value /= 2.20462;
   if (field.displayUnit === "cm") value *= 2.54;
-  if (field.displayUnit === "celsius") value = (value - 32) * (5 / 9);
   if (field.precision !== undefined) return value.toFixed(field.precision);
   if (field.step && Number(field.step) < 1) return String(Math.round(value * 10) / 10);
   return String(Math.round(value));
 }
 
+function normalizeTemperatureInput(key, value) {
+  if (key !== "ed_triage_temperature_c_mean") return { value, converted: false };
+  if (value >= 80 && value <= 110) {
+    return {
+      value: Math.round(((value - 32) * (5 / 9)) * 10) / 10,
+      converted: true,
+    };
+  }
+  return { value, converted: false };
+}
+
+function isLabReferenceMissing(reference) {
+  return !features || clearedFieldKeys.has(reference.key) || Number(features[`${reference.key}_missing`] ?? 0) === 1;
+}
+
 function labStatus(reference) {
-  if (!features || Number(features[`${reference.key}_missing`] ?? 0) === 1) {
+  if (isLabReferenceMissing(reference)) {
     return { label: "არ არის შეყვანილი", className: "missing" };
   }
   const value = Number(features[reference.key]);
@@ -509,7 +646,7 @@ function labStatus(reference) {
 }
 
 function labDisplayValue(reference) {
-  if (!features || Number(features[`${reference.key}_missing`] ?? 0) === 1) return "—";
+  if (isLabReferenceMissing(reference)) return "—";
   const value = Number(features[reference.key]);
   if (Number.isNaN(value)) return "—";
   if (reference.key === "lab_creatinine_mean" || reference.key === "lab_glucose_mean") {
@@ -557,10 +694,10 @@ function severityForSentence(sentence) {
   return patternMatches(severePatterns, sentence) ? "high" : "not_specified";
 }
 
-function parseSymptomTextDetailed(text) {
+function parseClinicalTextRules(text, rules) {
   const sentences = splitSymptomSentences(text);
   const details = {};
-  symptomTextRules.forEach((rule) => {
+  rules.forEach((rule) => {
     details[rule.key] = {
       key: rule.key,
       label: rule.label,
@@ -571,7 +708,7 @@ function parseSymptomTextDetailed(text) {
   });
 
   sentences.forEach((sentence) => {
-    symptomTextRules.forEach((rule) => {
+    rules.forEach((rule) => {
       if (!patternMatches(rule.patterns, sentence)) return;
       const status = symptomStatusForSentence(sentence);
       const severity = severityForSentence(sentence);
@@ -589,6 +726,21 @@ function parseSymptomTextDetailed(text) {
   });
 
   return details;
+}
+
+function parseSymptomTextDetailed(text) {
+  return parseClinicalTextRules(text, symptomTextRules);
+}
+
+function parseAdditionalClinicalTextDetailed(text) {
+  return parseClinicalTextRules(text, additionalClinicalTextRules);
+}
+
+function parsedClinicalTextDetails(text) {
+  return [
+    ...Object.values(parseSymptomTextDetailed(text)),
+    ...Object.values(parseAdditionalClinicalTextDetailed(text)),
+  ];
 }
 
 function parseSymptomText(text) {
@@ -640,6 +792,61 @@ function numericFeature(key, defaultValue = 0) {
 
 function booleanFeature(key) {
   return numericFeature(key) >= 0.5;
+}
+
+function baselineBpValues() {
+  const sbp = Number(String(baselineSbp).replace(",", "."));
+  const dbp = Number(String(baselineDbp).replace(",", "."));
+  return {
+    hasBaseline: Number.isFinite(sbp) && Number.isFinite(dbp) && sbp > 0 && dbp > 0,
+    sbp,
+    dbp,
+  };
+}
+
+function currentBpValues() {
+  return {
+    sbp: Math.max(numericFeature("omr_sbp_mean"), numericFeature("ed_triage_sbp_mean")),
+    dbp: Math.max(numericFeature("omr_dbp_mean"), numericFeature("ed_triage_dbp_mean")),
+  };
+}
+
+function baselineBpAssessment() {
+  const current = currentBpValues();
+  const baseline = baselineBpValues();
+  const absoluteHigh = current.sbp >= 180 || current.dbp >= 120;
+  const high = current.sbp >= 140 || current.dbp >= 90;
+
+  if (!baseline.hasBaseline) {
+    return {
+      className: high ? "caution" : "neutral",
+      label: "ჩვეულებრივი წნევა არ არის მითითებული",
+      text: high
+        ? "წნევა მაღალია ზოგად კლინიკურ დიაპაზონთან შედარებით; შეადარეთ პაციენტის ჩვეულებრივ მაჩვენებელს, თუ ეს მოგვიანებით გახდება ცნობილი."
+        : "შეფასება ეფუძნება ზოგად კლინიკურ დიაპაზონს, რადგან პაციენტის ჩვეულებრივი წნევა მითითებული არ არის.",
+      reason: high ? `წნევა ზოგად ზღვართან შედარებით მაღალია (${Math.round(current.sbp)}/${Math.round(current.dbp)} mmHg)` : "",
+      absoluteHigh,
+      aboveBaseline: false,
+    };
+  }
+
+  const sbpDelta = current.sbp - baseline.sbp;
+  const dbpDelta = current.dbp - baseline.dbp;
+  const aboveBaseline = sbpDelta >= 20 || dbpDelta >= 10;
+  const nearBaseline = Math.abs(sbpDelta) < 15 && Math.abs(dbpDelta) < 8;
+
+  return {
+    className: absoluteHigh || aboveBaseline ? "caution" : "neutral",
+    label: "შედარებულია პაციენტის ჩვეულებრივ წნევასთან",
+    text: nearBaseline
+      ? `მიმდინარე წნევა ახლოსაა პაციენტის ჩვეულებრივ მაჩვენებელთან (${Math.round(baseline.sbp)}/${Math.round(baseline.dbp)} mmHg).`
+      : `მიმდინარე წნევა პაციენტის ჩვეულებრივ მაჩვენებელთან შედარებით შეცვლილია: ${sbpDelta >= 0 ? "+" : ""}${Math.round(sbpDelta)}/${dbpDelta >= 0 ? "+" : ""}${Math.round(dbpDelta)} mmHg.`,
+    reason: aboveBaseline
+      ? `წნევა პაციენტის ჩვეულებრივ მაჩვენებელზე მაღალია (${sbpDelta >= 0 ? "+" : ""}${Math.round(sbpDelta)}/${dbpDelta >= 0 ? "+" : ""}${Math.round(dbpDelta)} mmHg)`
+      : "",
+    absoluteHigh,
+    aboveBaseline,
+  };
 }
 
 function ecgAlignment(risk) {
@@ -734,14 +941,15 @@ function urgencyAssessment(risk) {
   const spo2 = numericFeature("ed_triage_spo2_mean", 100);
   const heartRate = numericFeature("ed_triage_heart_rate_mean");
   const respRate = numericFeature("ed_triage_resp_rate_mean");
-  const sbp = Math.max(numericFeature("omr_sbp_mean"), numericFeature("ed_triage_sbp_mean"));
-  const dbp = Math.max(numericFeature("omr_dbp_mean"), numericFeature("ed_triage_dbp_mean"));
+  const bp = currentBpValues();
+  const bpAssessment = baselineBpAssessment();
   const acuity = numericFeature("ed_triage_acuity_mean", 5);
 
   if (["st_elevation", "st_depression"].includes(ecg)) reasons.push("ECG-ზე არის ST ცვლილება");
   if (troponin > 0.01) reasons.push("Troponin T მომატებულია");
   if (spo2 < 90) reasons.push(`SpO2 დაბალია (${Math.round(spo2)}%)`);
-  if (sbp >= 180 || dbp >= 120) reasons.push(`წნევა ძალიან მაღალია (${Math.round(sbp)}/${Math.round(dbp)} mmHg)`);
+  if (bpAssessment.absoluteHigh) reasons.push(`წნევა ძალიან მაღალია (${Math.round(bp.sbp)}/${Math.round(bp.dbp)} mmHg)`);
+  else if (bpAssessment.reason) reasons.push(bpAssessment.reason);
   if (heartRate >= 130 || heartRate <= 45) reasons.push(`გულისცემა უკიდურესია (${Math.round(heartRate)} bpm)`);
   if (respRate >= 28) reasons.push(`სუნთქვის სიხშირე მაღალია (${Math.round(respRate)} / min)`);
   if (acuity <= 2) reasons.push(`triage სიმძიმე მაღალია (${Math.round(acuity)} / 5)`);
@@ -773,6 +981,37 @@ function urgencyAssessment(risk) {
   };
 }
 
+function missingForBetterAssessment(risk) {
+  const target = risk?.target_name || "";
+  const items = [];
+  const addIfMissing = (key, text) => {
+    if (!isFeaturePresent(key)) items.push(text);
+  };
+
+  if (["target_myocardial_infarction", "target_acute_ischemic_heart_disease", "target_angina_pectoris"].includes(target)) {
+    addIfMissing("lab_troponin_t_mean", "Troponin T უკეთ ამყარებს ან ასუსტებს კორონარულ/ინფარქტის ეჭვს.");
+    if (selectedEcgOption().value === "not_available" && !ecgNote.trim()) items.push("ECG საჭიროა იშემიური ცვლილებების შესადარებლად.");
+    addIfMissing("symptom_chest_pain", "გულმკერდის ტკივილის არსებობა/უარყოფა მნიშვნელოვანია.");
+  }
+  if (target === "target_heart_failure") {
+    addIfMissing("lab_ntprobnp_mean", "NT-proBNP უკეთ აფასებს გულის დატვირთვას/უკმარისობის ეჭვს.");
+    addIfMissing("ed_triage_spo2_mean", "SpO2 და სუნთქვის მაჩვენებლები საჭიროა სიმძიმის შესაფასებლად.");
+  }
+  if (target.includes("hypertensive")) {
+    if (!baselineBpValues().hasBaseline) items.push("პაციენტის ჩვეულებრივი არტერიული წნევა დაეხმარება მიმდინარე წნევის სწორად შეფასებას.");
+    addIfMissing("lab_creatinine_mean", "კრეატინინი საჭიროა თირკმლის დაზიანების/ჰიპერტენზიული გართულების შესაფასებლად.");
+  }
+  if (target.includes("arrhythmia") || target.includes("fibrillation") || target.includes("tachycardia") || target.includes("conduction")) {
+    if (selectedEcgOption().value === "not_available" && !ecgNote.trim()) items.push("ECG rhythm strip საჭიროა რიტმის/გამტარობის დასადასტურებლად.");
+    addIfMissing("ed_triage_heart_rate_mean", "გულისცემის მაჩვენებელი საჭიროა რიტმის სიმძიმის შესაფასებლად.");
+  }
+  if (!baselineBpValues().hasBaseline && (numericFeature("ed_triage_sbp_mean") >= 140 || numericFeature("omr_sbp_mean") >= 140)) {
+    items.push("თუ ცნობილია, დაამატეთ პაციენტის ჩვეულებრივი წნევა, რათა მაღალი წნევა baseline-ს შევადაროთ.");
+  }
+
+  return uniqueItems(items).slice(0, 4);
+}
+
 function uniqueItems(items) {
   const seen = new Set();
   return items
@@ -795,60 +1034,11 @@ function isFeaturePresent(key) {
   return true;
 }
 
-function dataQualitySummary() {
-  if (!features) {
-    return {
-      score: 0,
-      label: "მონაცემები არ არის ჩატვირთული",
-      className: "low",
-      missingGroups: dataQualityGroups,
-      presentGroups: [],
-      recommendation: "ჩატვირთეთ სატესტო პაციენტი ან შეავსეთ ფორმა.",
-    };
-  }
-
-  const groupResults = dataQualityGroups.map((group) => {
-    const presentRatio = group.customPresent
-      ? group.customPresent()
-        ? 1
-        : 0
-      : group.keys.filter((key) => isFeaturePresent(key)).length / group.keys.length;
-    return { ...group, presentRatio };
-  });
-  const totalWeight = groupResults.reduce((sum, group) => sum + group.weight, 0);
-  const weightedScore = groupResults.reduce((sum, group) => sum + group.weight * group.presentRatio, 0);
-  const score = Math.round((weightedScore / totalWeight) * 100);
-  const missingGroups = groupResults.filter((group) => group.presentRatio < 0.75);
-  const presentGroups = groupResults.filter((group) => group.presentRatio >= 0.75);
-
-  let label = "საკმარისი მონაცემები";
-  let className = "good";
-  if (score < 55) {
-    label = "სუსტი მონაცემები";
-    className = "low";
-  } else if (score < 80) {
-    label = "ნაწილობრივ სრული მონაცემები";
-    className = "medium";
-  }
-
-  return {
-    score,
-    label,
-    className,
-    missingGroups,
-    presentGroups,
-    recommendation: missingGroups.length
-      ? missingGroups[0].fix
-      : "მონაცემები საკმარისად სრულად გამოიყურება; ახლა მთავარი ყურადღება კლინიკურ დადასტურებაზე გადადის.",
-  };
-}
-
 function clinicalActionGroups(risk) {
-  const quality = dataQualitySummary();
   const urgency = urgencyAssessment(risk);
   const ecg = ecgAlignment(risk);
   const diagnosisChecks = uniqueItems([...(risk?.suggested_clinical_checks || []).slice(0, 4), ...ecgClinicalChecks()]);
-  const dataChecks = uniqueItems(quality.missingGroups.slice(0, 3).map((group) => group.fix));
+  const dataChecks = uniqueItems(missingForBetterAssessment(risk));
   const safetyChecks = [
     `${urgency.label}: ${urgency.text}`,
     ecg.text,
@@ -953,7 +1143,11 @@ function updateFeatureFromInput(key, rawValue) {
     if (!Number.isFinite(value)) return;
     if (field?.displayUnit === "kg") value *= 2.20462;
     if (field?.displayUnit === "cm") value /= 2.54;
-    if (field?.displayUnit === "celsius") value = value * (9 / 5) + 32;
+    const normalizedTemperature = normalizeTemperatureInput(key, value);
+    value = normalizedTemperature.value;
+    if (normalizedTemperature.converted) {
+      statusText = `ტემპერატურა Fahrenheit-იდან Celsius-ში გადავიყვანე: ${value.toFixed(1)} °C. მოდელი Celsius მონაცემებზეა გაწვრთნილი.`;
+    }
     nextFeatures[key] = value;
     syncMeasurementMetadata(nextFeatures, key, false);
   }
@@ -971,6 +1165,8 @@ function clearPatientData() {
   symptomText = "";
   ecgFinding = "not_available";
   ecgNote = "";
+  baselineSbp = "";
+  baselineDbp = "";
   features = recomputeDerivedFeatures(baseFeatures);
   result = null;
   statusText = "ყველა მონაცემი გასუფთავდა.";
@@ -1023,6 +1219,31 @@ function renderInputField(field) {
             />`
       }
     </label>
+  `;
+}
+
+function renderBaselineBpInput() {
+  const assessment = baselineBpAssessment();
+  return `
+    <section class="form-section baseline-bp-section">
+      <div class="section-heading">
+        <div>
+          <h3>პაციენტის ჩვეულებრივი არტერიული წნევა (თუ ცნობილია)</h3>
+          <p>არასავალდებულოა. თუ მითითებულია, სისტემა მიმდინარე წნევას პაციენტის საკუთარ baseline მაჩვენებელს შეადარებს.</p>
+        </div>
+      </div>
+      <div class="field-grid baseline-grid">
+        <label class="field">
+          <span>ჩვეულებრივი სისტოლური წნევა <small>mmHg</small></span>
+          <input id="baseline-sbp" type="text" inputmode="decimal" placeholder="არასავალდებულო" value="${escapeHtml(baselineSbp)}" ${features ? "" : "disabled"} />
+        </label>
+        <label class="field">
+          <span>ჩვეულებრივი დიასტოლური წნევა <small>mmHg</small></span>
+          <input id="baseline-dbp" type="text" inputmode="decimal" placeholder="არასავალდებულო" value="${escapeHtml(baselineDbp)}" ${features ? "" : "disabled"} />
+        </label>
+      </div>
+      <p class="baseline-note ${assessment.className}">${escapeHtml(assessment.text)}</p>
+    </section>
   `;
 }
 
@@ -1150,12 +1371,6 @@ function renderReasonChips(risk, limit = 4) {
   return reasons.map((item) => `<span class="driver-chip">${escapeHtml(item)}</span>`).join("");
 }
 
-function clinicalResemblanceText(risk) {
-  const reasons = clinicalReasonList(risk, 5);
-  if (!reasons.length) return "მკვეთრი განმსაზღვრელი კლინიკური კომბინაცია არ გამოიკვეთა";
-  return reasons.join(" + ");
-}
-
 function ecgResultContext() {
   const selected = selectedEcgOption();
   if (selected.value === "not_available") return "";
@@ -1167,10 +1382,49 @@ function ecgResultContext() {
 
 function getPrimaryDiagnosticRisk() {
   if (!result?.subtype_risks?.length) return null;
-  const diagnosticCandidates = result.subtype_risks.filter((risk) =>
+  const activeCandidates = result.subtype_risks.filter(isActiveSubtypeSignal);
+  const diagnosticCandidates = activeCandidates.filter((risk) =>
     ["high", "diagnostic_signal"].includes(risk.diagnosis_confidence),
   );
-  return diagnosticCandidates[0] || result.subtype_risks[0];
+  return diagnosticCandidates[0] || activeCandidates[0] || null;
+}
+
+function subtypePrecision(risk) {
+  const value = Number(risk?.subtype_test_precision);
+  return Number.isFinite(value) ? value : null;
+}
+
+function subtypeRecall(risk) {
+  const value = Number(risk?.subtype_test_recall);
+  return Number.isFinite(value) ? value : null;
+}
+
+function highPrecision(risk) {
+  const value = Number(risk?.high_precision_test_precision);
+  return Number.isFinite(value) ? value : null;
+}
+
+function highPrecisionRecall(risk) {
+  const value = Number(risk?.high_precision_test_recall);
+  return Number.isFinite(value) ? value : null;
+}
+
+function isReliableSubtypeSignal(risk) {
+  const precision = subtypePrecision(risk);
+  const recall = subtypeRecall(risk);
+  if (precision !== null && precision < SUPPORTIVE_SUBTYPE_PRECISION_MIN) return false;
+  if (recall !== null && recall < SUPPORTIVE_SUBTYPE_RECALL_MIN) return false;
+  return risk?.subtype_reliability_level !== "low";
+}
+
+function isActiveSubtypeSignal(risk) {
+  const precision = highPrecision(risk);
+  const recall = highPrecisionRecall(risk);
+  if (!risk?.high_precision_signal) return false;
+  if (precision === null || recall === null) return false;
+  if (precision < HIGH_PRECISION_SIGNAL_MIN) return false;
+  if (recall < HIGH_PRECISION_RECALL_MIN) return false;
+  return ["high", "diagnostic_signal", "borderline"].includes(risk?.diagnosis_confidence);
 }
 
 function diagnosisSeverityRank(risk) {
@@ -1182,7 +1436,9 @@ function diagnosisSeverityRank(risk) {
   }[risk.diagnosis_confidence] || 0;
   const riskRank = { high: 3, medium: 2, low: 1 }[risk.risk_level] || 0;
   const supportRank = { strong: 3, partial: 2, weak: 1 }[risk.clinical_support_level] || 0;
-  return confidenceRank * 100 + supportRank * 10 + riskRank;
+  const precision = subtypePrecision(risk);
+  const precisionRank = risk?.high_precision_signal ? 5 : precision === null ? 2 : precision >= 0.79 ? 4 : precision >= 0.5 ? 3 : precision >= 0.3 ? 2 : 0;
+  return confidenceRank * 100 + precisionRank * 20 + supportRank * 10 + riskRank;
 }
 
 function sortByClinicalSeverity(risks) {
@@ -1195,7 +1451,7 @@ function sortByClinicalSeverity(risks) {
 
 function renderProbabilityMeter(risk) {
   const probability = clampPercent(risk.diagnosis_probability ?? risk.risk_probability);
-  const threshold = clampPercent(risk.diagnosis_threshold ?? 0.5);
+  const threshold = clampPercent(risk.high_precision_signal ? risk.high_precision_threshold ?? risk.diagnosis_threshold ?? 0.5 : risk.diagnosis_threshold ?? 0.5);
   return `
     <div class="probability-meter" aria-label="ალბათობა ${probability}% ზღვარი ${threshold}%">
       <div class="meter-track">
@@ -1210,16 +1466,30 @@ function renderProbabilityMeter(risk) {
   `;
 }
 
+function clinicalExplanationItems(risk, limit = 5) {
+  const urgency = urgencyAssessment(risk);
+  const ecg = ecgAlignment(risk);
+  const probability = formatPercent(risk.diagnosis_probability ?? risk.risk_probability);
+  const threshold = formatPercent(risk.diagnosis_threshold ?? 0.5);
+  const items = [
+    `მოდელის ალბათობაა ${probability}; შედარებისთვის, ამ დიაგნოსტიკური ჯგუფის ზღვარია ${threshold}.`,
+    ...clinicalReasonList(risk, 3),
+    ...urgency.reasons.slice(0, 2),
+  ];
+  if (selectedEcgOption().value !== "not_available") items.push(ecg.text);
+  return uniqueItems(items).slice(0, limit);
+}
+
 function renderClinicalSupport(risk) {
   const score = Number(risk.clinical_support_score ?? 0);
   const level = risk.clinical_support_level || "weak";
-  const reasons = risk.clinical_support_reasons || [];
+  const explanationItems = clinicalExplanationItems(risk);
   return `
     <div class="clinical-support ${supportClass(level)}">
       <div class="support-heading">
         <div>
-          <span>კლინიკური მხარდაჭერა</span>
-          <strong>${escapeHtml(supportLabel(level))}</strong>
+          <span>რატომ არის ეს მიმართულება საყურადღებო</span>
+          <strong>${escapeHtml(displayDiagnosisStatus(risk))}</strong>
         </div>
         <b>${Math.round(score)}%</b>
       </div>
@@ -1227,8 +1497,9 @@ function renderClinicalSupport(risk) {
         <span style="width: ${Math.max(0, Math.min(100, score))}%"></span>
       </div>
       <ul>
-        ${reasons.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+        ${explanationItems.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
       </ul>
+      <p>ეს არის დამხმარე კლინიკური სიგნალი და არა საბოლოო დიაგნოზი.</p>
       ${risk.verification_priority ? `<em>${escapeHtml(risk.verification_priority)}</em>` : ""}
       ${risk.reliability_note ? `<small>${escapeHtml(risk.reliability_note)}</small>` : ""}
     </div>
@@ -1257,41 +1528,102 @@ function renderClinicalTriagePanel(risk) {
   `;
 }
 
+function renderMissingAssessmentPanel(risk) {
+  const missing = missingForBetterAssessment(risk);
+  if (!missing.length) return "";
+  return `
+    <div class="missing-assessment">
+      <span>რა გააუმჯობესებს შეფასებას</span>
+      <ul>
+        ${missing.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+      </ul>
+    </div>
+  `;
+}
+
 function renderDecisionSummary() {
-  if (!result?.subtype_risks?.length) return "";
+  if (!result) return "";
   const topRisk = getPrimaryDiagnosticRisk();
-  const secondRisk = result.subtype_risks.find((risk) => risk.target_name !== topRisk.target_name);
-  const ecgContext = ecgResultContext();
+  if (!topRisk) {
+    const supportiveRisks = sortByClinicalSeverity((result.subtype_risks || []).filter(isReliableSubtypeSignal)).slice(0, 3);
+    return `
+      <div class="decision-summary">
+        <div class="decision-topline">
+          <span>მოდელის მთავარი დასკვნა</span>
+          <em class="status-pill confidence-signal">${riskLabel(result.risk_level)}</em>
+        </div>
+        <strong>საერთო გულ-სისხლძარღვთა დიაგნოსტიკური სიგნალი</strong>
+        <div class="decision-score">
+          <b>${formatPercent(result.risk_probability)}</b>
+          <em>კლინიკური ჯგუფის დასახელებისთვის სანდოობა არასაკმარისია</em>
+        </div>
+        <div class="decision-quick-grid">
+          <section class="decision-quick-card">
+            <span>ინტერპრეტაცია</span>
+            <strong>${escapeHtml(riskLabel(result.risk_level))}</strong>
+            <p>მოდელი აჩვენებს საერთო გულ-სისხლძარღვთა სიგნალს, მაგრამ კონკრეტული კლინიკური ჯგუფის დასახელება ამ მონაცემებით საკმარისად სანდო არ არის.</p>
+          </section>
+          <section class="decision-quick-card">
+            <span>რატომ არ ჩანს ჯგუფი</span>
+            <p>მთავარი კლინიკური ჯგუფი გამოჩნდება მხოლოდ მაშინ, როცა balanced რეჟიმში test precision დაახლოებით ${Math.round(HIGH_PRECISION_SIGNAL_MIN * 100)}% ან მეტია.</p>
+          </section>
+          <section class="decision-quick-card">
+            <span>საყურადღებო მიმართულებები</span>
+            ${
+              supportiveRisks.length
+                ? `<ul>${supportiveRisks.map((risk) => `<li>${escapeHtml(risk.display_name)} - ${formatPercent(risk.diagnosis_probability ?? risk.risk_probability)}</li>`).join("")}</ul>`
+                : "<p>საკმარისად სანდო კლინიკური ჯგუფი არ გამოიყო.</p>"
+            }
+          </section>
+          <section class="decision-quick-card">
+            <span>ექიმმა გადაამოწმოს</span>
+            <ul>
+              <li>პაციენტის ჩივილები, ანამნეზი და ფიზიკური გასინჯვა</li>
+              <li>ECG, ტროპონინი/NT-proBNP და საჭირო ლაბორატორია</li>
+              <li>კლინიკური გადაწყვეტილება არ მიიღება მხოლოდ მოდელის პასუხით</li>
+            </ul>
+          </section>
+        </div>
+      </div>
+    `;
+  }
+  const urgency = urgencyAssessment(topRisk);
+  const ecg = ecgAlignment(topRisk);
+  const explanationItems = clinicalExplanationItems(topRisk, 4);
+  const doctorChecks = clinicalActionGroups(topRisk)[0].items.slice(0, 3);
 
   return `
     <div class="decision-summary">
       <div class="decision-topline">
-        <span>მთავარი სავარაუდო მიმართულება</span>
+        <span>მოდელის მთავარი სავარაუდო მიმართულება</span>
         <em class="status-pill ${confidenceClass(topRisk.diagnosis_confidence)}">${diagnosisConfidenceLabel(topRisk.diagnosis_confidence)}</em>
       </div>
       <strong>${escapeHtml(topRisk.diagnosis_label || topRisk.display_name)}</strong>
       <div class="decision-score">
         <b>${formatPercent(topRisk.diagnosis_probability ?? topRisk.risk_probability)}</b>
-        <em>დიაგნოსტიკური ზღვარი ${formatPercent(topRisk.diagnosis_threshold ?? 0.5)}</em>
+        <em>balanced ზღვარი ${formatPercent(topRisk.high_precision_threshold ?? topRisk.diagnosis_threshold ?? 0.5)}</em>
       </div>
       ${renderProbabilityMeter(topRisk)}
-      ${renderClinicalSupport(topRisk)}
-      ${renderClinicalTriagePanel(topRisk)}
-      <div class="clinical-driver-block">
-        <span>3 მთავარი მიზეზი</span>
-        <div class="driver-list">${renderReasonChips(topRisk)}</div>
+      <div class="decision-quick-grid">
+        <section class="decision-quick-card ${urgency.className}">
+          <span>სასწრაფოობა</span>
+          <strong>${escapeHtml(urgency.label)}</strong>
+          <p>${escapeHtml(urgency.text)}</p>
+        </section>
+        <section class="decision-quick-card ecg-${ecg.className}">
+          <span>ECG</span>
+          <strong>${escapeHtml(ecg.label)}</strong>
+          <p>${escapeHtml(ecg.text)}</p>
+        </section>
+        <section class="decision-quick-card">
+          <span>რატომ</span>
+          <ul>${explanationItems.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+        </section>
+        <section class="decision-quick-card">
+          <span>ექიმმა გადაამოწმოს</span>
+          <ul>${doctorChecks.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+        </section>
       </div>
-      <div class="clinical-driver-block resemblance-block">
-        <span>რატომ ჰგავს ამ დიაგნოზს</span>
-        <p>${escapeHtml(clinicalResemblanceText(topRisk))}</p>
-      </div>
-      ${ecgContext ? `<div class="ecg-context-note">${escapeHtml(ecgContext)}</div>` : ""}
-      <p>${escapeHtml(topRisk.diagnosis_interpretation || "სისტემა ამ პაციენტის მონაცემებში ხედავს მსგავსებას შესაბამის ICD-კოდირებულ შემთხვევებთან.")}</p>
-      ${
-        secondRisk
-          ? `<small>შემდეგი შესადარებელი მიმართულება: ${escapeHtml(secondRisk.display_name)} (${formatPercent(secondRisk.risk_probability)}). ეს არ ნიშნავს საბოლოო დიაგნოზს.</small>`
-          : ""
-      }
     </div>
   `;
 }
@@ -1299,33 +1631,49 @@ function renderDecisionSummary() {
 function renderSubtypeRisks() {
   if (!result?.subtype_risks?.length) return "";
   const topRisk = getPrimaryDiagnosticRisk();
-  const otherRisks = sortByClinicalSeverity(result.subtype_risks.filter((risk) => risk.target_name !== topRisk.target_name));
-  const visibleRisks = isAllDiagnosesOpen ? otherRisks : otherRisks.slice(0, 4);
+  const allRisks = sortByClinicalSeverity(result.subtype_risks);
+  const otherRisks = topRisk ? allRisks.filter((risk) => risk.target_name !== topRisk.target_name) : allRisks;
+  const reliableOtherRisks = otherRisks.filter(isReliableSubtypeSignal);
+  const lowReliabilityRisks = otherRisks.filter((risk) => !isReliableSubtypeSignal(risk));
+  const visibleRisks = isAllDiagnosesOpen ? [...reliableOtherRisks, ...lowReliabilityRisks] : reliableOtherRisks.slice(0, 2);
   const hiddenCount = Math.max(0, otherRisks.length - visibleRisks.length);
+  const lowReliabilityNote = lowReliabilityRisks.length
+    ? `დაბალი precision-ის ${lowReliabilityRisks.length} კლინიკური ჯგუფი დამალულია ძირითადი შედარებიდან და ჩანს მხოლოდ ყველა ჯგუფის რეჟიმში.`
+    : "ძირითად შედარებაში ნაჩვენებია top 2 დამატებითი სანდო კლინიკური სიგნალი.";
 
   return `
     <div class="subtype-section">
-      <h3>რისკები დაავადების ჯგუფების მიხედვით</h3>
-      <div class="top-disease ${topRisk.risk_level}">
-        <div class="disease-heading">
-          <span>მთავარი სავარაუდო მიმართულება</span>
-          <em class="status-pill ${confidenceClass(topRisk.diagnosis_confidence)}">${topRisk.diagnosis_status || diseaseRiskLabel(topRisk.risk_level)}</em>
-        </div>
-        <strong>${escapeHtml(topRisk.display_name)}</strong>
-        <b>${formatPercent(topRisk.diagnosis_probability ?? topRisk.risk_probability)}</b>
-        ${renderProbabilityMeter(topRisk)}
-        ${renderClinicalSupport(topRisk)}
-        <div class="driver-list compact">${renderReasonChips(topRisk, 3)}</div>
-      </div>
+      <h3>დამატებით გადასამოწმებელი კლინიკური სიგნალები</h3>
+      ${
+        topRisk
+          ? `<div class="top-disease ${topRisk.risk_level}">
+              <div class="disease-heading">
+                <span>მოდელის მთავარი სავარაუდო მიმართულება</span>
+                <em class="status-pill ${confidenceClass(topRisk.diagnosis_confidence)}">${displayDiagnosisStatus(topRisk)}</em>
+              </div>
+              <strong>${escapeHtml(topRisk.display_name)}</strong>
+              <b>${formatPercent(topRisk.diagnosis_probability ?? topRisk.risk_probability)}</b>
+              ${renderProbabilityMeter(topRisk)}
+              <div class="driver-list compact">${renderReasonChips(topRisk, 3)}</div>
+            </div>`
+          : `<div class="top-disease low">
+              <div class="disease-heading">
+                <span>კლინიკური ჯგუფი</span>
+                <em class="status-pill confidence-low">არ არის არჩეული</em>
+              </div>
+              <strong>კონკრეტული კლინიკური ჯგუფის დასახელებისთვის სანდოობა არასაკმარისია</strong>
+              <small>მთავარ დასკვნად გამოიყენება საერთო CVD სიგნალი.</small>
+            </div>`
+      }
       <div class="subtype-list-header">
         <div>
-          <strong>${isAllDiagnosesOpen ? "ყველა დიაგნოზის ჯგუფი" : "მნიშვნელოვანი შედარებითი მიმართულებები"}</strong>
-          <span>${isAllDiagnosesOpen ? "ნაჩვენებია ყველა მოდელირებული ICD-ჯგუფი." : "ნაჩვენებია მხოლოდ top 4, რომ მთავარი დასკვნა არ გადაიტვირთოს."}</span>
+          <strong>${isAllDiagnosesOpen ? "ყველა მოდელირებული სიგნალი" : "დამატებითი შესაძლო მიმართულებები"}</strong>
+          <span>${isAllDiagnosesOpen ? "ნაჩვენებია ყველა მოდელირებული კლინიკური სიგნალი, მათ შორის დაბალი precision-ის მიმართულებები." : lowReliabilityNote}</span>
         </div>
         ${
-          otherRisks.length > 4
+          otherRisks.length > 2
             ? `<button class="secondary-button compact-button" id="toggle-diagnoses-button">
-                ${isAllDiagnosesOpen ? "მხოლოდ top 4" : `ყველა ჯგუფის ნახვა (${hiddenCount} მეტი)`}
+                ${isAllDiagnosesOpen ? "მხოლოდ top 2" : `ყველა სიგნალის ნახვა (${hiddenCount} მეტი)`}
               </button>`
             : ""
         }
@@ -1337,7 +1685,7 @@ function renderSubtypeRisks() {
               <div class="subtype-card ${risk.risk_level}">
                 <div class="subtype-main">
                   <strong>${escapeHtml(risk.display_name)}</strong>
-                  <em>${risk.diagnosis_status || diseaseRiskLabel(risk.risk_level)}</em>
+                  <em>${displayDiagnosisStatus(risk)}</em>
                   <small>${escapeHtml(risk.verification_priority || supportLabel(risk.clinical_support_level))}</small>
                   <span>${escapeHtml(riskReasonText(risk, 2))}</span>
                   ${renderProbabilityMeter(risk)}
@@ -1349,38 +1697,7 @@ function renderSubtypeRisks() {
           .join("")}
       </div>
       <p class="diagnosis-note">შეზღუდვა: სისტემა არ სვამს საბოლოო დიაგნოზს. ის აჩვენებს სავარაუდო ICD-კოდირებულ მიმართულებებს MIMIC-IV მონაცემებზე ნასწავლი მსგავსებების მიხედვით და საჭიროებს ექიმის დადასტურებას.</p>
-      ${renderClinicalChecks(topRisk)}
-    </div>
-  `;
-}
-
-function renderDataQualityPanel() {
-  const quality = dataQualitySummary();
-  return `
-    <div class="data-quality-card ${quality.className}">
-      <div class="data-quality-header">
-        <div>
-          <span>მონაცემების ხარისხი</span>
-          <strong>${quality.label}</strong>
-        </div>
-        <b>${quality.score}%</b>
-      </div>
-      <div class="quality-meter" aria-label="მონაცემების ხარისხი ${quality.score}%">
-        <span style="width: ${quality.score}%"></span>
-      </div>
-      <p>${escapeHtml(quality.recommendation)}</p>
-      <div class="quality-groups">
-        ${
-          quality.presentGroups.length
-            ? `<span>შევსებულია: ${escapeHtml(quality.presentGroups.map((group) => group.title).slice(0, 3).join(", "))}</span>`
-            : ""
-        }
-        ${
-          quality.missingGroups.length
-            ? `<span>დასამატებელია: ${escapeHtml(quality.missingGroups.map((group) => group.title).slice(0, 3).join(", "))}</span>`
-            : ""
-        }
-      </div>
+      ${topRisk ? renderClinicalChecks(topRisk) : ""}
     </div>
   `;
 }
@@ -1470,7 +1787,7 @@ function renderModelTrust() {
           </div>
           <div class="trust-footnote">
             <strong>საბოლოო ინტერპრეტაცია</strong>
-            <p>მაჩვენებლები დათვლილია test ნაწილზე. დიაგნოზის ჯგუფებისთვის ზღვარი შეირჩა validation ნაწილზე, რათა დადებითი და უარყოფითი პასუხები უკეთ დაბალანსდეს. დაბალი precision ზოგ subtype-ში ნიშნავს, რომ დადებითი სიგნალი ექიმმა დამატებით უნდა გადაამოწმოს.</p>
+            <p>მაჩვენებლები დათვლილია test ნაწილზე. დიაგნოზის ჯგუფებისთვის ზღვარი შეირჩა validation ნაწილზე precision-oriented წესით. დაბალი precision ან ძალიან დაბალი recall ჯგუფები არ ჩანს ამ ძირითად შეფასებაში და არ გამოიყენება მთავარ დიაგნოსტიკურ მიმართულებად.</p>
           </div>
         </div>
       </div>
@@ -1494,7 +1811,7 @@ function patientProfileText() {
   const dbp = Math.round(Number(features.omr_dbp_mean));
   const glucose = Number(features.lab_glucose_mean).toFixed(2);
   const creatinine = Number(features.lab_creatinine_mean).toFixed(2);
-  const symptomDetails = Object.values(parseSymptomTextDetailed(symptomText)).filter((item) => item.status !== "absent");
+  const symptomDetails = parsedClinicalTextDetails(symptomText).filter((item) => item.status !== "absent");
   const symptoms = symptomText.trim()
     ? symptomDetails.length
       ? symptomDetails.map((item) => `${item.label} - ${symptomStatusLabel(item.status)}`).join(", ")
@@ -1512,61 +1829,98 @@ function patientProfileText() {
 function patientReportText() {
   if (!result?.subtype_risks?.length) return "";
   const topRisk = getPrimaryDiagnosticRisk();
-  const quality = dataQualitySummary();
+  if (!topRisk) {
+    const supportiveRisks = sortByClinicalSeverity(result.subtype_risks.filter(isReliableSubtypeSignal)).slice(0, 3);
+    const supportiveText = supportiveRisks.length
+      ? supportiveRisks
+          .map((risk, index) => `${index + 1}. ${risk.display_name}: ${formatPercent(risk.diagnosis_probability ?? risk.risk_probability)} (${displayDiagnosisStatus(risk)})`)
+          .join("\n")
+      : "საკმარისად სანდო კლინიკური ჯგუფი არ გამოიყო.";
+    const bpAssessment = baselineBpAssessment();
+    const ecgContext = ecgResultContext();
+    return [
+      "პაციენტის კლინიკური დასკვნა",
+      "",
+      patientProfileText(),
+      "",
+      "დასკვნა",
+      `არსებული მონაცემების საფუძველზე საერთო გულ-სისხლძარღვთა სიგნალი არის ${formatPercent(result.risk_probability)} (${riskLabel(result.risk_level)}).`,
+      "კონკრეტული კლინიკური ჯგუფის დასახელებისთვის მოდელის სანდოობა ამ მონაცემებით არასაკმარისია, ამიტომ ჯგუფი არ არის წარმოდგენილი როგორც ძირითადი დიაგნოსტიკური მიმართულება.",
+      "",
+      "დასკვნის საფუძველი",
+      "სისტემა იყენებს selective prediction მიდგომას: კლინიკური ჯგუფი ჩანს მხოლოდ მაშინ, როცა მისი test precision და recall მინიმალურ სანდოობის ზღვარს აღწევს.",
+      "",
+      "არტერიული წნევა",
+      bpAssessment.text,
+      "",
+      "ECG ინტერპრეტაცია",
+      ecgClinicalText(),
+      ...(ecgContext ? ["", ecgContext] : []),
+      "",
+      "შესადარებელი საყურადღებო მიმართულებები",
+      supportiveText,
+      "",
+      "რეკომენდებული კლინიკური გადამოწმება",
+      "კლინიკური შეფასება:",
+      "- პაციენტის ჩივილები, ანამნეზი და ფიზიკური გასინჯვა",
+      "- ECG და საჭიროების შემთხვევაში განმეორებითი ECG",
+      "- ტროპონინი, NT-proBNP და ძირითადი ლაბორატორიული მაჩვენებლები",
+      "- ექიმის მიერ საბოლოო კლინიკური ინტერპრეტაცია",
+      "",
+      "შეზღუდვა",
+      "ეს დასკვნა არის კლინიკური გადაწყვეტილების დამხმარე ტექსტი და არ წარმოადგენს საბოლოო დიაგნოზს.",
+    ].join("\n");
+  }
   const actionGroups = clinicalActionGroups(topRisk);
   const topThree = result.subtype_risks
     .slice(0, 3)
-    .map((risk, index) => `${index + 1}. ${risk.display_name}: ${formatPercent(risk.diagnosis_probability ?? risk.risk_probability)} (${risk.diagnosis_status})`)
+    .map((risk, index) => `${index + 1}. ${risk.display_name}: ${formatPercent(risk.diagnosis_probability ?? risk.risk_probability)} (${displayDiagnosisStatus(risk)})`)
     .join("\n");
-  const reasons = clinicalReasonList(topRisk, 5).map((item) => `- ${item}`).join("\n") || "- მკვეთრი განმსაზღვრელი ფაქტორი არ გამოიკვეთა";
   const supportReasons =
-    (topRisk.clinical_support_reasons || []).map((item) => `- ${item}`).join("\n") || "- სპეციფიკური კლინიკური დამადასტურებელი ნიშანი მკვეთრად არ ჩანს";
+    clinicalExplanationItems(topRisk, 6).map((item) => `- ${item}`).join("\n") || "- სპეციფიკური კლინიკური განმსაზღვრელი ფაქტორი მკვეთრად არ ჩანს";
   const urgency = urgencyAssessment(topRisk);
   const ecgAlignmentSummary = ecgAlignment(topRisk);
+  const bpAssessment = baselineBpAssessment();
+  const missingAssessment = missingForBetterAssessment(topRisk);
   const ecgContext = ecgResultContext();
   const checks = actionGroups
     .map((group) => [`${group.title}:`, ...group.items.map((item) => `- ${item}`)].join("\n"))
     .join("\n\n");
 
   return [
-    "პაციენტის სავარაუდო დიაგნოსტიკური ანგარიში",
+    "პაციენტის კლინიკური დასკვნა",
     "",
     patientProfileText(),
     "",
-    "სავარაუდო მთავარი მიმართულება:",
-    `${topRisk.display_name} - ${formatPercent(topRisk.diagnosis_probability ?? topRisk.risk_probability)} (${topRisk.diagnosis_status}).`,
+    "დასკვნა",
+    `არსებული მონაცემების საფუძველზე მოდელი ყველაზე ძლიერ სიგნალს ხედავს მიმართულებაზე: ${topRisk.display_name}. ალბათობა არის ${formatPercent(topRisk.diagnosis_probability ?? topRisk.risk_probability)}; სტატუსი: ${displayDiagnosisStatus(topRisk)}.`,
     "",
-    "რა განსაზღვრავს ამ რისკს:",
-    reasons,
-    "",
-    "რატომ ჰგავს ამ დიაგნოზს:",
-    clinicalResemblanceText(topRisk),
-    "",
-    "კლინიკური მხარდაჭერა:",
-    `${supportLabel(topRisk.clinical_support_level)} - ${Math.round(Number(topRisk.clinical_support_score ?? 0))}%.`,
+    "დასკვნის საფუძველი",
+    `კლინიკური სიგნალის შეჯამება: ${displayDiagnosisStatus(topRisk)}. დამხმარე ქულა ${Math.round(Number(topRisk.clinical_support_score ?? 0))}%.`,
     supportReasons,
     topRisk.reliability_note || "",
     topRisk.verification_priority ? `პრიორიტეტი: ${topRisk.verification_priority}` : "",
     "",
-    "სასწრაფოობის დონე:",
+    "კლინიკური პრიორიტეტი",
     `${urgency.label}. ${urgency.text}`,
     ...urgency.reasons.map((item) => `- ${item}`),
     "",
-    "ECG შესაბამისობა:",
+    "არტერიული წნევა",
+    bpAssessment.text,
+    "",
+    "ECG ინტერპრეტაცია",
     `${ecgAlignmentSummary.label}. ${ecgAlignmentSummary.text}`,
     ...(ecgContext ? ["", ecgContext] : []),
+    ...(missingAssessment.length ? ["", "დამატებით სასურველია", ...missingAssessment.map((item) => `- ${item}`)] : []),
     "",
-    "მონაცემების ხარისხი:",
-    `${quality.label} - ${quality.score}%. ${quality.recommendation}`,
-    "",
-    "სხვა შესადარებელი მიმართულებები:",
+    "შესადარებელი დიაგნოსტიკური მიმართულებები",
     topThree,
     "",
-    "ექიმმა დამატებით უნდა გადაამოწმოს:",
+    "რეკომენდებული კლინიკური გადამოწმება",
     checks,
     "",
-    `საერთო გულ-სისხლძარღვთა სიგნალი: ${formatPercent(result.risk_probability)} (${riskLabel(result.risk_level)}).`,
-    "შეზღუდვა: სისტემა არ სვამს საბოლოო დიაგნოზს; ის აჩვენებს სავარაუდო დიაგნოსტიკურ მიმართულებებს MIMIC-IV მონაცემებზე ნასწავლი მსგავსებების მიხედვით.",
+    "შეზღუდვა",
+    `საერთო გულ-სისხლძარღვთა სიგნალი არის ${formatPercent(result.risk_probability)} (${riskLabel(result.risk_level)}). ეს დასკვნა არის კლინიკური გადაწყვეტილების დამხმარე ტექსტი და არ წარმოადგენს საბოლოო დიაგნოზს.`,
   ].join("\n");
 }
 
@@ -1575,10 +1929,19 @@ function renderPatientReport() {
   return `
     <div class="patient-report">
       <div class="report-header">
-        <h3>პაციენტის ანგარიში</h3>
-        <button class="secondary-button" id="copy-report-button">ანგარიშის კოპირება</button>
+        <h3>კლინიკური დასკვნა</h3>
+        <div class="report-actions">
+          <button class="secondary-button" id="toggle-report-button">${isPatientReportOpen ? "დასკვნის დამალვა" : "დასკვნის ნახვა"}</button>
+          <button class="secondary-button" id="copy-report-button">კოპირება</button>
+          <button class="secondary-button" id="download-report-button">TXT</button>
+          <button class="secondary-button" id="print-report-button">PDF</button>
+        </div>
       </div>
-      <textarea readonly>${escapeHtml(patientReportText())}</textarea>
+      ${
+        isPatientReportOpen
+          ? `<textarea readonly>${escapeHtml(patientReportText())}</textarea>`
+          : `<p class="report-preview">დასკვნა აერთიანებს მთავარ სავარაუდო მიმართულებას, კლინიკურ საფუძველს, ECG ინტერპრეტაციას და რეკომენდებულ გადასამოწმებელ ნაბიჯებს.</p>`
+      }
     </div>
   `;
 }
@@ -1612,7 +1975,7 @@ function renderClinicalImpacts() {
 
 function renderDetectedSymptoms() {
   if (!symptomText.trim()) return "სიმპტომების ტექსტი ცარიელია.";
-  const details = Object.values(parseSymptomTextDetailed(symptomText)).filter((item) => item.status !== "absent");
+  const details = parsedClinicalTextDetails(symptomText).filter((item) => item.status !== "absent");
   if (!details.length) return "ტექსტიდან ცნობილი გულ-სისხლძარღვთა სიმპტომი ჯერ არ ამოიცნო.";
   return `
     <span class="symptom-parser-title">ტექსტის ანალიზი</span>
@@ -1620,11 +1983,24 @@ function renderDetectedSymptoms() {
       .map(
         (item) => `
           <span class="symptom-chip ${item.status}">
-            ${item.label}: ${symptomStatusLabel(item.status)}${item.severity === "high" ? " · ძლიერი" : ""}
+            ${item.label}: ${symptomStatusLabel(item.status)}${item.severity === "high" ? " · მძიმე ჩივილი" : ""}
           </span>
         `,
       )
       .join("")}
+  `;
+}
+
+function renderInputWarnings() {
+  const warnings = inputWarnings();
+  if (!warnings.length) return "";
+  return `
+    <div class="input-warnings" role="status">
+      <strong>შესაყვანი მონაცემების გადამოწმება</strong>
+      <ul>
+        ${warnings.map((warning) => `<li>${escapeHtml(warning)}</li>`).join("")}
+      </ul>
+    </div>
   `;
 }
 
@@ -1675,10 +2051,10 @@ function renderEcgInput() {
 }
 
 function symptomStatusLabel(status) {
-  if (status === "present") return "დადებითი";
-  if (status === "negated") return "უარყოფილია";
-  if (status === "historical") return "წარსული/ისტორია";
-  if (status === "uncertain") return "გაურკვეველი";
+  if (status === "present") return "აღინიშნება";
+  if (status === "negated") return "უარყოფს";
+  if (status === "historical") return "ანამნეზში";
+  if (status === "uncertain") return "დასაზუსტებელია";
   return "არ ჩანს";
 }
 
@@ -1722,6 +2098,7 @@ function render() {
           </div>
 
           ${renderFormSections()}
+          ${renderBaselineBpInput()}
           ${renderEcgInput()}
 
           <div class="symptom-text-box">
@@ -1738,6 +2115,8 @@ function render() {
             </label>
             <p id="detected-symptoms">${renderDetectedSymptoms()}</p>
           </div>
+
+          ${renderInputWarnings()}
 
           <div class="action-row">
             <button class="primary-button" id="predict-button" ${!features || isPredicting || hasBlockingClearedFields() ? "disabled" : ""}>
@@ -1756,7 +2135,7 @@ function render() {
 
           ${
             result
-              ? `${renderDecisionSummary()}${renderDataQualityPanel()}${renderSubtypeRisks()}${renderModelTrustAction()}${renderPatientReport()}`
+              ? `${renderDecisionSummary()}${renderSubtypeRisks()}${renderModelTrustAction()}${renderPatientReport()}`
               : `<div class="empty-state">სავარაუდო დიაგნოსტიკური მიმართულების სანახავად გაუშვით პროგნოზი.</div>`
           }
         </div>
@@ -1795,6 +2174,14 @@ function render() {
     const status = document.querySelector(".ecg-status");
     if (status) status.textContent = ecgClinicalText();
   });
+  document.getElementById("baseline-sbp")?.addEventListener("input", (event) => {
+    baselineSbp = event.target.value;
+    result = null;
+  });
+  document.getElementById("baseline-dbp")?.addEventListener("input", (event) => {
+    baselineDbp = event.target.value;
+    result = null;
+  });
 
   document.getElementById("clear-data-button")?.addEventListener("click", () => {
     clearPatientData();
@@ -1806,7 +2193,13 @@ function render() {
   document.getElementById("load-sample-button")?.addEventListener("click", loadSample);
 
   document.getElementById("predict-button")?.addEventListener("click", runPrediction);
+  document.getElementById("toggle-report-button")?.addEventListener("click", () => {
+    isPatientReportOpen = !isPatientReportOpen;
+    render();
+  });
   document.getElementById("copy-report-button")?.addEventListener("click", copyPatientReport);
+  document.getElementById("download-report-button")?.addEventListener("click", downloadPatientReport);
+  document.getElementById("print-report-button")?.addEventListener("click", printPatientReportPdf);
   document.getElementById("lab-reference-button")?.addEventListener("click", () => {
     isLabReferenceOpen = true;
     render();
@@ -1847,8 +2240,11 @@ async function loadSample() {
     symptomText = sample.symptom_text || "";
     ecgFinding = sample.ecg_finding || "not_available";
     ecgNote = sample.ecg_note || "";
+    baselineSbp = sample.features?.omr_sbp_mean ? String(Math.round(Number(sample.features.omr_sbp_mean))) : "";
+    baselineDbp = sample.features?.omr_dbp_mean ? String(Math.round(Number(sample.features.omr_dbp_mean))) : "";
     clearedFieldKeys = new Set();
     isAllDiagnosesOpen = false;
+    isPatientReportOpen = false;
     features = recomputeDerivedFeatures({ ...sample.features });
     statusText = "სატესტო პაციენტი ჩაიტვირთა.";
   } catch (error) {
@@ -1871,6 +2267,7 @@ async function runPrediction() {
     const data = await response.json();
     if (!response.ok) throw new Error(data?.detail?.message || `API-მ დააბრუნა ${response.status}`);
     result = data;
+    isPatientReportOpen = false;
     statusText = "პროგნოზი დასრულებულია.";
   } catch (error) {
     statusText = `პროგნოზი ვერ შესრულდა: ${error.message}`;
@@ -1884,10 +2281,94 @@ async function copyPatientReport() {
   const text = patientReportText();
   try {
     await navigator.clipboard.writeText(text);
-    statusText = "პაციენტის ანგარიში დაკოპირდა.";
+    statusText = "კლინიკური დასკვნა დაკოპირდა.";
   } catch {
     statusText = "ანგარიშის ავტომატური კოპირება ვერ მოხერხდა.";
   }
+  render();
+}
+
+function downloadPatientReport() {
+  const text = patientReportText();
+  if (!text) {
+    statusText = "ჩამოსატვირთი დასკვნა ჯერ არ არის შექმნილი.";
+    render();
+    return;
+  }
+  const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  const sampleSuffix = sample?.sample_id ? `-${sample.sample_id}` : "";
+  link.href = url;
+  link.download = `clinical-conclusion${sampleSuffix}.txt`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+  statusText = "კლინიკური დასკვნა ჩამოიტვირთა.";
+  render();
+}
+
+function reportPrintHtml() {
+  const text = patientReportText();
+  const sections = text.split(/\n{2,}/).filter(Boolean);
+  const body = sections
+    .map((section, index) => {
+      const lines = section.split("\n").filter(Boolean);
+      if (index === 0) return `<h1>${escapeHtml(lines.join(" "))}</h1>`;
+      if (lines.length === 1) return `<p>${escapeHtml(lines[0])}</p>`;
+      const [heading, ...content] = lines;
+      const listItems = content.filter((line) => line.trim().startsWith("- "));
+      const paragraphs = content.filter((line) => !line.trim().startsWith("- "));
+      return `
+        <section>
+          <h2>${escapeHtml(heading)}</h2>
+          ${paragraphs.map((line) => `<p>${escapeHtml(line)}</p>`).join("")}
+          ${listItems.length ? `<ul>${listItems.map((line) => `<li>${escapeHtml(line.replace(/^-\s*/, ""))}</li>`).join("")}</ul>` : ""}
+        </section>
+      `;
+    })
+    .join("");
+  return `
+    <!doctype html>
+    <html lang="ka">
+      <head>
+        <meta charset="utf-8" />
+        <title>კლინიკური დასკვნა</title>
+        <style>
+          body { color: #1f2d3a; font-family: Arial, sans-serif; margin: 32px; }
+          h1 { border-bottom: 2px solid #1f4d60; color: #1f4d60; font-size: 24px; margin: 0 0 18px; padding-bottom: 10px; }
+          h2 { color: #263645; font-size: 15px; margin: 18px 0 8px; }
+          p, li { font-size: 12px; line-height: 1.55; }
+          p { margin: 4px 0; }
+          ul { margin: 6px 0 0; padding-left: 18px; }
+          section { border-bottom: 1px solid #d8e2e8; padding: 8px 0 12px; }
+          @media print { body { margin: 18mm; } }
+        </style>
+      </head>
+      <body>${body}</body>
+    </html>
+  `;
+}
+
+function printPatientReportPdf() {
+  if (!patientReportText()) {
+    statusText = "PDF დასკვნა ჯერ არ არის შექმნილი.";
+    render();
+    return;
+  }
+  const printWindow = window.open("", "_blank");
+  if (!printWindow) {
+    statusText = "PDF ფანჯრის გახსნა ვერ მოხერხდა.";
+    render();
+    return;
+  }
+  printWindow.document.open();
+  printWindow.document.write(reportPrintHtml());
+  printWindow.document.close();
+  printWindow.focus();
+  setTimeout(() => printWindow.print(), 250);
+  statusText = "PDF დასკვნის ფანჯარა გაიხსნა.";
   render();
 }
 
