@@ -24,6 +24,16 @@ NS = {
 EMU_PER_INCH = 914400
 MAX_IMAGE_WIDTH_EMU = int(6.5 * EMU_PER_INCH)
 
+SCREENSHOT_FILES = {
+    1: "01-main-frontend.png",
+    2: "02-filled-form-ecg-temperature.png",
+    3: "03-prediction-result.png",
+    4: "04-diagnosis-cards.png",
+    5: "05-lab-bmi-reference.png",
+    6: "06-model-technical-evaluation.png",
+    7: "07-swagger-docs.png",
+}
+
 
 def esc(text: str) -> str:
     return html.escape(text, quote=False)
@@ -183,7 +193,7 @@ def table(rows: list[list[str]]) -> str:
     )
 
 
-def parse_markdown(md: str, screenshot_1: Path | None = None) -> list[str]:
+def parse_markdown(md: str, screenshots: dict[int, tuple[Path, str]] | None = None) -> list[str]:
     blocks: list[str] = []
     lines = md.splitlines()
     i = 0
@@ -238,8 +248,14 @@ def parse_markdown(md: str, screenshot_1: Path | None = None) -> list[str]:
         elif line.startswith("**სქრინშოთი"):
             clean = line.replace("**", "")
             blocks.append(paragraph(clean, style="ScreenshotNote"))
-            if clean.startswith("სქრინშოთი 1") and screenshot_1 and screenshot_1.exists():
-                blocks.append(image_paragraph(screenshot_1, "rId5", 1))
+            match = re.match(r"სქრინშოთი\s+(\d+)", clean)
+            if match and screenshots:
+                screenshot_number = int(match.group(1))
+                screenshot = screenshots.get(screenshot_number)
+                if screenshot:
+                    image_path, relationship_id = screenshot
+                    if image_path.exists():
+                        blocks.append(image_paragraph(image_path, relationship_id, screenshot_number))
         else:
             blocks.append(paragraph(line.replace("  ", " ").strip(), style="Normal"))
         i += 1
@@ -290,21 +306,28 @@ def document_xml(blocks: list[str]) -> str:
     )
 
 
-def latest_desktop_screenshot() -> Path | None:
-    desktop = Path.home() / "Desktop"
-    screenshots = sorted(desktop.glob("Screenshot *.png"), key=lambda item: item.stat().st_mtime, reverse=True)
-    return screenshots[0] if screenshots else None
+def default_screenshots() -> dict[int, tuple[Path, str]]:
+    screenshot_dir = Path("docs/screenshots")
+    return {
+        number: (screenshot_dir / filename, f"rId{4 + number}")
+        for number, filename in SCREENSHOT_FILES.items()
+    }
 
 
-def write_docx(markdown_path: Path, output_path: Path, screenshot_1: Path | None = None) -> None:
+def write_docx(markdown_path: Path, output_path: Path, screenshots: dict[int, tuple[Path, str]] | None = None) -> None:
     markdown = markdown_path.read_text(encoding="utf-8")
-    blocks = parse_markdown(markdown, screenshot_1=screenshot_1)
+    screenshots = screenshots or default_screenshots()
+    blocks = parse_markdown(markdown, screenshots=screenshots)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     image_content_type = '<Default Extension="png" ContentType="image/png"/>'
-    image_relationship = ""
-    if screenshot_1 and screenshot_1.exists():
-        image_relationship = '<Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/screenshot-1.png"/>'
+    image_relationships = []
+    for number, (image_path, relationship_id) in screenshots.items():
+        if image_path.exists():
+            image_relationships.append(
+                f'<Relationship Id="{relationship_id}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/screenshot-{number}.png"/>'
+            )
+    image_relationship = "".join(image_relationships)
     files = {
         "[Content_Types].xml": f"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/>{image_content_type}<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/><Override PartName="/word/numbering.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml"/><Override PartName="/word/settings.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml"/><Override PartName="/word/fontTable.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.fontTable+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/><Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/></Types>""",
         "_rels/.rels": """<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/></Relationships>""",
@@ -320,22 +343,17 @@ def write_docx(markdown_path: Path, output_path: Path, screenshot_1: Path | None
     with zipfile.ZipFile(output_path, "w", zipfile.ZIP_DEFLATED) as docx:
         for name, content in files.items():
             docx.writestr(name, content)
-        if screenshot_1 and screenshot_1.exists():
-            docx.write(screenshot_1, "word/media/screenshot-1.png")
+        for number, (image_path, _relationship_id) in screenshots.items():
+            if image_path.exists():
+                docx.write(image_path, f"word/media/screenshot-{number}.png")
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", default="docs/final_report_ge.md")
     parser.add_argument("--output", default="output/documents/Nino_Jincharadze_Final_Report.docx")
-    parser.add_argument(
-        "--screenshot-1",
-        default=None,
-        help="PNG image to insert under the first screenshot placeholder. Defaults to the newest Desktop screenshot.",
-    )
     args = parser.parse_args()
-    screenshot_1 = Path(args.screenshot_1) if args.screenshot_1 else latest_desktop_screenshot()
-    write_docx(Path(args.input), Path(args.output), screenshot_1=screenshot_1)
+    write_docx(Path(args.input), Path(args.output), screenshots=default_screenshots())
     print(args.output)
 
 
