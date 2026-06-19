@@ -106,10 +106,10 @@ Preprocessing ეტაპზე შესრულდა:
 ტესტური შედეგები:
 
 ```text
-AUC-ROC: 0.8874
-F1-score: 0.8323
-Recall/Sensitivity: 0.8139
-Precision: 0.8515
+AUC-ROC: 0.8873
+F1-score: 0.8319
+Recall/Sensitivity: 0.8134
+Precision: 0.8511
 ```
 
 მოდელის ფაილები:
@@ -118,10 +118,9 @@ Precision: 0.8515
 models/time_aware/target_cvd.pkl
 models/time_aware/target_myocardial_infarction.pkl
 models/time_aware/target_heart_failure.pkl
-models/time_aware/target_stroke.pkl
-models/time_aware/target_arrhythmia.pkl
-models/time_aware/target_hypertension.pkl
-models/time_aware/target_coronary_artery_disease.pkl
+models/time_aware/target_atrial_fibrillation_flutter.pkl
+models/time_aware/target_hypertensive_crisis.pkl
+models/time_aware/target_chronic_ischemic_heart_disease.pkl
 models/time_aware/feature_columns.json
 ```
 

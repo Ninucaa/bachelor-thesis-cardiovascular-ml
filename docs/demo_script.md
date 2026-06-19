@@ -186,18 +186,18 @@ Swagger-ში შეგიძლიათ ახსენოთ:
 
 ### Slide 6 - მოდელები
 
-- Logistic Regression
-- Random Forest
-- XGBoost
+- განხილული baseline მიდგომები: Logistic Regression / Random Forest
+- საბოლოო production მოდელი: XGBoost
+- 1 საერთო CVD მოდელი და 19 subtype მოდელი
 
 ### Slide 7 - შედეგები
 
 Final time-aware XGBoost test metrics:
 
-- AUC-ROC: `0.8874`
-- F1-score: `0.8323`
-- Recall/Sensitivity: `0.8139`
-- Precision: `0.8515`
+- AUC-ROC: `0.8873`
+- F1-score: `0.8319`
+- Recall/Sensitivity: `0.8134`
+- Precision: `0.8511`
 
 ### Slide 8 - Explainable AI
 

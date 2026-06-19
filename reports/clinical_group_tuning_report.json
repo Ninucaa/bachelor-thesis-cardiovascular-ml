@@ -1,0 +1,3225 @@
+{
+  "group_ischemic_heart_disease": {
+    "label": "იშემიური გულის დაავადებები",
+    "selected_config": {
+      "name": "deeper_regularized",
+      "n_estimators": 300,
+      "max_depth": 5,
+      "learning_rate": 0.035,
+      "min_child_weight": 6,
+      "subsample": 0.85,
+      "colsample_bytree": 0.85,
+      "reg_lambda": 2.5,
+      "gamma": 0.2,
+      "scale_pos_weight_multiplier": 0.9
+    },
+    "selected_validation_metrics": {
+      "auc_roc": 0.8484,
+      "average_precision": 0.6074,
+      "f1_at_0_5": 0.5597,
+      "recall_at_0_5": 0.7695,
+      "precision_at_0_5": 0.4398,
+      "supportive": {
+        "threshold": 0.8484,
+        "f1": 0.3312,
+        "recall": 0.2088,
+        "precision": 0.7998,
+        "predicted_positive": 5713,
+        "confusion_matrix": [
+          [
+            84928,
+            1144
+          ],
+          [
+            17311,
+            4569
+          ]
+        ],
+        "selection_rule": "max_f1_with_precision_at_least_0.80"
+      },
+      "high_precision": {
+        "threshold": 0.9244,
+        "f1": 0.1788,
+        "recall": 0.0993,
+        "precision": 0.9005,
+        "predicted_positive": 2412,
+        "confusion_matrix": [
+          [
+            85832,
+            240
+          ],
+          [
+            19708,
+            2172
+          ]
+        ],
+        "selection_rule": "max_f1_with_precision_at_least_0.90"
+      }
+    },
+    "selection_score": 0.776,
+    "candidates": [
+      {
+        "config": {
+          "name": "baseline_balanced",
+          "n_estimators": 260,
+          "max_depth": 4,
+          "learning_rate": 0.05,
+          "min_child_weight": 1,
+          "subsample": 0.85,
+          "colsample_bytree": 0.85,
+          "reg_lambda": 1.0,
+          "gamma": 0.0,
+          "scale_pos_weight_multiplier": 1.0
+        },
+        "validation_metrics": {
+          "auc_roc": 0.8474,
+          "average_precision": 0.6037,
+          "f1_at_0_5": 0.553,
+          "recall_at_0_5": 0.7957,
+          "precision_at_0_5": 0.4238,
+          "supportive": {
+            "threshold": 0.8652,
+            "f1": 0.3192,
+            "recall": 0.1994,
+            "precision": 0.8001,
+            "predicted_positive": 5452,
+            "confusion_matrix": [
+              [
+                84982,
+                1090
+              ],
+              [
+                17518,
+                4362
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.9374,
+            "f1": 0.1604,
+            "recall": 0.0881,
+            "precision": 0.8996,
+            "predicted_positive": 2142,
+            "confusion_matrix": [
+              [
+                85857,
+                215
+              ],
+              [
+                19953,
+                1927
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.90"
+          }
+        },
+        "selection_score": 0.76589
+      },
+      {
+        "config": {
+          "name": "regularized_precision",
+          "n_estimators": 360,
+          "max_depth": 3,
+          "learning_rate": 0.04,
+          "min_child_weight": 8,
+          "subsample": 0.9,
+          "colsample_bytree": 0.9,
+          "reg_lambda": 3.0,
+          "gamma": 0.5,
+          "scale_pos_weight_multiplier": 0.75
+        },
+        "validation_metrics": {
+          "auc_roc": 0.8456,
+          "average_precision": 0.5973,
+          "f1_at_0_5": 0.5631,
+          "recall_at_0_5": 0.7126,
+          "precision_at_0_5": 0.4654,
+          "supportive": {
+            "threshold": 0.833,
+            "f1": 0.3023,
+            "recall": 0.1863,
+            "precision": 0.8004,
+            "predicted_positive": 5094,
+            "confusion_matrix": [
+              [
+                85055,
+                1017
+              ],
+              [
+                17803,
+                4077
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.9176,
+            "f1": 0.1569,
+            "recall": 0.0859,
+            "precision": 0.9,
+            "predicted_positive": 2089,
+            "confusion_matrix": [
+              [
+                85863,
+                209
+              ],
+              [
+                20000,
+                1880
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.90"
+          }
+        },
+        "selection_score": 0.753805
+      },
+      {
+        "config": {
+          "name": "recall_balanced",
+          "n_estimators": 320,
+          "max_depth": 4,
+          "learning_rate": 0.04,
+          "min_child_weight": 3,
+          "subsample": 0.9,
+          "colsample_bytree": 0.8,
+          "reg_lambda": 1.5,
+          "gamma": 0.0,
+          "scale_pos_weight_multiplier": 1.2
+        },
+        "validation_metrics": {
+          "auc_roc": 0.8475,
+          "average_precision": 0.6037,
+          "f1_at_0_5": 0.5423,
+          "recall_at_0_5": 0.8372,
+          "precision_at_0_5": 0.401,
+          "supportive": {
+            "threshold": 0.8842,
+            "f1": 0.321,
+            "recall": 0.2007,
+            "precision": 0.8003,
+            "predicted_positive": 5488,
+            "confusion_matrix": [
+              [
+                84976,
+                1096
+              ],
+              [
+                17488,
+                4392
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.9451,
+            "f1": 0.1644,
+            "recall": 0.0904,
+            "precision": 0.9008,
+            "predicted_positive": 2197,
+            "confusion_matrix": [
+              [
+                85854,
+                218
+              ],
+              [
+                19901,
+                1979
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.90"
+          }
+        },
+        "selection_score": 0.767035
+      },
+      {
+        "config": {
+          "name": "deeper_regularized",
+          "n_estimators": 300,
+          "max_depth": 5,
+          "learning_rate": 0.035,
+          "min_child_weight": 6,
+          "subsample": 0.85,
+          "colsample_bytree": 0.85,
+          "reg_lambda": 2.5,
+          "gamma": 0.2,
+          "scale_pos_weight_multiplier": 0.9
+        },
+        "validation_metrics": {
+          "auc_roc": 0.8484,
+          "average_precision": 0.6074,
+          "f1_at_0_5": 0.5597,
+          "recall_at_0_5": 0.7695,
+          "precision_at_0_5": 0.4398,
+          "supportive": {
+            "threshold": 0.8484,
+            "f1": 0.3312,
+            "recall": 0.2088,
+            "precision": 0.7998,
+            "predicted_positive": 5713,
+            "confusion_matrix": [
+              [
+                84928,
+                1144
+              ],
+              [
+                17311,
+                4569
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.9244,
+            "f1": 0.1788,
+            "recall": 0.0993,
+            "precision": 0.9005,
+            "predicted_positive": 2412,
+            "confusion_matrix": [
+              [
+                85832,
+                240
+              ],
+              [
+                19708,
+                2172
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.90"
+          }
+        },
+        "selection_score": 0.776
+      }
+    ]
+  },
+  "group_heart_failure": {
+    "label": "გულის უკმარისობა",
+    "selected_config": {
+      "name": "deeper_regularized",
+      "n_estimators": 300,
+      "max_depth": 5,
+      "learning_rate": 0.035,
+      "min_child_weight": 6,
+      "subsample": 0.85,
+      "colsample_bytree": 0.85,
+      "reg_lambda": 2.5,
+      "gamma": 0.2,
+      "scale_pos_weight_multiplier": 0.9
+    },
+    "selected_validation_metrics": {
+      "auc_roc": 0.8739,
+      "average_precision": 0.5815,
+      "f1_at_0_5": 0.5211,
+      "recall_at_0_5": 0.7749,
+      "precision_at_0_5": 0.3925,
+      "supportive": {
+        "threshold": 0.9066,
+        "f1": 0.3069,
+        "recall": 0.1899,
+        "precision": 0.7999,
+        "predicted_positive": 3699,
+        "confusion_matrix": [
+          [
+            91629,
+            740
+          ],
+          [
+            12624,
+            2959
+          ]
+        ],
+        "selection_rule": "max_f1_with_precision_at_least_0.80"
+      },
+      "high_precision": {
+        "threshold": 0.9522,
+        "f1": 0.1483,
+        "recall": 0.0808,
+        "precision": 0.8999,
+        "predicted_positive": 1399,
+        "confusion_matrix": [
+          [
+            92229,
+            140
+          ],
+          [
+            14324,
+            1259
+          ]
+        ],
+        "selection_rule": "max_f1_with_precision_at_least_0.90"
+      }
+    },
+    "selection_score": 0.73951,
+    "candidates": [
+      {
+        "config": {
+          "name": "baseline_balanced",
+          "n_estimators": 260,
+          "max_depth": 4,
+          "learning_rate": 0.05,
+          "min_child_weight": 1,
+          "subsample": 0.85,
+          "colsample_bytree": 0.85,
+          "reg_lambda": 1.0,
+          "gamma": 0.0,
+          "scale_pos_weight_multiplier": 1.0
+        },
+        "validation_metrics": {
+          "auc_roc": 0.8733,
+          "average_precision": 0.5788,
+          "f1_at_0_5": 0.5123,
+          "recall_at_0_5": 0.7963,
+          "precision_at_0_5": 0.3776,
+          "supportive": {
+            "threshold": 0.9215,
+            "f1": 0.29,
+            "recall": 0.1771,
+            "precision": 0.8006,
+            "predicted_positive": 3446,
+            "confusion_matrix": [
+              [
+                91682,
+                687
+              ],
+              [
+                12824,
+                2759
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.9654,
+            "f1": 0.1144,
+            "recall": 0.0611,
+            "precision": 0.9007,
+            "predicted_positive": 1057,
+            "confusion_matrix": [
+              [
+                92264,
+                105
+              ],
+              [
+                14631,
+                952
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.90"
+          }
+        },
+        "selection_score": 0.726625
+      },
+      {
+        "config": {
+          "name": "regularized_precision",
+          "n_estimators": 360,
+          "max_depth": 3,
+          "learning_rate": 0.04,
+          "min_child_weight": 8,
+          "subsample": 0.9,
+          "colsample_bytree": 0.9,
+          "reg_lambda": 3.0,
+          "gamma": 0.5,
+          "scale_pos_weight_multiplier": 0.75
+        },
+        "validation_metrics": {
+          "auc_roc": 0.8715,
+          "average_precision": 0.5722,
+          "f1_at_0_5": 0.5311,
+          "recall_at_0_5": 0.7292,
+          "precision_at_0_5": 0.4177,
+          "supportive": {
+            "threshold": 0.8974,
+            "f1": 0.2803,
+            "recall": 0.1699,
+            "precision": 0.8005,
+            "predicted_positive": 3308,
+            "confusion_matrix": [
+              [
+                91709,
+                660
+              ],
+              [
+                12935,
+                2648
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.9609,
+            "f1": 0.0952,
+            "recall": 0.0502,
+            "precision": 0.899,
+            "predicted_positive": 871,
+            "confusion_matrix": [
+              [
+                92281,
+                88
+              ],
+              [
+                14800,
+                783
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.90"
+          }
+        },
+        "selection_score": 0.714145
+      },
+      {
+        "config": {
+          "name": "recall_balanced",
+          "n_estimators": 320,
+          "max_depth": 4,
+          "learning_rate": 0.04,
+          "min_child_weight": 3,
+          "subsample": 0.9,
+          "colsample_bytree": 0.8,
+          "reg_lambda": 1.5,
+          "gamma": 0.0,
+          "scale_pos_weight_multiplier": 1.2
+        },
+        "validation_metrics": {
+          "auc_roc": 0.873,
+          "average_precision": 0.5773,
+          "f1_at_0_5": 0.4952,
+          "recall_at_0_5": 0.8306,
+          "precision_at_0_5": 0.3528,
+          "supportive": {
+            "threshold": 0.9329,
+            "f1": 0.288,
+            "recall": 0.1756,
+            "precision": 0.8001,
+            "predicted_positive": 3421,
+            "confusion_matrix": [
+              [
+                91685,
+                684
+              ],
+              [
+                12846,
+                2737
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.9723,
+            "f1": 0.1057,
+            "recall": 0.0562,
+            "precision": 0.9011,
+            "predicted_positive": 971,
+            "confusion_matrix": [
+              [
+                92273,
+                96
+              ],
+              [
+                14708,
+                875
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.90"
+          }
+        },
+        "selection_score": 0.723205
+      },
+      {
+        "config": {
+          "name": "deeper_regularized",
+          "n_estimators": 300,
+          "max_depth": 5,
+          "learning_rate": 0.035,
+          "min_child_weight": 6,
+          "subsample": 0.85,
+          "colsample_bytree": 0.85,
+          "reg_lambda": 2.5,
+          "gamma": 0.2,
+          "scale_pos_weight_multiplier": 0.9
+        },
+        "validation_metrics": {
+          "auc_roc": 0.8739,
+          "average_precision": 0.5815,
+          "f1_at_0_5": 0.5211,
+          "recall_at_0_5": 0.7749,
+          "precision_at_0_5": 0.3925,
+          "supportive": {
+            "threshold": 0.9066,
+            "f1": 0.3069,
+            "recall": 0.1899,
+            "precision": 0.7999,
+            "predicted_positive": 3699,
+            "confusion_matrix": [
+              [
+                91629,
+                740
+              ],
+              [
+                12624,
+                2959
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.9522,
+            "f1": 0.1483,
+            "recall": 0.0808,
+            "precision": 0.8999,
+            "predicted_positive": 1399,
+            "confusion_matrix": [
+              [
+                92229,
+                140
+              ],
+              [
+                14324,
+                1259
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.90"
+          }
+        },
+        "selection_score": 0.73951
+      }
+    ]
+  },
+  "group_arrhythmia_conduction": {
+    "label": "არითმია და გამტარობის დარღვევები",
+    "selected_config": {
+      "name": "deeper_regularized",
+      "n_estimators": 300,
+      "max_depth": 5,
+      "learning_rate": 0.035,
+      "min_child_weight": 6,
+      "subsample": 0.85,
+      "colsample_bytree": 0.85,
+      "reg_lambda": 2.5,
+      "gamma": 0.2,
+      "scale_pos_weight_multiplier": 0.9
+    },
+    "selected_validation_metrics": {
+      "auc_roc": 0.8201,
+      "average_precision": 0.5224,
+      "f1_at_0_5": 0.5265,
+      "recall_at_0_5": 0.7586,
+      "precision_at_0_5": 0.4031,
+      "supportive": {
+        "threshold": 0.8969,
+        "f1": 0.0874,
+        "recall": 0.0462,
+        "precision": 0.8002,
+        "predicted_positive": 1206,
+        "confusion_matrix": [
+          [
+            86843,
+            241
+          ],
+          [
+            19903,
+            965
+          ]
+        ],
+        "selection_rule": "max_f1_with_precision_at_least_0.80"
+      },
+      "high_precision": {
+        "threshold": 0.9371,
+        "f1": 0.0241,
+        "recall": 0.0122,
+        "precision": 0.9011,
+        "predicted_positive": 283,
+        "confusion_matrix": [
+          [
+            87056,
+            28
+          ],
+          [
+            20613,
+            255
+          ]
+        ],
+        "selection_rule": "max_f1_with_precision_at_least_0.90"
+      }
+    },
+    "selection_score": 0.59324,
+    "candidates": [
+      {
+        "config": {
+          "name": "baseline_balanced",
+          "n_estimators": 260,
+          "max_depth": 4,
+          "learning_rate": 0.05,
+          "min_child_weight": 1,
+          "subsample": 0.85,
+          "colsample_bytree": 0.85,
+          "reg_lambda": 1.0,
+          "gamma": 0.0,
+          "scale_pos_weight_multiplier": 1.0
+        },
+        "validation_metrics": {
+          "auc_roc": 0.8193,
+          "average_precision": 0.5195,
+          "f1_at_0_5": 0.5197,
+          "recall_at_0_5": 0.784,
+          "precision_at_0_5": 0.3886,
+          "supportive": {
+            "threshold": 0.9077,
+            "f1": 0.0834,
+            "recall": 0.044,
+            "precision": 0.8003,
+            "predicted_positive": 1147,
+            "confusion_matrix": [
+              [
+                86855,
+                229
+              ],
+              [
+                19950,
+                918
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.9459,
+            "f1": 0.0214,
+            "recall": 0.0108,
+            "precision": 0.9004,
+            "predicted_positive": 251,
+            "confusion_matrix": [
+              [
+                87059,
+                25
+              ],
+              [
+                20642,
+                226
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.90"
+          }
+        },
+        "selection_score": 0.588695
+      },
+      {
+        "config": {
+          "name": "regularized_precision",
+          "n_estimators": 360,
+          "max_depth": 3,
+          "learning_rate": 0.04,
+          "min_child_weight": 8,
+          "subsample": 0.9,
+          "colsample_bytree": 0.9,
+          "reg_lambda": 3.0,
+          "gamma": 0.5,
+          "scale_pos_weight_multiplier": 0.75
+        },
+        "validation_metrics": {
+          "auc_roc": 0.8176,
+          "average_precision": 0.5149,
+          "f1_at_0_5": 0.5294,
+          "recall_at_0_5": 0.7092,
+          "precision_at_0_5": 0.4223,
+          "supportive": {
+            "threshold": 0.8818,
+            "f1": 0.0752,
+            "recall": 0.0394,
+            "precision": 0.8014,
+            "predicted_positive": 1027,
+            "confusion_matrix": [
+              [
+                86880,
+                204
+              ],
+              [
+                20045,
+                823
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.9264,
+            "f1": 0.0213,
+            "recall": 0.0108,
+            "precision": 0.9,
+            "predicted_positive": 250,
+            "confusion_matrix": [
+              [
+                87059,
+                25
+              ],
+              [
+                20643,
+                225
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.90"
+          }
+        },
+        "selection_score": 0.581535
+      },
+      {
+        "config": {
+          "name": "recall_balanced",
+          "n_estimators": 320,
+          "max_depth": 4,
+          "learning_rate": 0.04,
+          "min_child_weight": 3,
+          "subsample": 0.9,
+          "colsample_bytree": 0.8,
+          "reg_lambda": 1.5,
+          "gamma": 0.0,
+          "scale_pos_weight_multiplier": 1.2
+        },
+        "validation_metrics": {
+          "auc_roc": 0.8193,
+          "average_precision": 0.5193,
+          "f1_at_0_5": 0.5082,
+          "recall_at_0_5": 0.8244,
+          "precision_at_0_5": 0.3673,
+          "supportive": {
+            "threshold": 0.9194,
+            "f1": 0.0872,
+            "recall": 0.0461,
+            "precision": 0.8003,
+            "predicted_positive": 1202,
+            "confusion_matrix": [
+              [
+                86844,
+                240
+              ],
+              [
+                19906,
+                962
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.9564,
+            "f1": 0.0176,
+            "recall": 0.0089,
+            "precision": 0.9024,
+            "predicted_positive": 205,
+            "confusion_matrix": [
+              [
+                87064,
+                20
+              ],
+              [
+                20683,
+                185
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.90"
+          }
+        },
+        "selection_score": 0.589065
+      },
+      {
+        "config": {
+          "name": "deeper_regularized",
+          "n_estimators": 300,
+          "max_depth": 5,
+          "learning_rate": 0.035,
+          "min_child_weight": 6,
+          "subsample": 0.85,
+          "colsample_bytree": 0.85,
+          "reg_lambda": 2.5,
+          "gamma": 0.2,
+          "scale_pos_weight_multiplier": 0.9
+        },
+        "validation_metrics": {
+          "auc_roc": 0.8201,
+          "average_precision": 0.5224,
+          "f1_at_0_5": 0.5265,
+          "recall_at_0_5": 0.7586,
+          "precision_at_0_5": 0.4031,
+          "supportive": {
+            "threshold": 0.8969,
+            "f1": 0.0874,
+            "recall": 0.0462,
+            "precision": 0.8002,
+            "predicted_positive": 1206,
+            "confusion_matrix": [
+              [
+                86843,
+                241
+              ],
+              [
+                19903,
+                965
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.9371,
+            "f1": 0.0241,
+            "recall": 0.0122,
+            "precision": 0.9011,
+            "predicted_positive": 283,
+            "confusion_matrix": [
+              [
+                87056,
+                28
+              ],
+              [
+                20613,
+                255
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.90"
+          }
+        },
+        "selection_score": 0.59324
+      }
+    ]
+  },
+  "group_hypertensive_disease": {
+    "label": "ჰიპერტენზიული დაავადებები",
+    "selected_config": {
+      "name": "deeper_regularized",
+      "n_estimators": 300,
+      "max_depth": 5,
+      "learning_rate": 0.035,
+      "min_child_weight": 6,
+      "subsample": 0.85,
+      "colsample_bytree": 0.85,
+      "reg_lambda": 2.5,
+      "gamma": 0.2,
+      "scale_pos_weight_multiplier": 0.9
+    },
+    "selected_validation_metrics": {
+      "auc_roc": 0.8465,
+      "average_precision": 0.8311,
+      "f1_at_0_5": 0.7743,
+      "recall_at_0_5": 0.7926,
+      "precision_at_0_5": 0.7568,
+      "supportive": {
+        "threshold": 0.6096,
+        "f1": 0.7262,
+        "recall": 0.6652,
+        "precision": 0.7995,
+        "predicted_positive": 45780,
+        "confusion_matrix": [
+          [
+            43754,
+            9178
+          ],
+          [
+            18418,
+            36602
+          ]
+        ],
+        "selection_rule": "max_f1_with_precision_at_least_0.80"
+      },
+      "high_precision": {
+        "threshold": 0.8249,
+        "f1": 0.377,
+        "recall": 0.2384,
+        "precision": 0.9,
+        "predicted_positive": 14574,
+        "confusion_matrix": [
+          [
+            51475,
+            1457
+          ],
+          [
+            41903,
+            13117
+          ]
+        ],
+        "selection_rule": "max_f1_with_precision_at_least_0.90"
+      }
+    },
+    "selection_score": 1.147835,
+    "candidates": [
+      {
+        "config": {
+          "name": "baseline_balanced",
+          "n_estimators": 260,
+          "max_depth": 4,
+          "learning_rate": 0.05,
+          "min_child_weight": 1,
+          "subsample": 0.85,
+          "colsample_bytree": 0.85,
+          "reg_lambda": 1.0,
+          "gamma": 0.0,
+          "scale_pos_weight_multiplier": 1.0
+        },
+        "validation_metrics": {
+          "auc_roc": 0.8457,
+          "average_precision": 0.8304,
+          "f1_at_0_5": 0.78,
+          "recall_at_0_5": 0.8142,
+          "precision_at_0_5": 0.7486,
+          "supportive": {
+            "threshold": 0.6341,
+            "f1": 0.723,
+            "recall": 0.6595,
+            "precision": 0.8,
+            "predicted_positive": 45355,
+            "confusion_matrix": [
+              [
+                43861,
+                9071
+              ],
+              [
+                18736,
+                36284
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.8394,
+            "f1": 0.3766,
+            "recall": 0.2381,
+            "precision": 0.8999,
+            "predicted_positive": 14557,
+            "confusion_matrix": [
+              [
+                51475,
+                1457
+              ],
+              [
+                41920,
+                13100
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.90"
+          }
+        },
+        "selection_score": 1.146075
+      },
+      {
+        "config": {
+          "name": "regularized_precision",
+          "n_estimators": 360,
+          "max_depth": 3,
+          "learning_rate": 0.04,
+          "min_child_weight": 8,
+          "subsample": 0.9,
+          "colsample_bytree": 0.9,
+          "reg_lambda": 3.0,
+          "gamma": 0.5,
+          "scale_pos_weight_multiplier": 0.75
+        },
+        "validation_metrics": {
+          "auc_roc": 0.8445,
+          "average_precision": 0.8286,
+          "f1_at_0_5": 0.757,
+          "recall_at_0_5": 0.742,
+          "precision_at_0_5": 0.7726,
+          "supportive": {
+            "threshold": 0.5653,
+            "f1": 0.7214,
+            "recall": 0.6569,
+            "precision": 0.8,
+            "predicted_positive": 45173,
+            "confusion_matrix": [
+              [
+                43899,
+                9033
+              ],
+              [
+                18880,
+                36140
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.7957,
+            "f1": 0.3704,
+            "recall": 0.2332,
+            "precision": 0.9,
+            "predicted_positive": 14255,
+            "confusion_matrix": [
+              [
+                51506,
+                1426
+              ],
+              [
+                42191,
+                12829
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.90"
+          }
+        },
+        "selection_score": 1.142805
+      },
+      {
+        "config": {
+          "name": "recall_balanced",
+          "n_estimators": 320,
+          "max_depth": 4,
+          "learning_rate": 0.04,
+          "min_child_weight": 3,
+          "subsample": 0.9,
+          "colsample_bytree": 0.8,
+          "reg_lambda": 1.5,
+          "gamma": 0.0,
+          "scale_pos_weight_multiplier": 1.2
+        },
+        "validation_metrics": {
+          "auc_roc": 0.8458,
+          "average_precision": 0.8304,
+          "f1_at_0_5": 0.7863,
+          "recall_at_0_5": 0.8478,
+          "precision_at_0_5": 0.7331,
+          "supportive": {
+            "threshold": 0.6756,
+            "f1": 0.7247,
+            "recall": 0.6624,
+            "precision": 0.8,
+            "predicted_positive": 45556,
+            "confusion_matrix": [
+              [
+                43819,
+                9113
+              ],
+              [
+                18577,
+                36443
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.8627,
+            "f1": 0.373,
+            "recall": 0.2353,
+            "precision": 0.8998,
+            "predicted_positive": 14386,
+            "confusion_matrix": [
+              [
+                51491,
+                1441
+              ],
+              [
+                42075,
+                12945
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.90"
+          }
+        },
+        "selection_score": 1.14605
+      },
+      {
+        "config": {
+          "name": "deeper_regularized",
+          "n_estimators": 300,
+          "max_depth": 5,
+          "learning_rate": 0.035,
+          "min_child_weight": 6,
+          "subsample": 0.85,
+          "colsample_bytree": 0.85,
+          "reg_lambda": 2.5,
+          "gamma": 0.2,
+          "scale_pos_weight_multiplier": 0.9
+        },
+        "validation_metrics": {
+          "auc_roc": 0.8465,
+          "average_precision": 0.8311,
+          "f1_at_0_5": 0.7743,
+          "recall_at_0_5": 0.7926,
+          "precision_at_0_5": 0.7568,
+          "supportive": {
+            "threshold": 0.6096,
+            "f1": 0.7262,
+            "recall": 0.6652,
+            "precision": 0.7995,
+            "predicted_positive": 45780,
+            "confusion_matrix": [
+              [
+                43754,
+                9178
+              ],
+              [
+                18418,
+                36602
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.8249,
+            "f1": 0.377,
+            "recall": 0.2384,
+            "precision": 0.9,
+            "predicted_positive": 14574,
+            "confusion_matrix": [
+              [
+                51475,
+                1457
+              ],
+              [
+                41903,
+                13117
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.90"
+          }
+        },
+        "selection_score": 1.147835
+      }
+    ]
+  },
+  "group_cerebrovascular_disease": {
+    "label": "ცერებროვასკულური დაავადებები",
+    "selected_config": {
+      "name": "deeper_regularized",
+      "n_estimators": 300,
+      "max_depth": 5,
+      "learning_rate": 0.035,
+      "min_child_weight": 6,
+      "subsample": 0.85,
+      "colsample_bytree": 0.85,
+      "reg_lambda": 2.5,
+      "gamma": 0.2,
+      "scale_pos_weight_multiplier": 0.9
+    },
+    "selected_validation_metrics": {
+      "auc_roc": 0.8162,
+      "average_precision": 0.3425,
+      "f1_at_0_5": 0.2475,
+      "recall_at_0_5": 0.6474,
+      "precision_at_0_5": 0.153,
+      "supportive": {
+        "threshold": 0.9489,
+        "f1": 0.1623,
+        "recall": 0.0903,
+        "precision": 0.7991,
+        "predicted_positive": 647,
+        "confusion_matrix": [
+          [
+            102099,
+            130
+          ],
+          [
+            5206,
+            517
+          ]
+        ],
+        "selection_rule": "max_f1_with_precision_at_least_0.80"
+      },
+      "high_precision": {
+        "threshold": 0.98,
+        "f1": 0.0669,
+        "recall": 0.0348,
+        "precision": 0.8964,
+        "predicted_positive": 222,
+        "confusion_matrix": [
+          [
+            102206,
+            23
+          ],
+          [
+            5524,
+            199
+          ]
+        ],
+        "selection_rule": "max_f1_with_precision_at_least_0.90"
+      }
+    },
+    "selection_score": 0.442035,
+    "candidates": [
+      {
+        "config": {
+          "name": "baseline_balanced",
+          "n_estimators": 260,
+          "max_depth": 4,
+          "learning_rate": 0.05,
+          "min_child_weight": 1,
+          "subsample": 0.85,
+          "colsample_bytree": 0.85,
+          "reg_lambda": 1.0,
+          "gamma": 0.0,
+          "scale_pos_weight_multiplier": 1.0
+        },
+        "validation_metrics": {
+          "auc_roc": 0.8147,
+          "average_precision": 0.3369,
+          "f1_at_0_5": 0.2246,
+          "recall_at_0_5": 0.7147,
+          "precision_at_0_5": 0.1332,
+          "supportive": {
+            "threshold": 0.9536,
+            "f1": 0.1469,
+            "recall": 0.0809,
+            "precision": 0.7997,
+            "predicted_positive": 579,
+            "confusion_matrix": [
+              [
+                102113,
+                116
+              ],
+              [
+                5260,
+                463
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.981,
+            "f1": 0.0578,
+            "recall": 0.0299,
+            "precision": 0.8953,
+            "predicted_positive": 191,
+            "confusion_matrix": [
+              [
+                102209,
+                20
+              ],
+              [
+                5552,
+                171
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.90"
+          }
+        },
+        "selection_score": 0.430375
+      },
+      {
+        "config": {
+          "name": "regularized_precision",
+          "n_estimators": 360,
+          "max_depth": 3,
+          "learning_rate": 0.04,
+          "min_child_weight": 8,
+          "subsample": 0.9,
+          "colsample_bytree": 0.9,
+          "reg_lambda": 3.0,
+          "gamma": 0.5,
+          "scale_pos_weight_multiplier": 0.75
+        },
+        "validation_metrics": {
+          "auc_roc": 0.8127,
+          "average_precision": 0.3284,
+          "f1_at_0_5": 0.2747,
+          "recall_at_0_5": 0.5668,
+          "precision_at_0_5": 0.1813,
+          "supportive": {
+            "threshold": 0.9361,
+            "f1": 0.1487,
+            "recall": 0.082,
+            "precision": 0.8017,
+            "predicted_positive": 585,
+            "confusion_matrix": [
+              [
+                102113,
+                116
+              ],
+              [
+                5254,
+                469
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.9751,
+            "f1": 0.0316,
+            "recall": 0.0161,
+            "precision": 0.902,
+            "predicted_positive": 102,
+            "confusion_matrix": [
+              [
+                102219,
+                10
+              ],
+              [
+                5631,
+                92
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.90"
+          }
+        },
+        "selection_score": 0.418385
+      },
+      {
+        "config": {
+          "name": "recall_balanced",
+          "n_estimators": 320,
+          "max_depth": 4,
+          "learning_rate": 0.04,
+          "min_child_weight": 3,
+          "subsample": 0.9,
+          "colsample_bytree": 0.8,
+          "reg_lambda": 1.5,
+          "gamma": 0.0,
+          "scale_pos_weight_multiplier": 1.2
+        },
+        "validation_metrics": {
+          "auc_roc": 0.8144,
+          "average_precision": 0.3363,
+          "f1_at_0_5": 0.1951,
+          "recall_at_0_5": 0.7905,
+          "precision_at_0_5": 0.1113,
+          "supportive": {
+            "threshold": 0.9601,
+            "f1": 0.1507,
+            "recall": 0.0832,
+            "precision": 0.8013,
+            "predicted_positive": 594,
+            "confusion_matrix": [
+              [
+                102111,
+                118
+              ],
+              [
+                5247,
+                476
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.9849,
+            "f1": 0.0486,
+            "recall": 0.025,
+            "precision": 0.8882,
+            "predicted_positive": 161,
+            "confusion_matrix": [
+              [
+                102211,
+                18
+              ],
+              [
+                5580,
+                143
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.90"
+          }
+        },
+        "selection_score": 0.42952
+      },
+      {
+        "config": {
+          "name": "deeper_regularized",
+          "n_estimators": 300,
+          "max_depth": 5,
+          "learning_rate": 0.035,
+          "min_child_weight": 6,
+          "subsample": 0.85,
+          "colsample_bytree": 0.85,
+          "reg_lambda": 2.5,
+          "gamma": 0.2,
+          "scale_pos_weight_multiplier": 0.9
+        },
+        "validation_metrics": {
+          "auc_roc": 0.8162,
+          "average_precision": 0.3425,
+          "f1_at_0_5": 0.2475,
+          "recall_at_0_5": 0.6474,
+          "precision_at_0_5": 0.153,
+          "supportive": {
+            "threshold": 0.9489,
+            "f1": 0.1623,
+            "recall": 0.0903,
+            "precision": 0.7991,
+            "predicted_positive": 647,
+            "confusion_matrix": [
+              [
+                102099,
+                130
+              ],
+              [
+                5206,
+                517
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.98,
+            "f1": 0.0669,
+            "recall": 0.0348,
+            "precision": 0.8964,
+            "predicted_positive": 222,
+            "confusion_matrix": [
+              [
+                102206,
+                23
+              ],
+              [
+                5524,
+                199
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.90"
+          }
+        },
+        "selection_score": 0.442035
+      }
+    ]
+  },
+  "group_critical_cardiac_event": {
+    "label": "კრიტიკული კარდიული მოვლენა",
+    "selected_config": {
+      "name": "regularized_precision",
+      "n_estimators": 360,
+      "max_depth": 3,
+      "learning_rate": 0.04,
+      "min_child_weight": 8,
+      "subsample": 0.9,
+      "colsample_bytree": 0.9,
+      "reg_lambda": 3.0,
+      "gamma": 0.5,
+      "scale_pos_weight_multiplier": 0.75
+    },
+    "selected_validation_metrics": {
+      "auc_roc": 0.8955,
+      "average_precision": 0.1591,
+      "f1_at_0_5": 0.0644,
+      "recall_at_0_5": 0.716,
+      "precision_at_0_5": 0.0337,
+      "supportive": {
+        "threshold": 0.9925,
+        "f1": 0.0275,
+        "recall": 0.014,
+        "precision": 0.7778,
+        "predicted_positive": 9,
+        "confusion_matrix": [
+          [
+            107450,
+            2
+          ],
+          [
+            493,
+            7
+          ]
+        ],
+        "selection_rule": "max_f1_with_precision_at_least_0.80"
+      },
+      "high_precision": {
+        "threshold": 0.9961,
+        "f1": 0.008,
+        "recall": 0.004,
+        "precision": 1.0,
+        "predicted_positive": 2,
+        "confusion_matrix": [
+          [
+            107452,
+            0
+          ],
+          [
+            498,
+            2
+          ]
+        ],
+        "selection_rule": "fallback_max_precision_below_0.90"
+      }
+    },
+    "selection_score": 0.213325,
+    "candidates": [
+      {
+        "config": {
+          "name": "baseline_balanced",
+          "n_estimators": 260,
+          "max_depth": 4,
+          "learning_rate": 0.05,
+          "min_child_weight": 1,
+          "subsample": 0.85,
+          "colsample_bytree": 0.85,
+          "reg_lambda": 1.0,
+          "gamma": 0.0,
+          "scale_pos_weight_multiplier": 1.0
+        },
+        "validation_metrics": {
+          "auc_roc": 0.8919,
+          "average_precision": 0.1531,
+          "f1_at_0_5": 0.0565,
+          "recall_at_0_5": 0.726,
+          "precision_at_0_5": 0.0294,
+          "supportive": {
+            "threshold": 0.9926,
+            "f1": 0.0314,
+            "recall": 0.016,
+            "precision": 0.8,
+            "predicted_positive": 10,
+            "confusion_matrix": [
+              [
+                107450,
+                2
+              ],
+              [
+                492,
+                8
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.9958,
+            "f1": 0.008,
+            "recall": 0.004,
+            "precision": 1.0,
+            "predicted_positive": 2,
+            "confusion_matrix": [
+              [
+                107452,
+                0
+              ],
+              [
+                498,
+                2
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.90"
+          }
+        },
+        "selection_score": 0.208315
+      },
+      {
+        "config": {
+          "name": "regularized_precision",
+          "n_estimators": 360,
+          "max_depth": 3,
+          "learning_rate": 0.04,
+          "min_child_weight": 8,
+          "subsample": 0.9,
+          "colsample_bytree": 0.9,
+          "reg_lambda": 3.0,
+          "gamma": 0.5,
+          "scale_pos_weight_multiplier": 0.75
+        },
+        "validation_metrics": {
+          "auc_roc": 0.8955,
+          "average_precision": 0.1591,
+          "f1_at_0_5": 0.0644,
+          "recall_at_0_5": 0.716,
+          "precision_at_0_5": 0.0337,
+          "supportive": {
+            "threshold": 0.9925,
+            "f1": 0.0275,
+            "recall": 0.014,
+            "precision": 0.7778,
+            "predicted_positive": 9,
+            "confusion_matrix": [
+              [
+                107450,
+                2
+              ],
+              [
+                493,
+                7
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.9961,
+            "f1": 0.008,
+            "recall": 0.004,
+            "precision": 1.0,
+            "predicted_positive": 2,
+            "confusion_matrix": [
+              [
+                107452,
+                0
+              ],
+              [
+                498,
+                2
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.90"
+          }
+        },
+        "selection_score": 0.213325
+      },
+      {
+        "config": {
+          "name": "recall_balanced",
+          "n_estimators": 320,
+          "max_depth": 4,
+          "learning_rate": 0.04,
+          "min_child_weight": 3,
+          "subsample": 0.9,
+          "colsample_bytree": 0.8,
+          "reg_lambda": 1.5,
+          "gamma": 0.0,
+          "scale_pos_weight_multiplier": 1.2
+        },
+        "validation_metrics": {
+          "auc_roc": 0.8902,
+          "average_precision": 0.1501,
+          "f1_at_0_5": 0.0489,
+          "recall_at_0_5": 0.748,
+          "precision_at_0_5": 0.0253,
+          "supportive": {
+            "threshold": 0.9955,
+            "f1": 0.0198,
+            "recall": 0.01,
+            "precision": 1.0,
+            "predicted_positive": 5,
+            "confusion_matrix": [
+              [
+                107452,
+                0
+              ],
+              [
+                495,
+                5
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.9955,
+            "f1": 0.0198,
+            "recall": 0.01,
+            "precision": 1.0,
+            "predicted_positive": 5,
+            "confusion_matrix": [
+              [
+                107452,
+                0
+              ],
+              [
+                495,
+                5
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.90"
+          }
+        },
+        "selection_score": 0.20352
+      },
+      {
+        "config": {
+          "name": "deeper_regularized",
+          "n_estimators": 300,
+          "max_depth": 5,
+          "learning_rate": 0.035,
+          "min_child_weight": 6,
+          "subsample": 0.85,
+          "colsample_bytree": 0.85,
+          "reg_lambda": 2.5,
+          "gamma": 0.2,
+          "scale_pos_weight_multiplier": 0.9
+        },
+        "validation_metrics": {
+          "auc_roc": 0.8915,
+          "average_precision": 0.1525,
+          "f1_at_0_5": 0.0673,
+          "recall_at_0_5": 0.686,
+          "precision_at_0_5": 0.0354,
+          "supportive": {
+            "threshold": 0.9947,
+            "f1": 0.0119,
+            "recall": 0.006,
+            "precision": 1.0,
+            "predicted_positive": 3,
+            "confusion_matrix": [
+              [
+                107452,
+                0
+              ],
+              [
+                497,
+                3
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.9947,
+            "f1": 0.0119,
+            "recall": 0.006,
+            "precision": 1.0,
+            "predicted_positive": 3,
+            "confusion_matrix": [
+              [
+                107452,
+                0
+              ],
+              [
+                497,
+                3
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.90"
+          }
+        },
+        "selection_score": 0.20243
+      }
+    ]
+  },
+  "group_venous_thromboembolism": {
+    "label": "ვენური თრომბოემბოლია / ფილტვის ემბოლია",
+    "selected_config": {
+      "name": "deeper_regularized",
+      "n_estimators": 300,
+      "max_depth": 5,
+      "learning_rate": 0.035,
+      "min_child_weight": 6,
+      "subsample": 0.85,
+      "colsample_bytree": 0.85,
+      "reg_lambda": 2.5,
+      "gamma": 0.2,
+      "scale_pos_weight_multiplier": 0.9
+    },
+    "selected_validation_metrics": {
+      "auc_roc": 0.7353,
+      "average_precision": 0.0979,
+      "f1_at_0_5": 0.1339,
+      "recall_at_0_5": 0.6061,
+      "precision_at_0_5": 0.0753,
+      "supportive": {
+        "threshold": 0.9212,
+        "f1": 0.0005,
+        "recall": 0.0003,
+        "precision": 1.0,
+        "predicted_positive": 1,
+        "confusion_matrix": [
+          [
+            104093,
+            0
+          ],
+          [
+            3858,
+            1
+          ]
+        ],
+        "selection_rule": "fallback_max_precision_below_0.80"
+      },
+      "high_precision": {
+        "threshold": 0.9212,
+        "f1": 0.0005,
+        "recall": 0.0003,
+        "precision": 1.0,
+        "predicted_positive": 1,
+        "confusion_matrix": [
+          [
+            104093,
+            0
+          ],
+          [
+            3858,
+            1
+          ]
+        ],
+        "selection_rule": "fallback_max_precision_below_0.90"
+      }
+    },
+    "selection_score": 0.13489,
+    "candidates": [
+      {
+        "config": {
+          "name": "baseline_balanced",
+          "n_estimators": 260,
+          "max_depth": 4,
+          "learning_rate": 0.05,
+          "min_child_weight": 1,
+          "subsample": 0.85,
+          "colsample_bytree": 0.85,
+          "reg_lambda": 1.0,
+          "gamma": 0.0,
+          "scale_pos_weight_multiplier": 1.0
+        },
+        "validation_metrics": {
+          "auc_roc": 0.7341,
+          "average_precision": 0.0967,
+          "f1_at_0_5": 0.1253,
+          "recall_at_0_5": 0.6701,
+          "precision_at_0_5": 0.0691,
+          "supportive": {
+            "threshold": 0.9249,
+            "f1": 0.0016,
+            "recall": 0.0008,
+            "precision": 0.75,
+            "predicted_positive": 4,
+            "confusion_matrix": [
+              [
+                104092,
+                1
+              ],
+              [
+                3856,
+                3
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.9249,
+            "f1": 0.0016,
+            "recall": 0.0008,
+            "precision": 0.75,
+            "predicted_positive": 4,
+            "confusion_matrix": [
+              [
+                104092,
+                1
+              ],
+              [
+                3856,
+                3
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.90"
+          }
+        },
+        "selection_score": 0.134125
+      },
+      {
+        "config": {
+          "name": "regularized_precision",
+          "n_estimators": 360,
+          "max_depth": 3,
+          "learning_rate": 0.04,
+          "min_child_weight": 8,
+          "subsample": 0.9,
+          "colsample_bytree": 0.9,
+          "reg_lambda": 3.0,
+          "gamma": 0.5,
+          "scale_pos_weight_multiplier": 0.75
+        },
+        "validation_metrics": {
+          "auc_roc": 0.7333,
+          "average_precision": 0.095,
+          "f1_at_0_5": 0.1393,
+          "recall_at_0_5": 0.5209,
+          "precision_at_0_5": 0.0804,
+          "supportive": {
+            "threshold": 0.9412,
+            "f1": 0.0005,
+            "recall": 0.0003,
+            "precision": 1.0,
+            "predicted_positive": 1,
+            "confusion_matrix": [
+              [
+                104093,
+                0
+              ],
+              [
+                3858,
+                1
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.9412,
+            "f1": 0.0005,
+            "recall": 0.0003,
+            "precision": 1.0,
+            "predicted_positive": 1,
+            "confusion_matrix": [
+              [
+                104093,
+                0
+              ],
+              [
+                3858,
+                1
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.90"
+          }
+        },
+        "selection_score": 0.13189
+      },
+      {
+        "config": {
+          "name": "recall_balanced",
+          "n_estimators": 320,
+          "max_depth": 4,
+          "learning_rate": 0.04,
+          "min_child_weight": 3,
+          "subsample": 0.9,
+          "colsample_bytree": 0.8,
+          "reg_lambda": 1.5,
+          "gamma": 0.0,
+          "scale_pos_weight_multiplier": 1.2
+        },
+        "validation_metrics": {
+          "auc_roc": 0.7337,
+          "average_precision": 0.0961,
+          "f1_at_0_5": 0.1124,
+          "recall_at_0_5": 0.7655,
+          "precision_at_0_5": 0.0606,
+          "supportive": {
+            "threshold": 0.9152,
+            "f1": 0.0036,
+            "recall": 0.0018,
+            "precision": 0.3333,
+            "predicted_positive": 21,
+            "confusion_matrix": [
+              [
+                104079,
+                14
+              ],
+              [
+                3852,
+                7
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.9152,
+            "f1": 0.0036,
+            "recall": 0.0018,
+            "precision": 0.3333,
+            "predicted_positive": 21,
+            "confusion_matrix": [
+              [
+                104079,
+                14
+              ],
+              [
+                3852,
+                7
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.90"
+          }
+        },
+        "selection_score": 0.134405
+      },
+      {
+        "config": {
+          "name": "deeper_regularized",
+          "n_estimators": 300,
+          "max_depth": 5,
+          "learning_rate": 0.035,
+          "min_child_weight": 6,
+          "subsample": 0.85,
+          "colsample_bytree": 0.85,
+          "reg_lambda": 2.5,
+          "gamma": 0.2,
+          "scale_pos_weight_multiplier": 0.9
+        },
+        "validation_metrics": {
+          "auc_roc": 0.7353,
+          "average_precision": 0.0979,
+          "f1_at_0_5": 0.1339,
+          "recall_at_0_5": 0.6061,
+          "precision_at_0_5": 0.0753,
+          "supportive": {
+            "threshold": 0.9212,
+            "f1": 0.0005,
+            "recall": 0.0003,
+            "precision": 1.0,
+            "predicted_positive": 1,
+            "confusion_matrix": [
+              [
+                104093,
+                0
+              ],
+              [
+                3858,
+                1
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.9212,
+            "f1": 0.0005,
+            "recall": 0.0003,
+            "precision": 1.0,
+            "predicted_positive": 1,
+            "confusion_matrix": [
+              [
+                104093,
+                0
+              ],
+              [
+                3858,
+                1
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.90"
+          }
+        },
+        "selection_score": 0.13489
+      }
+    ]
+  },
+  "group_peripheral_vascular_disease": {
+    "label": "პერიფერიული სისხლძარღვოვანი დაავადება",
+    "selected_config": {
+      "name": "recall_balanced",
+      "n_estimators": 320,
+      "max_depth": 4,
+      "learning_rate": 0.04,
+      "min_child_weight": 3,
+      "subsample": 0.9,
+      "colsample_bytree": 0.8,
+      "reg_lambda": 1.5,
+      "gamma": 0.0,
+      "scale_pos_weight_multiplier": 1.2
+    },
+    "selected_validation_metrics": {
+      "auc_roc": 0.7776,
+      "average_precision": 0.1906,
+      "f1_at_0_5": 0.211,
+      "recall_at_0_5": 0.8149,
+      "precision_at_0_5": 0.1212,
+      "supportive": {
+        "threshold": 0.894,
+        "f1": 0.0125,
+        "recall": 0.0063,
+        "precision": 0.4074,
+        "predicted_positive": 108,
+        "confusion_matrix": [
+          [
+            100935,
+            64
+          ],
+          [
+            6909,
+            44
+          ]
+        ],
+        "selection_rule": "fallback_max_precision_below_0.80"
+      },
+      "high_precision": {
+        "threshold": 0.894,
+        "f1": 0.0125,
+        "recall": 0.0063,
+        "precision": 0.4074,
+        "predicted_positive": 108,
+        "confusion_matrix": [
+          [
+            100935,
+            64
+          ],
+          [
+            6909,
+            44
+          ]
+        ],
+        "selection_rule": "fallback_max_precision_below_0.90"
+      }
+    },
+    "selection_score": 0.235105,
+    "candidates": [
+      {
+        "config": {
+          "name": "baseline_balanced",
+          "n_estimators": 260,
+          "max_depth": 4,
+          "learning_rate": 0.05,
+          "min_child_weight": 1,
+          "subsample": 0.85,
+          "colsample_bytree": 0.85,
+          "reg_lambda": 1.0,
+          "gamma": 0.0,
+          "scale_pos_weight_multiplier": 1.0
+        },
+        "validation_metrics": {
+          "auc_roc": 0.7775,
+          "average_precision": 0.1921,
+          "f1_at_0_5": 0.2223,
+          "recall_at_0_5": 0.7615,
+          "precision_at_0_5": 0.1302,
+          "supportive": {
+            "threshold": 0.9083,
+            "f1": 0.0009,
+            "recall": 0.0004,
+            "precision": 0.5,
+            "predicted_positive": 6,
+            "confusion_matrix": [
+              [
+                100996,
+                3
+              ],
+              [
+                6950,
+                3
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.9083,
+            "f1": 0.0009,
+            "recall": 0.0004,
+            "precision": 0.5,
+            "predicted_positive": 6,
+            "confusion_matrix": [
+              [
+                100996,
+                3
+              ],
+              [
+                6950,
+                3
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.90"
+          }
+        },
+        "selection_score": 0.23138
+      },
+      {
+        "config": {
+          "name": "regularized_precision",
+          "n_estimators": 360,
+          "max_depth": 3,
+          "learning_rate": 0.04,
+          "min_child_weight": 8,
+          "subsample": 0.9,
+          "colsample_bytree": 0.9,
+          "reg_lambda": 3.0,
+          "gamma": 0.5,
+          "scale_pos_weight_multiplier": 0.75
+        },
+        "validation_metrics": {
+          "auc_roc": 0.7751,
+          "average_precision": 0.1871,
+          "f1_at_0_5": 0.2399,
+          "recall_at_0_5": 0.6553,
+          "precision_at_0_5": 0.1468,
+          "supportive": {
+            "threshold": 0.8868,
+            "f1": 0.0,
+            "recall": 0.0,
+            "precision": 0.0,
+            "predicted_positive": 0,
+            "confusion_matrix": [
+              [
+                100999,
+                0
+              ],
+              [
+                6953,
+                0
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.8868,
+            "f1": 0.0,
+            "recall": 0.0,
+            "precision": 0.0,
+            "predicted_positive": 0,
+            "confusion_matrix": [
+              [
+                100999,
+                0
+              ],
+              [
+                6953,
+                0
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.90"
+          }
+        },
+        "selection_score": 0.225855
+      },
+      {
+        "config": {
+          "name": "recall_balanced",
+          "n_estimators": 320,
+          "max_depth": 4,
+          "learning_rate": 0.04,
+          "min_child_weight": 3,
+          "subsample": 0.9,
+          "colsample_bytree": 0.8,
+          "reg_lambda": 1.5,
+          "gamma": 0.0,
+          "scale_pos_weight_multiplier": 1.2
+        },
+        "validation_metrics": {
+          "auc_roc": 0.7776,
+          "average_precision": 0.1906,
+          "f1_at_0_5": 0.211,
+          "recall_at_0_5": 0.8149,
+          "precision_at_0_5": 0.1212,
+          "supportive": {
+            "threshold": 0.894,
+            "f1": 0.0125,
+            "recall": 0.0063,
+            "precision": 0.4074,
+            "predicted_positive": 108,
+            "confusion_matrix": [
+              [
+                100935,
+                64
+              ],
+              [
+                6909,
+                44
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.894,
+            "f1": 0.0125,
+            "recall": 0.0063,
+            "precision": 0.4074,
+            "predicted_positive": 108,
+            "confusion_matrix": [
+              [
+                100935,
+                64
+              ],
+              [
+                6909,
+                44
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.90"
+          }
+        },
+        "selection_score": 0.235105
+      },
+      {
+        "config": {
+          "name": "deeper_regularized",
+          "n_estimators": 300,
+          "max_depth": 5,
+          "learning_rate": 0.035,
+          "min_child_weight": 6,
+          "subsample": 0.85,
+          "colsample_bytree": 0.85,
+          "reg_lambda": 2.5,
+          "gamma": 0.2,
+          "scale_pos_weight_multiplier": 0.9
+        },
+        "validation_metrics": {
+          "auc_roc": 0.7786,
+          "average_precision": 0.1938,
+          "f1_at_0_5": 0.2308,
+          "recall_at_0_5": 0.7256,
+          "precision_at_0_5": 0.1372,
+          "supportive": {
+            "threshold": 0.9072,
+            "f1": 0.0003,
+            "recall": 0.0001,
+            "precision": 1.0,
+            "predicted_positive": 1,
+            "confusion_matrix": [
+              [
+                100999,
+                0
+              ],
+              [
+                6952,
+                1
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.9072,
+            "f1": 0.0003,
+            "recall": 0.0001,
+            "precision": 1.0,
+            "predicted_positive": 1,
+            "confusion_matrix": [
+              [
+                100999,
+                0
+              ],
+              [
+                6952,
+                1
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.90"
+          }
+        },
+        "selection_score": 0.232865
+      }
+    ]
+  },
+  "group_valvular_heart_disease": {
+    "label": "ვალვულარული გულის დაავადებები",
+    "selected_config": {
+      "name": "deeper_regularized",
+      "n_estimators": 300,
+      "max_depth": 5,
+      "learning_rate": 0.035,
+      "min_child_weight": 6,
+      "subsample": 0.85,
+      "colsample_bytree": 0.85,
+      "reg_lambda": 2.5,
+      "gamma": 0.2,
+      "scale_pos_weight_multiplier": 0.9
+    },
+    "selected_validation_metrics": {
+      "auc_roc": 0.8203,
+      "average_precision": 0.2794,
+      "f1_at_0_5": 0.2635,
+      "recall_at_0_5": 0.7401,
+      "precision_at_0_5": 0.1603,
+      "supportive": {
+        "threshold": 0.9801,
+        "f1": 0.0006,
+        "recall": 0.0003,
+        "precision": 1.0,
+        "predicted_positive": 2,
+        "confusion_matrix": [
+          [
+            101287,
+            0
+          ],
+          [
+            6663,
+            2
+          ]
+        ],
+        "selection_rule": "fallback_max_precision_below_0.80"
+      },
+      "high_precision": {
+        "threshold": 0.9801,
+        "f1": 0.0006,
+        "recall": 0.0003,
+        "precision": 1.0,
+        "predicted_positive": 2,
+        "confusion_matrix": [
+          [
+            101287,
+            0
+          ],
+          [
+            6663,
+            2
+          ]
+        ],
+        "selection_rule": "fallback_max_precision_below_0.90"
+      }
+    },
+    "selection_score": 0.320685,
+    "candidates": [
+      {
+        "config": {
+          "name": "baseline_balanced",
+          "n_estimators": 260,
+          "max_depth": 4,
+          "learning_rate": 0.05,
+          "min_child_weight": 1,
+          "subsample": 0.85,
+          "colsample_bytree": 0.85,
+          "reg_lambda": 1.0,
+          "gamma": 0.0,
+          "scale_pos_weight_multiplier": 1.0
+        },
+        "validation_metrics": {
+          "auc_roc": 0.8193,
+          "average_precision": 0.2747,
+          "f1_at_0_5": 0.2532,
+          "recall_at_0_5": 0.7679,
+          "precision_at_0_5": 0.1516,
+          "supportive": {
+            "threshold": 0.9837,
+            "f1": 0.0003,
+            "recall": 0.0002,
+            "precision": 1.0,
+            "predicted_positive": 1,
+            "confusion_matrix": [
+              [
+                101287,
+                0
+              ],
+              [
+                6664,
+                1
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.9837,
+            "f1": 0.0003,
+            "recall": 0.0002,
+            "precision": 1.0,
+            "predicted_positive": 1,
+            "confusion_matrix": [
+              [
+                101287,
+                0
+              ],
+              [
+                6664,
+                1
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.90"
+          }
+        },
+        "selection_score": 0.3158
+      },
+      {
+        "config": {
+          "name": "regularized_precision",
+          "n_estimators": 360,
+          "max_depth": 3,
+          "learning_rate": 0.04,
+          "min_child_weight": 8,
+          "subsample": 0.9,
+          "colsample_bytree": 0.9,
+          "reg_lambda": 3.0,
+          "gamma": 0.5,
+          "scale_pos_weight_multiplier": 0.75
+        },
+        "validation_metrics": {
+          "auc_roc": 0.8171,
+          "average_precision": 0.2662,
+          "f1_at_0_5": 0.2759,
+          "recall_at_0_5": 0.6965,
+          "precision_at_0_5": 0.172,
+          "supportive": {
+            "threshold": 0.9607,
+            "f1": 0.0024,
+            "recall": 0.0012,
+            "precision": 0.8,
+            "predicted_positive": 10,
+            "confusion_matrix": [
+              [
+                101285,
+                2
+              ],
+              [
+                6657,
+                8
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.9664,
+            "f1": 0.0006,
+            "recall": 0.0003,
+            "precision": 1.0,
+            "predicted_positive": 2,
+            "confusion_matrix": [
+              [
+                101287,
+                0
+              ],
+              [
+                6663,
+                2
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.90"
+          }
+        },
+        "selection_score": 0.307865
+      },
+      {
+        "config": {
+          "name": "recall_balanced",
+          "n_estimators": 320,
+          "max_depth": 4,
+          "learning_rate": 0.04,
+          "min_child_weight": 3,
+          "subsample": 0.9,
+          "colsample_bytree": 0.8,
+          "reg_lambda": 1.5,
+          "gamma": 0.0,
+          "scale_pos_weight_multiplier": 1.2
+        },
+        "validation_metrics": {
+          "auc_roc": 0.8189,
+          "average_precision": 0.273,
+          "f1_at_0_5": 0.2367,
+          "recall_at_0_5": 0.8105,
+          "precision_at_0_5": 0.1386,
+          "supportive": {
+            "threshold": 0.9867,
+            "f1": 0.0,
+            "recall": 0.0,
+            "precision": 0.0,
+            "predicted_positive": 0,
+            "confusion_matrix": [
+              [
+                101287,
+                0
+              ],
+              [
+                6665,
+                0
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.9867,
+            "f1": 0.0,
+            "recall": 0.0,
+            "precision": 0.0,
+            "predicted_positive": 0,
+            "confusion_matrix": [
+              [
+                101287,
+                0
+              ],
+              [
+                6665,
+                0
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.90"
+          }
+        },
+        "selection_score": 0.313945
+      },
+      {
+        "config": {
+          "name": "deeper_regularized",
+          "n_estimators": 300,
+          "max_depth": 5,
+          "learning_rate": 0.035,
+          "min_child_weight": 6,
+          "subsample": 0.85,
+          "colsample_bytree": 0.85,
+          "reg_lambda": 2.5,
+          "gamma": 0.2,
+          "scale_pos_weight_multiplier": 0.9
+        },
+        "validation_metrics": {
+          "auc_roc": 0.8203,
+          "average_precision": 0.2794,
+          "f1_at_0_5": 0.2635,
+          "recall_at_0_5": 0.7401,
+          "precision_at_0_5": 0.1603,
+          "supportive": {
+            "threshold": 0.9801,
+            "f1": 0.0006,
+            "recall": 0.0003,
+            "precision": 1.0,
+            "predicted_positive": 2,
+            "confusion_matrix": [
+              [
+                101287,
+                0
+              ],
+              [
+                6663,
+                2
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.9801,
+            "f1": 0.0006,
+            "recall": 0.0003,
+            "precision": 1.0,
+            "predicted_positive": 2,
+            "confusion_matrix": [
+              [
+                101287,
+                0
+              ],
+              [
+                6663,
+                2
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.90"
+          }
+        },
+        "selection_score": 0.320685
+      }
+    ]
+  },
+  "group_cardiomyopathy": {
+    "label": "კარდიომიოპათია",
+    "selected_config": {
+      "name": "baseline_balanced",
+      "n_estimators": 260,
+      "max_depth": 4,
+      "learning_rate": 0.05,
+      "min_child_weight": 1,
+      "subsample": 0.85,
+      "colsample_bytree": 0.85,
+      "reg_lambda": 1.0,
+      "gamma": 0.0,
+      "scale_pos_weight_multiplier": 1.0
+    },
+    "selected_validation_metrics": {
+      "auc_roc": 0.7867,
+      "average_precision": 0.1511,
+      "f1_at_0_5": 0.127,
+      "recall_at_0_5": 0.684,
+      "precision_at_0_5": 0.07,
+      "supportive": {
+        "threshold": 0.9673,
+        "f1": 0.0044,
+        "recall": 0.0022,
+        "precision": 0.7778,
+        "predicted_positive": 9,
+        "confusion_matrix": [
+          [
+            104798,
+            2
+          ],
+          [
+            3145,
+            7
+          ]
+        ],
+        "selection_rule": "max_f1_with_precision_at_least_0.80"
+      },
+      "high_precision": {
+        "threshold": 0.9731,
+        "f1": 0.0025,
+        "recall": 0.0013,
+        "precision": 1.0,
+        "predicted_positive": 4,
+        "confusion_matrix": [
+          [
+            104800,
+            0
+          ],
+          [
+            3148,
+            4
+          ]
+        ],
+        "selection_rule": "fallback_max_precision_below_0.90"
+      }
+    },
+    "selection_score": 0.19213,
+    "candidates": [
+      {
+        "config": {
+          "name": "baseline_balanced",
+          "n_estimators": 260,
+          "max_depth": 4,
+          "learning_rate": 0.05,
+          "min_child_weight": 1,
+          "subsample": 0.85,
+          "colsample_bytree": 0.85,
+          "reg_lambda": 1.0,
+          "gamma": 0.0,
+          "scale_pos_weight_multiplier": 1.0
+        },
+        "validation_metrics": {
+          "auc_roc": 0.7867,
+          "average_precision": 0.1511,
+          "f1_at_0_5": 0.127,
+          "recall_at_0_5": 0.684,
+          "precision_at_0_5": 0.07,
+          "supportive": {
+            "threshold": 0.9673,
+            "f1": 0.0044,
+            "recall": 0.0022,
+            "precision": 0.7778,
+            "predicted_positive": 9,
+            "confusion_matrix": [
+              [
+                104798,
+                2
+              ],
+              [
+                3145,
+                7
+              ]
+            ],
+            "selection_rule": "max_f1_with_precision_at_least_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.9731,
+            "f1": 0.0025,
+            "recall": 0.0013,
+            "precision": 1.0,
+            "predicted_positive": 4,
+            "confusion_matrix": [
+              [
+                104800,
+                0
+              ],
+              [
+                3148,
+                4
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.90"
+          }
+        },
+        "selection_score": 0.19213
+      },
+      {
+        "config": {
+          "name": "regularized_precision",
+          "n_estimators": 360,
+          "max_depth": 3,
+          "learning_rate": 0.04,
+          "min_child_weight": 8,
+          "subsample": 0.9,
+          "colsample_bytree": 0.9,
+          "reg_lambda": 3.0,
+          "gamma": 0.5,
+          "scale_pos_weight_multiplier": 0.75
+        },
+        "validation_metrics": {
+          "auc_roc": 0.7843,
+          "average_precision": 0.146,
+          "f1_at_0_5": 0.1449,
+          "recall_at_0_5": 0.5717,
+          "precision_at_0_5": 0.083,
+          "supportive": {
+            "threshold": 0.9677,
+            "f1": 0.0019,
+            "recall": 0.001,
+            "precision": 1.0,
+            "predicted_positive": 3,
+            "confusion_matrix": [
+              [
+                104800,
+                0
+              ],
+              [
+                3149,
+                3
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.9677,
+            "f1": 0.0019,
+            "recall": 0.001,
+            "precision": 1.0,
+            "predicted_positive": 3,
+            "confusion_matrix": [
+              [
+                104800,
+                0
+              ],
+              [
+                3149,
+                3
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.90"
+          }
+        },
+        "selection_score": 0.18607
+      },
+      {
+        "config": {
+          "name": "recall_balanced",
+          "n_estimators": 320,
+          "max_depth": 4,
+          "learning_rate": 0.04,
+          "min_child_weight": 3,
+          "subsample": 0.9,
+          "colsample_bytree": 0.8,
+          "reg_lambda": 1.5,
+          "gamma": 0.0,
+          "scale_pos_weight_multiplier": 1.2
+        },
+        "validation_metrics": {
+          "auc_roc": 0.7864,
+          "average_precision": 0.151,
+          "f1_at_0_5": 0.1155,
+          "recall_at_0_5": 0.7449,
+          "precision_at_0_5": 0.0626,
+          "supportive": {
+            "threshold": 0.9759,
+            "f1": 0.0019,
+            "recall": 0.001,
+            "precision": 1.0,
+            "predicted_positive": 3,
+            "confusion_matrix": [
+              [
+                104800,
+                0
+              ],
+              [
+                3149,
+                3
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.9759,
+            "f1": 0.0019,
+            "recall": 0.001,
+            "precision": 1.0,
+            "predicted_positive": 3,
+            "confusion_matrix": [
+              [
+                104800,
+                0
+              ],
+              [
+                3149,
+                3
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.90"
+          }
+        },
+        "selection_score": 0.191175
+      },
+      {
+        "config": {
+          "name": "deeper_regularized",
+          "n_estimators": 300,
+          "max_depth": 5,
+          "learning_rate": 0.035,
+          "min_child_weight": 6,
+          "subsample": 0.85,
+          "colsample_bytree": 0.85,
+          "reg_lambda": 2.5,
+          "gamma": 0.2,
+          "scale_pos_weight_multiplier": 0.9
+        },
+        "validation_metrics": {
+          "auc_roc": 0.7865,
+          "average_precision": 0.1522,
+          "f1_at_0_5": 0.1366,
+          "recall_at_0_5": 0.6313,
+          "precision_at_0_5": 0.0766,
+          "supportive": {
+            "threshold": 0.9725,
+            "f1": 0.0,
+            "recall": 0.0,
+            "precision": 0.0,
+            "predicted_positive": 0,
+            "confusion_matrix": [
+              [
+                104800,
+                0
+              ],
+              [
+                3152,
+                0
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.9725,
+            "f1": 0.0,
+            "recall": 0.0,
+            "precision": 0.0,
+            "predicted_positive": 0,
+            "confusion_matrix": [
+              [
+                104800,
+                0
+              ],
+              [
+                3152,
+                0
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.90"
+          }
+        },
+        "selection_score": 0.191525
+      }
+    ]
+  },
+  "group_inflammatory_heart_disease": {
+    "label": "ანთებითი გულის დაავადებები",
+    "selected_config": {
+      "name": "deeper_regularized",
+      "n_estimators": 300,
+      "max_depth": 5,
+      "learning_rate": 0.035,
+      "min_child_weight": 6,
+      "subsample": 0.85,
+      "colsample_bytree": 0.85,
+      "reg_lambda": 2.5,
+      "gamma": 0.2,
+      "scale_pos_weight_multiplier": 0.9
+    },
+    "selected_validation_metrics": {
+      "auc_roc": 0.7848,
+      "average_precision": 0.0763,
+      "f1_at_0_5": 0.0672,
+      "recall_at_0_5": 0.6162,
+      "precision_at_0_5": 0.0356,
+      "supportive": {
+        "threshold": 0.9486,
+        "f1": 0.0047,
+        "recall": 0.0024,
+        "precision": 0.75,
+        "predicted_positive": 4,
+        "confusion_matrix": [
+          [
+            106677,
+            1
+          ],
+          [
+            1271,
+            3
+          ]
+        ],
+        "selection_rule": "fallback_max_precision_below_0.80"
+      },
+      "high_precision": {
+        "threshold": 0.9486,
+        "f1": 0.0047,
+        "recall": 0.0024,
+        "precision": 0.75,
+        "predicted_positive": 4,
+        "confusion_matrix": [
+          [
+            106677,
+            1
+          ],
+          [
+            1271,
+            3
+          ]
+        ],
+        "selection_rule": "fallback_max_precision_below_0.90"
+      }
+    },
+    "selection_score": 0.117655,
+    "candidates": [
+      {
+        "config": {
+          "name": "baseline_balanced",
+          "n_estimators": 260,
+          "max_depth": 4,
+          "learning_rate": 0.05,
+          "min_child_weight": 1,
+          "subsample": 0.85,
+          "colsample_bytree": 0.85,
+          "reg_lambda": 1.0,
+          "gamma": 0.0,
+          "scale_pos_weight_multiplier": 1.0
+        },
+        "validation_metrics": {
+          "auc_roc": 0.7845,
+          "average_precision": 0.0707,
+          "f1_at_0_5": 0.0593,
+          "recall_at_0_5": 0.6805,
+          "precision_at_0_5": 0.031,
+          "supportive": {
+            "threshold": 0.9636,
+            "f1": 0.0016,
+            "recall": 0.0008,
+            "precision": 1.0,
+            "predicted_positive": 1,
+            "confusion_matrix": [
+              [
+                106678,
+                0
+              ],
+              [
+                1273,
+                1
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.9636,
+            "f1": 0.0016,
+            "recall": 0.0008,
+            "precision": 1.0,
+            "predicted_positive": 1,
+            "confusion_matrix": [
+              [
+                106678,
+                0
+              ],
+              [
+                1273,
+                1
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.90"
+          }
+        },
+        "selection_score": 0.110645
+      },
+      {
+        "config": {
+          "name": "regularized_precision",
+          "n_estimators": 360,
+          "max_depth": 3,
+          "learning_rate": 0.04,
+          "min_child_weight": 8,
+          "subsample": 0.9,
+          "colsample_bytree": 0.9,
+          "reg_lambda": 3.0,
+          "gamma": 0.5,
+          "scale_pos_weight_multiplier": 0.75
+        },
+        "validation_metrics": {
+          "auc_roc": 0.7873,
+          "average_precision": 0.0687,
+          "f1_at_0_5": 0.0704,
+          "recall_at_0_5": 0.5887,
+          "precision_at_0_5": 0.0375,
+          "supportive": {
+            "threshold": 0.946,
+            "f1": 0.0016,
+            "recall": 0.0008,
+            "precision": 1.0,
+            "predicted_positive": 1,
+            "confusion_matrix": [
+              [
+                106678,
+                0
+              ],
+              [
+                1273,
+                1
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.946,
+            "f1": 0.0016,
+            "recall": 0.0008,
+            "precision": 1.0,
+            "predicted_positive": 1,
+            "confusion_matrix": [
+              [
+                106678,
+                0
+              ],
+              [
+                1273,
+                1
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.90"
+          }
+        },
+        "selection_score": 0.108785
+      },
+      {
+        "config": {
+          "name": "recall_balanced",
+          "n_estimators": 320,
+          "max_depth": 4,
+          "learning_rate": 0.04,
+          "min_child_weight": 3,
+          "subsample": 0.9,
+          "colsample_bytree": 0.8,
+          "reg_lambda": 1.5,
+          "gamma": 0.0,
+          "scale_pos_weight_multiplier": 1.2
+        },
+        "validation_metrics": {
+          "auc_roc": 0.7846,
+          "average_precision": 0.0705,
+          "f1_at_0_5": 0.0514,
+          "recall_at_0_5": 0.7473,
+          "precision_at_0_5": 0.0266,
+          "supportive": {
+            "threshold": 0.9585,
+            "f1": 0.0047,
+            "recall": 0.0024,
+            "precision": 0.75,
+            "predicted_positive": 4,
+            "confusion_matrix": [
+              [
+                106677,
+                1
+              ],
+              [
+                1271,
+                3
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.9585,
+            "f1": 0.0047,
+            "recall": 0.0024,
+            "precision": 0.75,
+            "predicted_positive": 4,
+            "confusion_matrix": [
+              [
+                106677,
+                1
+              ],
+              [
+                1271,
+                3
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.90"
+          }
+        },
+        "selection_score": 0.111845
+      },
+      {
+        "config": {
+          "name": "deeper_regularized",
+          "n_estimators": 300,
+          "max_depth": 5,
+          "learning_rate": 0.035,
+          "min_child_weight": 6,
+          "subsample": 0.85,
+          "colsample_bytree": 0.85,
+          "reg_lambda": 2.5,
+          "gamma": 0.2,
+          "scale_pos_weight_multiplier": 0.9
+        },
+        "validation_metrics": {
+          "auc_roc": 0.7848,
+          "average_precision": 0.0763,
+          "f1_at_0_5": 0.0672,
+          "recall_at_0_5": 0.6162,
+          "precision_at_0_5": 0.0356,
+          "supportive": {
+            "threshold": 0.9486,
+            "f1": 0.0047,
+            "recall": 0.0024,
+            "precision": 0.75,
+            "predicted_positive": 4,
+            "confusion_matrix": [
+              [
+                106677,
+                1
+              ],
+              [
+                1271,
+                3
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.80"
+          },
+          "high_precision": {
+            "threshold": 0.9486,
+            "f1": 0.0047,
+            "recall": 0.0024,
+            "precision": 0.75,
+            "predicted_positive": 4,
+            "confusion_matrix": [
+              [
+                106677,
+                1
+              ],
+              [
+                1271,
+                3
+              ]
+            ],
+            "selection_rule": "fallback_max_precision_below_0.90"
+          }
+        },
+        "selection_score": 0.117655
+      }
+    ]
+  }
+}

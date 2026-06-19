@@ -25,6 +25,7 @@ TARGETS = {
     target: config["label_ge"]
     for target, config in EXPANDED_DIAGNOSIS_TARGETS.items()
 }
+MIN_SUBTYPE_PRECISION = 0.30
 
 
 def metrics_at(y_true: pd.Series, probabilities: np.ndarray, threshold: float) -> dict[str, Any]:
@@ -34,17 +35,32 @@ def metrics_at(y_true: pd.Series, probabilities: np.ndarray, threshold: float) -
         "f1": round(float(f1_score(y_true, predictions, zero_division=0)), 4),
         "recall": round(float(recall_score(y_true, predictions, zero_division=0)), 4),
         "precision": round(float(precision_score(y_true, predictions, zero_division=0)), 4),
+        "predicted_positive": int(predictions.sum()),
         "confusion_matrix": confusion_matrix(y_true, predictions).tolist(),
     }
 
 
 def best_threshold(y_true: pd.Series, probabilities: np.ndarray) -> dict[str, Any]:
-    candidates = np.unique(np.quantile(probabilities, np.linspace(0.02, 0.98, 193)))
-    candidates = np.unique(np.concatenate([candidates, np.linspace(0.05, 0.95, 181)]))
+    candidates = np.unique(np.quantile(probabilities, np.linspace(0.02, 0.995, 220)))
+    candidates = np.unique(np.concatenate([candidates, np.linspace(0.05, 0.995, 190)]))
+    evaluated = [metrics_at(y_true, probabilities, threshold) for threshold in candidates]
+    precision_eligible = [
+        item
+        for item in evaluated
+        if item["precision"] >= MIN_SUBTYPE_PRECISION and item["predicted_positive"] >= 10
+    ]
+    if precision_eligible:
+        best = max(
+            precision_eligible,
+            key=lambda item: (item["f1"], item["recall"], item["precision"]),
+        )
+        best["selection_rule"] = f"max_f1_with_precision_at_least_{MIN_SUBTYPE_PRECISION:.2f}"
+        return best
     best = max(
-        (metrics_at(y_true, probabilities, threshold) for threshold in candidates),
-        key=lambda item: (item["f1"], item["recall"], item["precision"]),
+        evaluated,
+        key=lambda item: (item["precision"], item["f1"], item["recall"]),
     )
+    best["selection_rule"] = f"fallback_max_precision_below_{MIN_SUBTYPE_PRECISION:.2f}"
     return best
 
 
@@ -71,10 +87,14 @@ def main() -> None:
     lines = [
         "# Diagnosis Thresholds",
         "",
-        "Thresholds were selected on the validation split by maximizing F1. Test metrics are reported using the selected validation threshold.",
+        (
+            "Thresholds were selected on the validation split using a precision-oriented rule: "
+            f"maximize F1 among thresholds with validation precision >= {MIN_SUBTYPE_PRECISION:.2f}. "
+            "If a subtype cannot reach that precision with enough positive predictions, the fallback is maximum precision."
+        ),
         "",
-        "| Target | Label | Threshold | Validation F1 | Validation Recall | Validation Precision | Test F1 | Test Recall | Test Precision |",
-        "|---|---|---:|---:|---:|---:|---:|---:|---:|",
+        "| Target | Label | Threshold | Rule | Validation F1 | Validation Recall | Validation Precision | Test F1 | Test Recall | Test Precision |",
+        "|---|---|---:|---|---:|---:|---:|---:|---:|---:|",
     ]
 
     for target, label in TARGETS.items():
@@ -87,6 +107,8 @@ def main() -> None:
         thresholds[target] = {
             "label": label,
             "threshold": validation_metrics["threshold"],
+            "selection_rule": validation_metrics.get("selection_rule"),
+            "min_precision_target": MIN_SUBTYPE_PRECISION,
             "validation": validation_metrics,
             "test": test_metrics,
             "confidence_rule": {
@@ -97,7 +119,7 @@ def main() -> None:
             },
         }
         lines.append(
-            f"| `{target}` | {label} | {validation_metrics['threshold']} | "
+            f"| `{target}` | {label} | {validation_metrics['threshold']} | {validation_metrics.get('selection_rule', '')} | "
             f"{validation_metrics['f1']} | {validation_metrics['recall']} | {validation_metrics['precision']} | "
             f"{test_metrics['f1']} | {test_metrics['recall']} | {test_metrics['precision']} |"
         )

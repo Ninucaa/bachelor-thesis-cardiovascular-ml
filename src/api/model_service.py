@@ -8,7 +8,7 @@ from typing import Any
 import joblib
 import pandas as pd
 
-from src.diagnosis_targets import EXPANDED_CLINICAL_CHECKS, EXPANDED_DIAGNOSIS_TARGETS
+from src.diagnosis_targets import CLINICAL_GROUP_CHECKS, CLINICAL_GROUP_TARGETS
 
 
 PROJECT_DIR = Path(__file__).resolve().parents[2]
@@ -17,7 +17,7 @@ MODEL_DIR = PROJECT_DIR / "models" / "time_aware"
 MODEL_PATH = MODEL_DIR / "target_cvd.pkl"
 FEATURES_PATH = MODEL_DIR / "feature_columns.json"
 SUBTYPE_MODEL_DIR = MODEL_DIR
-DIAGNOSIS_THRESHOLDS_PATH = MODEL_DIR / "diagnosis_thresholds.json"
+DIAGNOSIS_THRESHOLDS_PATH = MODEL_DIR / "clinical_group_thresholds.json"
 TARGET_NAME = "target_cvd"
 DISPLAY_TARGET_NAME = "გულ-სისხლძარღვთა სავარაუდო დიაგნოსტიკური მიმართულება"
 TARGET_DESCRIPTION = (
@@ -27,7 +27,7 @@ TARGET_DESCRIPTION = (
     "მიმართულება და საჭიროებს ექიმის დადასტურებას."
 )
 METHOD_NOTE = (
-    "პროგნოზისთვის გამოყენებულია XGBoost, ხოლო ახსნისთვის SHAP. თითოეული subtype "
+    "პროგნოზისთვის გამოყენებულია XGBoost, ხოლო ახსნისთვის SHAP. თითოეული კლინიკური ჯგუფის "
     "მოდელი გაწვრთნილია MIMIC-IV-ში დაფიქსირებულ რეალურ ICD დიაგნოზებზე. სისტემა "
     "სწავლობს სტატისტიკურ კავშირებს და არ ცვლის ექიმის საბოლოო დიაგნოზს."
 )
@@ -37,12 +37,57 @@ SUBTYPE_NOTE = (
     "split-ზე დათვლილ threshold-ს აჭარბებს."
 )
 
-SUBTYPE_LABELS = {
-    target: config["label_ge"]
-    for target, config in EXPANDED_DIAGNOSIS_TARGETS.items()
+DEMO_TEST_PATIENTS = {
+    "demo-1": {
+        "hadm_id": 20725896,
+        "label": "სატესტო პაციენტი 1 - გულის უკმარისობა",
+        "source": "MIMIC-IV test split admission; ICD ჯგუფი: გულის უკმარისობა",
+        "symptom_text": "რეალური test split ჩანაწერი. პაციენტი training-ში არ ყოფილა გამოყენებული.",
+    },
+    "demo-2": {
+        "hadm_id": 25713350,
+        "label": "სატესტო პაციენტი 2 - იშემიური გულის დაავადება",
+        "source": "MIMIC-IV test split admission; ICD ჯგუფი: იშემიური გულის დაავადებები",
+        "symptom_text": "რეალური test split ჩანაწერი. პაციენტი training-ში არ ყოფილა გამოყენებული.",
+    },
+    "demo-3": {
+        "hadm_id": 29880045,
+        "label": "სატესტო პაციენტი 3 - არითმია / გამტარობის დარღვევა",
+        "source": "MIMIC-IV test split admission; ICD ჯგუფი: არითმია და გამტარობის დარღვევები",
+        "symptom_text": "რეალური test split ჩანაწერი. პაციენტი training-ში არ ყოფილა გამოყენებული.",
+    },
+    "demo-4": {
+        "hadm_id": 26441980,
+        "label": "სატესტო პაციენტი 4 - დაბალი რისკის კონტროლი",
+        "source": "MIMIC-IV test split admission; CVD target არ ფიქსირდება",
+        "symptom_text": "რეალური test split ჩანაწერი. პაციენტი training-ში არ ყოფილა გამოყენებული.",
+    },
+    "demo-5": {
+        "hadm_id": 27561701,
+        "label": "სატესტო პაციენტი 5 - ჰიპერტენზიული დაავადება",
+        "source": "MIMIC-IV test split admission; ICD ჯგუფი: ჰიპერტენზიული დაავადებები",
+        "symptom_text": "რეალური test split ჩანაწერი. პაციენტი training-ში არ ყოფილა გამოყენებული.",
+    },
+    "demo-6": {
+        "hadm_id": 24602686,
+        "label": "სატესტო პაციენტი 6 - ცერებროვასკულური დაავადება",
+        "source": "MIMIC-IV test split admission; ICD ჯგუფი: ცერებროვასკულური დაავადებები",
+        "symptom_text": "რეალური test split ჩანაწერი. პაციენტი training-ში არ ყოფილა გამოყენებული.",
+    },
+    "demo-7": {
+        "hadm_id": 21785529,
+        "label": "სატესტო პაციენტი 7 - ვალვულარული გულის დაავადება",
+        "source": "MIMIC-IV test split admission; ICD ჯგუფი: ვალვულარული გულის დაავადებები",
+        "symptom_text": "რეალური test split ჩანაწერი. პაციენტი training-ში არ ყოფილა გამოყენებული.",
+    },
 }
 
-CLINICAL_CHECKS = EXPANDED_CLINICAL_CHECKS
+SUBTYPE_LABELS = {
+    target: config["label_ge"]
+    for target, config in CLINICAL_GROUP_TARGETS.items()
+}
+
+CLINICAL_CHECKS = CLINICAL_GROUP_CHECKS
 
 FEATURE_GROUPS = {
     "age": "დემოგრაფიული მონაცემები",
@@ -106,7 +151,7 @@ FEATURE_LABELS = {
     "lab_hemoglobin_mean_count": "ჰემოგლობინის ჩანაწერების რაოდენობა",
     "lab_platelets_mean_count": "თრომბოციტების ჩანაწერების რაოდენობა",
     "ed_arrived_by_ambulance": "სასწრაფო დახმარებით მიყვანა",
-    "ed_triage_temperature_f_mean": "triage ტემპერატურა",
+    "ed_triage_temperature_c_mean": "triage ტემპერატურა",
     "ed_triage_resp_rate_mean": "triage სუნთქვის სიხშირე",
     "ed_triage_heart_rate_mean": "triage გულისცემა",
     "ed_triage_sbp_mean": "triage სისტოლური წნევა",
@@ -253,8 +298,8 @@ def diagnosis_status(confidence: str) -> str:
     if confidence == "diagnostic_signal":
         return "სავარაუდო დიაგნოზის ჯგუფი"
     if confidence == "borderline":
-        return "სუსტი/საზღვრული დამხმარე სიგნალი"
-    return "დაბალი დიაგნოსტიკური მხარდაჭერა"
+        return "დამატებით გადასამოწმებელი სიგნალი"
+    return "დაბალი ალბათობის მიმართულება"
 
 
 def is_available(row: dict[str, float], feature: str) -> bool:
@@ -316,28 +361,29 @@ def clinical_support_for_target(target: str, row: dict[str, float]) -> dict[str,
 
     signals: list[tuple[int, str]] = []
 
-    if target in {"target_myocardial_infarction", "target_acute_ischemic_heart_disease"}:
+    if target in {"target_myocardial_infarction", "target_acute_ischemic_heart_disease", "group_ischemic_heart_disease"}:
         add_signal(signals, troponin > 0.01, 35, f"Troponin T მომატებულია ({format_numeric_value('lab_troponin_t_mean', troponin, 'ng/mL')})")
         add_signal(signals, chest_pain, 25, "მითითებულია გულმკერდის ტკივილი")
         add_signal(signals, pain >= 5, 10, f"ტკივილის შეფასება მაღალია ({round(pain, 1)} / 10)")
         add_signal(signals, dyspnea, 10, "თან ახლავს ქოშინი")
         add_signal(signals, diabetes or tobacco or lipid_signal, 10, "არსებობს კორონარული რისკ-ფაქტორები")
-    elif target == "target_heart_failure":
+    elif target in {"target_heart_failure", "group_heart_failure"}:
         add_signal(signals, ntprobnp > 450, 35, f"NT-proBNP მომატებულია ({format_numeric_value('lab_ntprobnp_mean', ntprobnp, 'pg/mL')})")
         add_signal(signals, dyspnea, 25, "მითითებულია ქოშინი")
         add_signal(signals, edema, 20, "მითითებულია შეშუპება")
         add_signal(signals, spo2 < 95, 10, f"SpO2 დაბალია ({round(spo2)}%)")
         add_signal(signals, resp_rate > 20, 10, f"სუნთქვის სიხშირე მომატებულია ({round(resp_rate)} / min)")
-    elif target in {"target_atrial_fibrillation_flutter", "target_paroxysmal_tachycardia", "target_other_arrhythmia"}:
+    elif target in {"target_atrial_fibrillation_flutter", "target_paroxysmal_tachycardia", "target_other_arrhythmia", "group_arrhythmia_conduction"}:
         add_signal(signals, palpitations, 25, "მითითებულია გულის ფრიალი")
         add_signal(signals, heart_rate >= 110, 25, f"გულისცემა მაღალია ({round(heart_rate)} bpm)")
+        add_signal(signals, heart_rate and heart_rate <= 55, 20, f"გულისცემა დაბალია ({round(heart_rate)} bpm)")
         add_signal(signals, syncope or dizziness, 20, "არის სინკოპე ან თავბრუსხვევა")
         add_signal(signals, dyspnea, 10, "თან ახლავს ქოშინი")
     elif target == "target_av_conduction_block":
         add_signal(signals, syncope or dizziness, 30, "არის სინკოპე ან თავბრუსხვევა")
         add_signal(signals, heart_rate and heart_rate <= 55, 25, f"გულისცემა დაბალია ({round(heart_rate)} bpm)")
         add_signal(signals, palpitations, 10, "მითითებულია გულის ფრიალი")
-    elif target == "target_cardiac_arrest":
+    elif target in {"target_cardiac_arrest", "group_critical_cardiac_event"}:
         add_signal(signals, acuity <= 2, 25, f"triage სიმძიმე მაღალია ({round(acuity)} / 5)")
         add_signal(signals, ambulance, 20, "პაციენტი სასწრაფოთი არის მოყვანილი")
         add_signal(signals, spo2 < 90, 20, f"SpO2 მკვეთრად დაბალია ({round(spo2)}%)")
@@ -349,6 +395,7 @@ def clinical_support_for_target(target: str, row: dict[str, float]) -> dict[str,
         "target_hypertensive_kidney_disease",
         "target_hypertensive_heart_kidney_disease",
         "target_hypertensive_crisis",
+        "group_hypertensive_disease",
     }:
         severe_pressure = sbp >= 180 or dbp >= 120
         high_pressure = sbp >= 140 or dbp >= 90
@@ -368,11 +415,39 @@ def clinical_support_for_target(target: str, row: dict[str, float]) -> dict[str,
         "target_intracerebral_hemorrhage",
         "target_ischemic_stroke",
         "target_other_cerebrovascular_disease",
+        "group_cerebrovascular_disease",
     }:
         add_signal(signals, dizziness or syncope, 25, "არის ნევროლოგიურად საყურადღებო თავბრუსხვევა/სინკოპე")
         add_signal(signals, sbp >= 160 or dbp >= 100, 20, f"წნევა მაღალია ({round(sbp)}/{round(dbp)} mmHg)")
         add_signal(signals, palpitations, 15, "არის არითმიის შესაძლო სიმპტომი")
         add_signal(signals, diabetes or kidney_history, 10, "არსებობს სისხლძარღვოვანი რისკ-ფაქტორები")
+    elif target == "group_venous_thromboembolism":
+        add_signal(signals, dyspnea, 25, "მითითებულია ქოშინი")
+        add_signal(signals, chest_pain, 20, "მითითებულია გულმკერდის ტკივილი")
+        add_signal(signals, heart_rate >= 110, 20, f"გულისცემა მაღალია ({round(heart_rate)} bpm)")
+        add_signal(signals, resp_rate > 20, 15, f"სუნთქვის სიხშირე მომატებულია ({round(resp_rate)} / min)")
+        add_signal(signals, spo2 < 95, 15, f"SpO2 დაბალია ({round(spo2)}%)")
+    elif target == "group_peripheral_vascular_disease":
+        add_signal(signals, diabetes, 20, "არსებობს დიაბეტის ისტორია")
+        add_signal(signals, tobacco, 20, "არსებობს თამბაქოს/ნიკოტინის ისტორია")
+        add_signal(signals, sbp >= 140 or dbp >= 90, 15, f"წნევა მომატებულია ({round(sbp)}/{round(dbp)} mmHg)")
+        add_signal(signals, creatinine > 1.3 or kidney_history, 15, "არის თირკმლის/სისხლძარღვოვანი რისკის სიგნალი")
+        add_signal(signals, lipid_signal, 15, "ლიპიდური პროფილი სისხლძარღვოვანი რისკის სასარგებლოდ არის")
+    elif target == "group_valvular_heart_disease":
+        add_signal(signals, dyspnea, 25, "მითითებულია ქოშინი")
+        add_signal(signals, edema, 20, "მითითებულია შეშუპება")
+        add_signal(signals, ntprobnp > 450, 20, f"NT-proBNP მომატებულია ({format_numeric_value('lab_ntprobnp_mean', ntprobnp, 'pg/mL')})")
+        add_signal(signals, resp_rate > 20 or spo2 < 95, 15, "არის სუნთქვის/ოქსიგენაციის საყურადღებო მაჩვენებელი")
+    elif target == "group_cardiomyopathy":
+        add_signal(signals, ntprobnp > 450, 30, f"NT-proBNP მომატებულია ({format_numeric_value('lab_ntprobnp_mean', ntprobnp, 'pg/mL')})")
+        add_signal(signals, dyspnea, 25, "მითითებულია ქოშინი")
+        add_signal(signals, edema, 20, "მითითებულია შეშუპება")
+        add_signal(signals, palpitations or syncope, 15, "არის არითმიის ან სინკოპეს შესაძლო სიმპტომი")
+    elif target == "group_inflammatory_heart_disease":
+        add_signal(signals, troponin > 0.01, 25, "Troponin T მომატებულია")
+        add_signal(signals, chest_pain, 20, "მითითებულია გულმკერდის ტკივილი")
+        add_signal(signals, dyspnea, 15, "თან ახლავს ქოშინი")
+        add_signal(signals, heart_rate >= 110, 15, f"გულისცემა მაღალია ({round(heart_rate)} bpm)")
 
     if not signals:
         add_signal(signals, True, 10, "სპეციფიკური კლინიკური დამადასტურებელი ნიშანი მკვეთრად არ ჩანს")
@@ -402,18 +477,58 @@ def subtype_precision(thresholds: dict[str, Any], target: str) -> float | None:
 
 def reliability_note(precision: float | None) -> str:
     if precision is None:
-        return "ამ subtype-ის test precision ხელმისაწვდომი არ არის; პასუხი აუცილებლად გადაამოწმეთ კლინიკურად."
-    if precision >= 0.5:
+        return "ამ კლინიკური ჯგუფის test precision ხელმისაწვდომი არ არის; პასუხი აუცილებლად გადაამოწმეთ კლინიკურად."
+    if precision >= 0.79:
         level = "შედარებით მაღალი"
-    elif precision >= 0.3:
-        level = "საშუალო"
     else:
-        level = "დაბალი"
-    return f"ამ subtype-ზე test precision არის {precision:.2f} ({level}); დადებითი პასუხი გამოიყენეთ როგორც გადასამოწმებელი სიგნალი."
+        level = "არასაკმარისი"
+    return f"ამ კლინიკურ ჯგუფზე test precision არის {precision:.2f} ({level}); დადებითი პასუხი გამოიყენეთ როგორც გადასამოწმებელი სიგნალი."
 
 
-def verification_priority(confidence: str, support_level: str, precision: float | None) -> str:
-    if confidence in {"high", "diagnostic_signal"} and support_level == "strong" and (precision is None or precision >= 0.3):
+def subtype_recall(thresholds: dict[str, Any], target: str) -> float | None:
+    value = thresholds.get(target, {}).get("test", {}).get("recall")
+    if value is None:
+        return None
+    return float(value)
+
+
+def high_precision_threshold(thresholds: dict[str, Any], target: str) -> float | None:
+    value = thresholds.get(target, {}).get("high_precision", {}).get("threshold")
+    if value is None:
+        return None
+    return float(value)
+
+
+def high_precision_test_precision(thresholds: dict[str, Any], target: str) -> float | None:
+    value = thresholds.get(target, {}).get("high_precision", {}).get("test", {}).get("precision")
+    if value is None:
+        return None
+    return float(value)
+
+
+def high_precision_test_recall(thresholds: dict[str, Any], target: str) -> float | None:
+    value = thresholds.get(target, {}).get("high_precision", {}).get("test", {}).get("recall")
+    if value is None:
+        return None
+    return float(value)
+
+
+def reliability_level(precision: float | None, recall: float | None = None) -> str:
+    if precision is None:
+        return "unknown"
+    if recall is not None and recall < 0.04:
+        return "low"
+    if precision >= 0.79:
+        return "higher"
+    return "low"
+
+
+def verification_priority(confidence: str, support_level: str, precision: float | None, recall: float | None = None) -> str:
+    if recall is not None and recall < 0.04:
+        return "დაბალი სანდოობის კლინიკური ჯგუფის სიგნალი"
+    if precision is not None and precision < 0.79:
+        return "დაბალი სანდოობის კლინიკური ჯგუფის სიგნალი"
+    if confidence in {"high", "diagnostic_signal"} and support_level == "strong" and (precision is None or precision >= 0.79):
         return "კლინიკურად გამყარებული სავარაუდო მიმართულება"
     if confidence in {"high", "diagnostic_signal"} and support_level in {"strong", "partial"}:
         return "სასწრაფოდ გადასამოწმებელი სიგნალი"
@@ -424,8 +539,12 @@ def verification_priority(confidence: str, support_level: str, precision: float 
     return "დაბალი პრიორიტეტი"
 
 
-def calibrated_diagnosis_status(confidence: str, support_level: str, precision: float | None) -> str:
-    if confidence in {"high", "diagnostic_signal"} and support_level == "strong" and (precision is None or precision >= 0.3):
+def calibrated_diagnosis_status(confidence: str, support_level: str, precision: float | None, recall: float | None = None) -> str:
+    if recall is not None and recall < 0.04:
+        return "დაბალი სანდოობის კლინიკური ჯგუფის სიგნალი"
+    if precision is not None and precision < 0.79:
+        return "დაბალი სანდოობის კლინიკური ჯგუფის სიგნალი"
+    if confidence in {"high", "diagnostic_signal"} and support_level == "strong" and (precision is None or precision >= 0.79):
         return "კლინიკურად გამყარებული სავარაუდო დიაგნოზის ჯგუფი"
     if confidence in {"high", "diagnostic_signal"} and support_level in {"strong", "partial"}:
         return "სავარაუდო დიაგნოზის ჯგუფი - საჭიროებს დადასტურებას"
@@ -453,7 +572,7 @@ def diagnosis_interpretation(
             f" კლინიკური დამხმარე ქულა არის {support['score']}% "
             f"({', '.join(support['reasons'][:2])})."
         )
-    precision_text = f" subtype-ის test precision არის {precision:.2f}." if precision is not None else ""
+    precision_text = f" კლინიკური ჯგუფის test precision არის {precision:.2f}." if precision is not None else ""
 
     if confidence in {"high", "diagnostic_signal"}:
         return (
@@ -463,12 +582,12 @@ def diagnosis_interpretation(
     if confidence == "borderline":
         return (
             f"{display_name}: სიგნალი ახლოსაა threshold-თან, მაგრამ საკმარისად არ აჭარბებს მას "
-            f"({probability_text} / ზღვარი {threshold_text}). ეს არის სუსტი/საზღვრული დამხმარე სიგნალი. "
+            f"({probability_text} / ზღვარი {threshold_text}). ეს არის დამატებით გადასამოწმებელი სიგნალი. "
             f"დამხმარე ნიშნებია: {increasing_text}.{support_text}"
         )
     return (
         f"{display_name}: სიგნალი threshold-ზე დაბალია ({probability_text} / ზღვარი {threshold_text}); "
-        "ამ მონაცემებით ამ დიაგნოზის მხარდაჭერა სუსტია."
+        "ამ მონაცემებით ეს მიმართულება დაბალი ალბათობისაა."
     )
 
 
@@ -715,10 +834,38 @@ class ModelService:
         return source_row, features
 
     @cached_property
+    def demo_test_rows(self) -> dict[int, pd.Series]:
+        demo_ids = {demo["hadm_id"] for demo in DEMO_TEST_PATIENTS.values()}
+        usecols = ["subject_id", "hadm_id", "split_hint", TARGET_NAME, *self.feature_columns]
+        df = pd.read_csv(DATA_PATH, usecols=usecols)
+        df = df[df["hadm_id"].isin(demo_ids)]
+        return {int(row["hadm_id"]): row for _, row in df.iterrows()}
+
+    @cached_property
     def sample_patient(self) -> dict[str, Any]:
         return self.sample_patient_by_id("demo-1")
 
     def sample_patient_by_id(self, sample_id: str = "demo-1") -> dict[str, Any]:
+        demo = DEMO_TEST_PATIENTS.get(sample_id, DEMO_TEST_PATIENTS["demo-1"])
+        resolved_sample_id = sample_id if sample_id in DEMO_TEST_PATIENTS else "demo-1"
+        source_row = self.demo_test_rows[int(demo["hadm_id"])]
+        features = {
+            column: float(source_row[column])
+            for column in self.feature_columns
+        }
+        return {
+            "source": demo["source"],
+            "sample_id": resolved_sample_id,
+            "sample_label": demo["label"],
+            "row_index": -1,
+            "original_csv_index": int(source_row.name) if source_row.name is not None else -1,
+            "actual_target": int(source_row[TARGET_NAME]),
+            "features": features,
+            "symptom_text": demo["symptom_text"],
+            "ecg_finding": "not_available",
+            "ecg_note": "ECG აღწერა ამ demo ჩანაწერში მოდელის input-ად არ გამოიყენება.",
+        }
+
         source_row, features = self.demo_base_row
         profiles: dict[str, dict[str, Any]] = {
             "demo-1": {
@@ -736,7 +883,7 @@ class ModelService:
                     "omr_bmi_mean": 32.7,
                     "omr_sbp_mean": 164,
                     "omr_dbp_mean": 92,
-                    "ed_triage_temperature_f_mean": 98.8,
+                    "ed_triage_temperature_c_mean": 37.1,
                     "ed_triage_heart_rate_mean": 118,
                     "ed_triage_resp_rate_mean": 28,
                     "ed_triage_spo2_mean": 89,
@@ -753,7 +900,7 @@ class ModelService:
                     "lab_ntprobnp_mean": 9800,
                     "lab_ldl_measured_mean": 160,
                     "lab_platelets_mean": 310,
-                    "lab_troponin_t_mean": 0.14,
+                    "lab_troponin_t_mean": 0.03,
                     "lab_glucose_mean": 186,
                     "lab_chol_total_mean": 238,
                     "lab_ldl_calc_mean": 158,
@@ -771,8 +918,8 @@ class ModelService:
                     "გულმკერდის მოჭერის ტიპის ტკივილი, გულის ფრიალი, თავბრუსხვევა და ქვედა კიდურების შეშუპება. "
                     "გულის წასვლა არ ჰქონია."
                 ),
-                "ecg_finding": "st_depression",
-                "ecg_note": "ლატერალურ განხრებში აღინიშნება ST სეგმენტის დაწევა; აღწერილია არარეგულარული რიტმი და საჭიროა წინაგულთა ფიბრილაციის გამორიცხვა.",
+                "ecg_finding": "other_abnormal",
+                "ecg_note": "აღწერილია მარცხენა პარკუჭის დატვირთვის/ჰიპერტროფიის ნიშნები და არასპეციფიკური ST-T ცვლილებები; მწვავე ST elevation არ ფიქსირდება.",
             },
             "demo-2": {
                 "label": "სატესტო პაციენტი 2",
@@ -789,7 +936,7 @@ class ModelService:
                     "omr_bmi_mean": 27.8,
                     "omr_sbp_mean": 172,
                     "omr_dbp_mean": 98,
-                    "ed_triage_temperature_f_mean": 98.4,
+                    "ed_triage_temperature_c_mean": 36.9,
                     "ed_triage_heart_rate_mean": 106,
                     "ed_triage_resp_rate_mean": 24,
                     "ed_triage_spo2_mean": 94,
@@ -838,7 +985,7 @@ class ModelService:
                     "omr_bmi_mean": 26.0,
                     "omr_sbp_mean": 140,
                     "omr_dbp_mean": 84,
-                    "ed_triage_temperature_f_mean": 98.1,
+                    "ed_triage_temperature_c_mean": 36.7,
                     "ed_triage_heart_rate_mean": 146,
                     "ed_triage_resp_rate_mean": 22,
                     "ed_triage_spo2_mean": 96,
@@ -887,7 +1034,7 @@ class ModelService:
                     "omr_bmi_mean": 22.4,
                     "omr_sbp_mean": 116,
                     "omr_dbp_mean": 74,
-                    "ed_triage_temperature_f_mean": 98.2,
+                    "ed_triage_temperature_c_mean": 36.8,
                     "ed_triage_heart_rate_mean": 72,
                     "ed_triage_resp_rate_mean": 16,
                     "ed_triage_spo2_mean": 99,
@@ -936,7 +1083,7 @@ class ModelService:
                     "omr_bmi_mean": 35.2,
                     "omr_sbp_mean": 178,
                     "omr_dbp_mean": 104,
-                    "ed_triage_temperature_f_mean": 98.6,
+                    "ed_triage_temperature_c_mean": 37.0,
                     "ed_triage_heart_rate_mean": 96,
                     "ed_triage_resp_rate_mean": 21,
                     "ed_triage_spo2_mean": 95,
@@ -953,7 +1100,7 @@ class ModelService:
                     "lab_ntprobnp_mean": 720,
                     "lab_ldl_measured_mean": 145,
                     "lab_platelets_mean": 275,
-                    "lab_troponin_t_mean": 0.02,
+                    "lab_troponin_t_mean": 0.01,
                     "lab_glucose_mean": 162,
                     "lab_chol_total_mean": 224,
                     "lab_ldl_calc_mean": 148,
@@ -968,7 +1115,7 @@ class ModelService:
                 },
                 "symptom_text": "პაციენტს აქვს ხანგრძლივი მაღალი წნევა, ქოშინი კიბეზე ასვლისას, თავბრუსხვევა და მსუბუქი შეშუპება. მკვეთრ გულმკერდის ტკივილს უარყოფს.",
                 "ecg_finding": "other_abnormal",
-                "ecg_note": "სავარაუდოა მარცხენა პარკუჭის დატვირთვის სურათი; მწვავე ST სეგმენტის აწევა აღწერილი არ არის.",
+                "ecg_note": "სავარაუდოა მარცხენა პარკუჭის ჰიპერტროფიის/დატვირთვის სურათი; მწვავე ST სეგმენტის აწევა აღწერილი არ არის.",
             },
             "demo-6": {
                 "label": "სატესტო პაციენტი 6",
@@ -985,7 +1132,7 @@ class ModelService:
                     "omr_bmi_mean": 26.7,
                     "omr_sbp_mean": 196,
                     "omr_dbp_mean": 118,
-                    "ed_triage_temperature_f_mean": 98.7,
+                    "ed_triage_temperature_c_mean": 37.1,
                     "ed_triage_heart_rate_mean": 104,
                     "ed_triage_resp_rate_mean": 23,
                     "ed_triage_spo2_mean": 96,
@@ -1015,7 +1162,7 @@ class ModelService:
                     "symptom_dizziness": True,
                     "symptom_edema": False,
                 },
-                "symptom_text": "პაციენტი სასწრაფოთი მოყვანილია ძალიან მაღალი წნევით, ძლიერი თავის ტკივილით, თავბრუსხვევით, ქოშინით და გულმკერდის დისკომფორტით.",
+                "symptom_text": "პაციენტი სასწრაფოთი მოყვანილია ძალიან მაღალი წნევით, ძლიერი თავის ტკივილით, თავბრუსხვევით, ქოშინით და გულმკერდის დისკომფორტით. ჩივილები დაიწყო დღეს.",
                 "ecg_finding": "st_depression",
                 "ecg_note": "აღინიშნება არასპეციფიკური ST-T ცვლილებები; triage-ზე დაფიქსირდა მძიმე ჰიპერტენზია.",
             },
@@ -1034,7 +1181,7 @@ class ModelService:
                     "omr_bmi_mean": 27.3,
                     "omr_sbp_mean": 154,
                     "omr_dbp_mean": 88,
-                    "ed_triage_temperature_f_mean": 98.2,
+                    "ed_triage_temperature_c_mean": 36.8,
                     "ed_triage_heart_rate_mean": 92,
                     "ed_triage_resp_rate_mean": 20,
                     "ed_triage_spo2_mean": 97,
@@ -1064,7 +1211,7 @@ class ModelService:
                     "symptom_dizziness": False,
                     "symptom_edema": False,
                 },
-                "symptom_text": "პაციენტს აქვს განმეორებითი გულმკერდის ტკივილი დატვირთვაზე, ქოშინი სიარულისას და მაღალი ქოლესტერინის ისტორია.",
+                "symptom_text": "პაციენტს აქვს განმეორებითი გულმკერდის ტკივილი დატვირთვაზე, რომელიც მოსვენებით მსუბუქდება, ქოშინი სიარულისას და მაღალი ქოლესტერინის ისტორია.",
                 "ecg_finding": "st_depression",
                 "ecg_note": "სიმპტომების დროს აღინიშნება ST სეგმენტის დაწევა; გასათვალისწინებელია ქრონიკული იშემიური სურათი.",
             },
@@ -1083,7 +1230,7 @@ class ModelService:
                     "omr_bmi_mean": 28.0,
                     "omr_sbp_mean": 182,
                     "omr_dbp_mean": 96,
-                    "ed_triage_temperature_f_mean": 98.5,
+                    "ed_triage_temperature_c_mean": 36.9,
                     "ed_triage_heart_rate_mean": 88,
                     "ed_triage_resp_rate_mean": 20,
                     "ed_triage_spo2_mean": 95,
@@ -1113,9 +1260,9 @@ class ModelService:
                     "symptom_dizziness": True,
                     "symptom_edema": False,
                 },
-                "symptom_text": "პაციენტი სასწრაფოთი მოყვანილია უეცარი თავბრუსხვევით, სისუსტით და მეტყველების გაძნელებით. გულმკერდის ტკივილს უარყოფს.",
+                "symptom_text": "პაციენტი სასწრაფოთი მოყვანილია უეცარი თავბრუსხვევით, სისუსტით და მეტყველების გაძნელებით. გულმკერდის ტკივილს და ქოშინს უარყოფს.",
                 "ecg_finding": "atrial_fibrillation",
-                "ecg_note": "აღწერილია წინაგულთა ფიბრილაციის სურათი; კლინიკურად გასათვალისწინებელია ცერებროვასკულური მოვლენის რისკი.",
+                "ecg_note": "არარეგულარულად არარეგულარული რიტმი შეესაბამება წინაგულთა ფიბრილაციას; ფონზე მაღალია ემბოლიური ინსულტის რისკის გადამოწმების საჭიროება.",
             },
         }
 
@@ -1225,6 +1372,18 @@ class ModelService:
             confidence = diagnosis_confidence(probability, threshold)
             support = clinical_support_for_target(target, row)
             precision = subtype_precision(self.diagnosis_thresholds, target)
+            recall = subtype_recall(self.diagnosis_thresholds, target)
+            high_threshold = high_precision_threshold(self.diagnosis_thresholds, target)
+            high_precision = high_precision_test_precision(self.diagnosis_thresholds, target)
+            high_recall = high_precision_test_recall(self.diagnosis_thresholds, target)
+            high_signal = (
+                high_threshold is not None
+                and high_precision is not None
+                and high_recall is not None
+                and probability >= high_threshold
+                and high_precision >= 0.70
+                and high_recall >= 0.01
+            )
             factors = self.explain_with(self.subtype_explainers[target], patient, 12)
             reason_factors = [
                 short_factor_label(factor)
@@ -1241,7 +1400,7 @@ class ModelService:
                     "diagnosis_label": display_name,
                     "diagnosis_probability": round(probability, 4),
                     "diagnosis_threshold": round(threshold, 4),
-                    "diagnosis_status": calibrated_diagnosis_status(confidence, support["level"], precision),
+                    "diagnosis_status": calibrated_diagnosis_status(confidence, support["level"], precision, recall),
                     "diagnosis_confidence": confidence,
                     "diagnosis_interpretation": diagnosis_interpretation(
                         display_name, probability, threshold, confidence, clinical_factors, support, precision
@@ -1250,8 +1409,15 @@ class ModelService:
                     "clinical_support_score": support["score"],
                     "clinical_support_level": support["level"],
                     "clinical_support_reasons": support["reasons"],
+                    "subtype_test_precision": round(precision, 4) if precision is not None else None,
+                    "subtype_test_recall": round(recall, 4) if recall is not None else None,
+                    "subtype_reliability_level": reliability_level(precision, recall),
+                    "high_precision_threshold": round(high_threshold, 4) if high_threshold is not None else None,
+                    "high_precision_test_precision": round(high_precision, 4) if high_precision is not None else None,
+                    "high_precision_test_recall": round(high_recall, 4) if high_recall is not None else None,
+                    "high_precision_signal": high_signal,
                     "reliability_note": reliability_note(precision),
-                    "verification_priority": verification_priority(confidence, support["level"], precision),
+                    "verification_priority": verification_priority(confidence, support["level"], precision, recall),
                     "explanation": self.subtype_explanation(display_name, probability, level, clinical_factors),
                     "reason_factors": reason_factors,
                 }
@@ -1262,6 +1428,7 @@ class ModelService:
             "სასწრაფოდ გადასამოწმებელი სიგნალი": 3,
             "მოდელის სიგნალი სუსტი კლინიკური მხარდაჭერით": 2,
             "საზღვრული სიგნალი": 1,
+            "დაბალი სანდოობის კლინიკური ჯგუფის სიგნალი": 0,
             "დაბალი პრიორიტეტი": 0,
         }
         risks.sort(

@@ -1,0 +1,795 @@
+{
+  "group_ischemic_heart_disease": {
+    "label": "იშემიური გულის დაავადებები",
+    "members": [
+      "target_myocardial_infarction",
+      "target_angina_pectoris",
+      "target_acute_ischemic_heart_disease",
+      "target_chronic_ischemic_heart_disease"
+    ],
+    "threshold": 0.8484,
+    "selection_rule": "max_f1_with_precision_at_least_0.80",
+    "min_precision_target": 0.8,
+    "validation": {
+      "threshold": 0.8484,
+      "f1": 0.3312,
+      "recall": 0.2088,
+      "precision": 0.7998,
+      "predicted_positive": 5713,
+      "confusion_matrix": [
+        [
+          84928,
+          1144
+        ],
+        [
+          17311,
+          4569
+        ]
+      ],
+      "selection_rule": "max_f1_with_precision_at_least_0.80"
+    },
+    "test": {
+      "threshold": 0.8484,
+      "f1": 0.3367,
+      "recall": 0.214,
+      "precision": 0.7901,
+      "predicted_positive": 2997,
+      "confusion_matrix": [
+        [
+          43427,
+          629
+        ],
+        [
+          8699,
+          2368
+        ]
+      ]
+    },
+    "supportive": {
+      "threshold": 0.8484,
+      "selection_rule": "max_f1_with_precision_at_least_0.80",
+      "min_precision_target": 0.8,
+      "validation": {
+        "threshold": 0.8484,
+        "f1": 0.3312,
+        "recall": 0.2088,
+        "precision": 0.7998,
+        "predicted_positive": 5713,
+        "confusion_matrix": [
+          [
+            84928,
+            1144
+          ],
+          [
+            17311,
+            4569
+          ]
+        ],
+        "selection_rule": "max_f1_with_precision_at_least_0.80"
+      },
+      "test": {
+        "threshold": 0.8484,
+        "f1": 0.3367,
+        "recall": 0.214,
+        "precision": 0.7901,
+        "predicted_positive": 2997,
+        "confusion_matrix": [
+          [
+            43427,
+            629
+          ],
+          [
+            8699,
+            2368
+          ]
+        ]
+      }
+    },
+    "high_precision": {
+      "threshold": 0.7996,
+      "selection_rule": "max_f1_with_precision_at_least_0.72",
+      "min_precision_target": 0.72,
+      "validation": {
+        "threshold": 0.7996,
+        "f1": 0.4189,
+        "recall": 0.2954,
+        "precision": 0.72,
+        "predicted_positive": 8976,
+        "confusion_matrix": [
+          [
+            83559,
+            2513
+          ],
+          [
+            15417,
+            6463
+          ]
+        ],
+        "selection_rule": "max_f1_with_precision_at_least_0.72"
+      },
+      "test": {
+        "threshold": 0.7996,
+        "f1": 0.4297,
+        "recall": 0.306,
+        "precision": 0.7213,
+        "predicted_positive": 4694,
+        "confusion_matrix": [
+          [
+            42748,
+            1308
+          ],
+          [
+            7681,
+            3386
+          ]
+        ]
+      }
+    },
+    "confidence_rule": {
+      "high": "probability >= max(0.75, threshold * 1.5)",
+      "diagnostic_signal": "probability >= threshold",
+      "borderline": "probability >= threshold * 0.75",
+      "low": "probability < threshold * 0.75"
+    }
+  },
+  "group_heart_failure": {
+    "label": "გულის უკმარისობა",
+    "members": [
+      "target_heart_failure"
+    ],
+    "threshold": 0.9066,
+    "selection_rule": "max_f1_with_precision_at_least_0.80",
+    "min_precision_target": 0.8,
+    "validation": {
+      "threshold": 0.9066,
+      "f1": 0.3069,
+      "recall": 0.1899,
+      "precision": 0.7999,
+      "predicted_positive": 3699,
+      "confusion_matrix": [
+        [
+          91629,
+          740
+        ],
+        [
+          12624,
+          2959
+        ]
+      ],
+      "selection_rule": "max_f1_with_precision_at_least_0.80"
+    },
+    "test": {
+      "threshold": 0.9066,
+      "f1": 0.317,
+      "recall": 0.1966,
+      "precision": 0.8191,
+      "predicted_positive": 1968,
+      "confusion_matrix": [
+        [
+          46566,
+          356
+        ],
+        [
+          6589,
+          1612
+        ]
+      ]
+    },
+    "supportive": {
+      "threshold": 0.9066,
+      "selection_rule": "max_f1_with_precision_at_least_0.80",
+      "min_precision_target": 0.8,
+      "validation": {
+        "threshold": 0.9066,
+        "f1": 0.3069,
+        "recall": 0.1899,
+        "precision": 0.7999,
+        "predicted_positive": 3699,
+        "confusion_matrix": [
+          [
+            91629,
+            740
+          ],
+          [
+            12624,
+            2959
+          ]
+        ],
+        "selection_rule": "max_f1_with_precision_at_least_0.80"
+      },
+      "test": {
+        "threshold": 0.9066,
+        "f1": 0.317,
+        "recall": 0.1966,
+        "precision": 0.8191,
+        "predicted_positive": 1968,
+        "confusion_matrix": [
+          [
+            46566,
+            356
+          ],
+          [
+            6589,
+            1612
+          ]
+        ]
+      }
+    },
+    "high_precision": {
+      "threshold": 0.862,
+      "selection_rule": "max_f1_with_precision_at_least_0.72",
+      "min_precision_target": 0.72,
+      "validation": {
+        "threshold": 0.862,
+        "f1": 0.4172,
+        "recall": 0.2937,
+        "precision": 0.7201,
+        "predicted_positive": 6355,
+        "confusion_matrix": [
+          [
+            90590,
+            1779
+          ],
+          [
+            11007,
+            4576
+          ]
+        ],
+        "selection_rule": "max_f1_with_precision_at_least_0.72"
+      },
+      "test": {
+        "threshold": 0.862,
+        "f1": 0.4292,
+        "recall": 0.3017,
+        "precision": 0.7434,
+        "predicted_positive": 3328,
+        "confusion_matrix": [
+          [
+            46068,
+            854
+          ],
+          [
+            5727,
+            2474
+          ]
+        ]
+      }
+    },
+    "confidence_rule": {
+      "high": "probability >= max(0.75, threshold * 1.5)",
+      "diagnostic_signal": "probability >= threshold",
+      "borderline": "probability >= threshold * 0.75",
+      "low": "probability < threshold * 0.75"
+    }
+  },
+  "group_arrhythmia_conduction": {
+    "label": "არითმია და გამტარობის დარღვევები",
+    "members": [
+      "target_atrial_fibrillation_flutter",
+      "target_paroxysmal_tachycardia",
+      "target_av_conduction_block",
+      "target_other_arrhythmia"
+    ],
+    "threshold": 0.8969,
+    "selection_rule": "max_f1_with_precision_at_least_0.80",
+    "min_precision_target": 0.8,
+    "validation": {
+      "threshold": 0.8969,
+      "f1": 0.0874,
+      "recall": 0.0462,
+      "precision": 0.8002,
+      "predicted_positive": 1206,
+      "confusion_matrix": [
+        [
+          86843,
+          241
+        ],
+        [
+          19903,
+          965
+        ]
+      ],
+      "selection_rule": "max_f1_with_precision_at_least_0.80"
+    },
+    "test": {
+      "threshold": 0.8969,
+      "f1": 0.0903,
+      "recall": 0.0477,
+      "precision": 0.838,
+      "predicted_positive": 605,
+      "confusion_matrix": [
+        [
+          44397,
+          98
+        ],
+        [
+          10121,
+          507
+        ]
+      ]
+    },
+    "supportive": {
+      "threshold": 0.8969,
+      "selection_rule": "max_f1_with_precision_at_least_0.80",
+      "min_precision_target": 0.8,
+      "validation": {
+        "threshold": 0.8969,
+        "f1": 0.0874,
+        "recall": 0.0462,
+        "precision": 0.8002,
+        "predicted_positive": 1206,
+        "confusion_matrix": [
+          [
+            86843,
+            241
+          ],
+          [
+            19903,
+            965
+          ]
+        ],
+        "selection_rule": "max_f1_with_precision_at_least_0.80"
+      },
+      "test": {
+        "threshold": 0.8969,
+        "f1": 0.0903,
+        "recall": 0.0477,
+        "precision": 0.838,
+        "predicted_positive": 605,
+        "confusion_matrix": [
+          [
+            44397,
+            98
+          ],
+          [
+            10121,
+            507
+          ]
+        ]
+      }
+    },
+    "high_precision": {
+      "threshold": 0.8538,
+      "selection_rule": "max_f1_with_precision_at_least_0.72",
+      "min_precision_target": 0.72,
+      "validation": {
+        "threshold": 0.8538,
+        "f1": 0.1904,
+        "recall": 0.1097,
+        "precision": 0.72,
+        "predicted_positive": 3179,
+        "confusion_matrix": [
+          [
+            86194,
+            890
+          ],
+          [
+            18579,
+            2289
+          ]
+        ],
+        "selection_rule": "max_f1_with_precision_at_least_0.72"
+      },
+      "test": {
+        "threshold": 0.8538,
+        "f1": 0.1969,
+        "recall": 0.1135,
+        "precision": 0.7426,
+        "predicted_positive": 1624,
+        "confusion_matrix": [
+          [
+            44077,
+            418
+          ],
+          [
+            9422,
+            1206
+          ]
+        ]
+      }
+    },
+    "confidence_rule": {
+      "high": "probability >= max(0.75, threshold * 1.5)",
+      "diagnostic_signal": "probability >= threshold",
+      "borderline": "probability >= threshold * 0.75",
+      "low": "probability < threshold * 0.75"
+    }
+  },
+  "group_hypertensive_disease": {
+    "label": "ჰიპერტენზიული დაავადებები",
+    "members": [
+      "target_primary_hypertension",
+      "target_hypertensive_heart_disease",
+      "target_hypertensive_kidney_disease",
+      "target_hypertensive_heart_kidney_disease",
+      "target_hypertensive_crisis"
+    ],
+    "threshold": 0.6096,
+    "selection_rule": "max_f1_with_precision_at_least_0.80",
+    "min_precision_target": 0.8,
+    "validation": {
+      "threshold": 0.6096,
+      "f1": 0.7262,
+      "recall": 0.6652,
+      "precision": 0.7995,
+      "predicted_positive": 45780,
+      "confusion_matrix": [
+        [
+          43754,
+          9178
+        ],
+        [
+          18418,
+          36602
+        ]
+      ],
+      "selection_rule": "max_f1_with_precision_at_least_0.80"
+    },
+    "test": {
+      "threshold": 0.6096,
+      "f1": 0.7288,
+      "recall": 0.6688,
+      "precision": 0.8007,
+      "predicted_positive": 23418,
+      "confusion_matrix": [
+        [
+          22420,
+          4667
+        ],
+        [
+          9285,
+          18751
+        ]
+      ]
+    },
+    "supportive": {
+      "threshold": 0.6096,
+      "selection_rule": "max_f1_with_precision_at_least_0.80",
+      "min_precision_target": 0.8,
+      "validation": {
+        "threshold": 0.6096,
+        "f1": 0.7262,
+        "recall": 0.6652,
+        "precision": 0.7995,
+        "predicted_positive": 45780,
+        "confusion_matrix": [
+          [
+            43754,
+            9178
+          ],
+          [
+            18418,
+            36602
+          ]
+        ],
+        "selection_rule": "max_f1_with_precision_at_least_0.80"
+      },
+      "test": {
+        "threshold": 0.6096,
+        "f1": 0.7288,
+        "recall": 0.6688,
+        "precision": 0.8007,
+        "predicted_positive": 23418,
+        "confusion_matrix": [
+          [
+            22420,
+            4667
+          ],
+          [
+            9285,
+            18751
+          ]
+        ]
+      }
+    },
+    "high_precision": {
+      "threshold": 0.3878,
+      "selection_rule": "max_f1_with_precision_at_least_0.72",
+      "min_precision_target": 0.72,
+      "validation": {
+        "threshold": 0.3878,
+        "f1": 0.791,
+        "recall": 0.8775,
+        "precision": 0.7199,
+        "predicted_positive": 67062,
+        "confusion_matrix": [
+          [
+            34151,
+            18781
+          ],
+          [
+            6739,
+            48281
+          ]
+        ],
+        "selection_rule": "max_f1_with_precision_at_least_0.72"
+      },
+      "test": {
+        "threshold": 0.3878,
+        "f1": 0.79,
+        "recall": 0.8759,
+        "precision": 0.7195,
+        "predicted_positive": 34134,
+        "confusion_matrix": [
+          [
+            17511,
+            9576
+          ],
+          [
+            3478,
+            24558
+          ]
+        ]
+      }
+    },
+    "confidence_rule": {
+      "high": "probability >= max(0.75, threshold * 1.5)",
+      "diagnostic_signal": "probability >= threshold",
+      "borderline": "probability >= threshold * 0.75",
+      "low": "probability < threshold * 0.75"
+    }
+  },
+  "group_cerebrovascular_disease": {
+    "label": "ცერებროვასკულური დაავადებები",
+    "members": [
+      "target_subarachnoid_hemorrhage",
+      "target_intracerebral_hemorrhage",
+      "target_ischemic_stroke",
+      "target_other_cerebrovascular_disease"
+    ],
+    "threshold": 0.9489,
+    "selection_rule": "max_f1_with_precision_at_least_0.80",
+    "min_precision_target": 0.8,
+    "validation": {
+      "threshold": 0.9489,
+      "f1": 0.1623,
+      "recall": 0.0903,
+      "precision": 0.7991,
+      "predicted_positive": 647,
+      "confusion_matrix": [
+        [
+          102099,
+          130
+        ],
+        [
+          5206,
+          517
+        ]
+      ],
+      "selection_rule": "max_f1_with_precision_at_least_0.80"
+    },
+    "test": {
+      "threshold": 0.9489,
+      "f1": 0.1705,
+      "recall": 0.0955,
+      "precision": 0.796,
+      "predicted_positive": 353,
+      "confusion_matrix": [
+        [
+          52108,
+          72
+        ],
+        [
+          2662,
+          281
+        ]
+      ]
+    },
+    "supportive": {
+      "threshold": 0.9489,
+      "selection_rule": "max_f1_with_precision_at_least_0.80",
+      "min_precision_target": 0.8,
+      "validation": {
+        "threshold": 0.9489,
+        "f1": 0.1623,
+        "recall": 0.0903,
+        "precision": 0.7991,
+        "predicted_positive": 647,
+        "confusion_matrix": [
+          [
+            102099,
+            130
+          ],
+          [
+            5206,
+            517
+          ]
+        ],
+        "selection_rule": "max_f1_with_precision_at_least_0.80"
+      },
+      "test": {
+        "threshold": 0.9489,
+        "f1": 0.1705,
+        "recall": 0.0955,
+        "precision": 0.796,
+        "predicted_positive": 353,
+        "confusion_matrix": [
+          [
+            52108,
+            72
+          ],
+          [
+            2662,
+            281
+          ]
+        ]
+      }
+    },
+    "high_precision": {
+      "threshold": 0.9277,
+      "selection_rule": "max_f1_with_precision_at_least_0.72",
+      "min_precision_target": 0.72,
+      "validation": {
+        "threshold": 0.9277,
+        "f1": 0.2215,
+        "recall": 0.1309,
+        "precision": 0.7202,
+        "predicted_positive": 1040,
+        "confusion_matrix": [
+          [
+            101938,
+            291
+          ],
+          [
+            4974,
+            749
+          ]
+        ],
+        "selection_rule": "max_f1_with_precision_at_least_0.72"
+      },
+      "test": {
+        "threshold": 0.9277,
+        "f1": 0.2215,
+        "recall": 0.1312,
+        "precision": 0.7109,
+        "predicted_positive": 543,
+        "confusion_matrix": [
+          [
+            52023,
+            157
+          ],
+          [
+            2557,
+            386
+          ]
+        ]
+      }
+    },
+    "confidence_rule": {
+      "high": "probability >= max(0.75, threshold * 1.5)",
+      "diagnostic_signal": "probability >= threshold",
+      "borderline": "probability >= threshold * 0.75",
+      "low": "probability < threshold * 0.75"
+    }
+  },
+  "group_valvular_heart_disease": {
+    "label": "ვალვულარული გულის დაავადებები",
+    "members": [
+      "target_valvular_heart_disease"
+    ],
+    "threshold": 0.9801,
+    "selection_rule": "fallback_max_precision_below_0.80",
+    "min_precision_target": 0.8,
+    "validation": {
+      "threshold": 0.9801,
+      "f1": 0.0006,
+      "recall": 0.0003,
+      "precision": 1.0,
+      "predicted_positive": 2,
+      "confusion_matrix": [
+        [
+          101287,
+          0
+        ],
+        [
+          6663,
+          2
+        ]
+      ],
+      "selection_rule": "fallback_max_precision_below_0.80"
+    },
+    "test": {
+      "threshold": 0.9801,
+      "f1": 0.0,
+      "recall": 0.0,
+      "precision": 0.0,
+      "predicted_positive": 0,
+      "confusion_matrix": [
+        [
+          51800,
+          0
+        ],
+        [
+          3323,
+          0
+        ]
+      ]
+    },
+    "supportive": {
+      "threshold": 0.9801,
+      "selection_rule": "fallback_max_precision_below_0.80",
+      "min_precision_target": 0.8,
+      "validation": {
+        "threshold": 0.9801,
+        "f1": 0.0006,
+        "recall": 0.0003,
+        "precision": 1.0,
+        "predicted_positive": 2,
+        "confusion_matrix": [
+          [
+            101287,
+            0
+          ],
+          [
+            6663,
+            2
+          ]
+        ],
+        "selection_rule": "fallback_max_precision_below_0.80"
+      },
+      "test": {
+        "threshold": 0.9801,
+        "f1": 0.0,
+        "recall": 0.0,
+        "precision": 0.0,
+        "predicted_positive": 0,
+        "confusion_matrix": [
+          [
+            51800,
+            0
+          ],
+          [
+            3323,
+            0
+          ]
+        ]
+      }
+    },
+    "high_precision": {
+      "threshold": 0.9502,
+      "selection_rule": "max_f1_with_precision_at_least_0.72",
+      "min_precision_target": 0.72,
+      "validation": {
+        "threshold": 0.9502,
+        "f1": 0.0374,
+        "recall": 0.0192,
+        "precision": 0.7191,
+        "predicted_positive": 178,
+        "confusion_matrix": [
+          [
+            101237,
+            50
+          ],
+          [
+            6537,
+            128
+          ]
+        ],
+        "selection_rule": "max_f1_with_precision_at_least_0.72"
+      },
+      "test": {
+        "threshold": 0.9502,
+        "f1": 0.0382,
+        "recall": 0.0196,
+        "precision": 0.7831,
+        "predicted_positive": 83,
+        "confusion_matrix": [
+          [
+            51782,
+            18
+          ],
+          [
+            3258,
+            65
+          ]
+        ]
+      }
+    },
+    "confidence_rule": {
+      "high": "probability >= max(0.75, threshold * 1.5)",
+      "diagnostic_signal": "probability >= threshold",
+      "borderline": "probability >= threshold * 0.75",
+      "low": "probability < threshold * 0.75"
+    }
+  }
+}

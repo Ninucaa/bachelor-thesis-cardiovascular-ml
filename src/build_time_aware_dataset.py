@@ -89,7 +89,7 @@ VALID_RANGES = {
     "lab_glucose_mean": (20, 1000),
     "lab_hemoglobin_mean": (1, 25),
     "lab_platelets_mean": (1, 1500),
-    "ed_triage_temperature_f_mean": (80, 110),
+    "ed_triage_temperature_c_mean": (26.7, 43.3),
     "ed_triage_heart_rate_mean": (20, 250),
     "ed_triage_resp_rate_mean": (4, 80),
     "ed_triage_spo2_mean": (50, 100),
@@ -128,6 +128,52 @@ class RunningStats:
             {"hadm_id": key, name: self.sum[key] / self.count[key], f"{name}_count": self.count[key]}
             for key in self.count
         ]
+        return pd.DataFrame(rows)
+
+
+class TrendStats:
+    def __init__(self) -> None:
+        self.sum = defaultdict(float)
+        self.count = defaultdict(int)
+        self.minimum = {}
+        self.maximum = {}
+        self.first_time = {}
+        self.first_value = {}
+        self.last_time = {}
+        self.last_value = {}
+
+    def add(self, key: int, value: float, charttime: pd.Timestamp) -> None:
+        if pd.isna(value) or pd.isna(charttime):
+            return
+        value = float(value)
+        self.sum[key] += value
+        self.count[key] += 1
+        self.minimum[key] = value if key not in self.minimum else min(self.minimum[key], value)
+        self.maximum[key] = value if key not in self.maximum else max(self.maximum[key], value)
+        if key not in self.first_time or charttime < self.first_time[key]:
+            self.first_time[key] = charttime
+            self.first_value[key] = value
+        if key not in self.last_time or charttime > self.last_time[key]:
+            self.last_time[key] = charttime
+            self.last_value[key] = value
+
+    def to_frame(self, name: str) -> pd.DataFrame:
+        rows = []
+        for key in self.count:
+            first = self.first_value.get(key)
+            last = self.last_value.get(key)
+            rows.append(
+                {
+                    "hadm_id": key,
+                    name: self.sum[key] / self.count[key],
+                    f"{name}_count": self.count[key],
+                    f"{name}_first": first,
+                    f"{name}_last": last,
+                    f"{name}_min": self.minimum.get(key),
+                    f"{name}_max": self.maximum.get(key),
+                    f"{name}_delta": last - first if first is not None and last is not None else pd.NA,
+                }
+            )
         return pd.DataFrame(rows)
 
 
@@ -242,7 +288,7 @@ def build_ed_features(edstays_path: Path, triage_path: Path) -> pd.DataFrame:
     df["ed_arrived_by_ambulance"] = df.get("arrival_transport", "").astype(str).str.contains("AMBULANCE", case=False, na=False).astype("int8")
     df["triage_pain_mean"] = pd.to_numeric(df["pain"], errors="coerce")
     rename = {
-        "temperature": "ed_triage_temperature_f_mean",
+        "temperature": "ed_triage_temperature_f_raw",
         "heartrate": "ed_triage_heart_rate_mean",
         "resprate": "ed_triage_resp_rate_mean",
         "o2sat": "ed_triage_spo2_mean",
@@ -251,8 +297,11 @@ def build_ed_features(edstays_path: Path, triage_path: Path) -> pd.DataFrame:
         "acuity": "ed_triage_acuity_mean",
     }
     df = df.rename(columns=rename)
+    df["ed_triage_temperature_c_mean"] = (
+        pd.to_numeric(df["ed_triage_temperature_f_raw"], errors="coerce") - 32
+    ) * 5 / 9
     agg = {
-        "ed_triage_temperature_f_mean": "mean",
+        "ed_triage_temperature_c_mean": "mean",
         "ed_triage_heart_rate_mean": "mean",
         "ed_triage_resp_rate_mean": "mean",
         "ed_triage_spo2_mean": "mean",
@@ -332,6 +381,47 @@ def aggregate_events(
         for feature, group in chunk.groupby("feature"):
             for hadm_id, value in zip(group["hadm_id"], group[value_column]):
                 stats[feature].add(int(hadm_id), value)
+
+    frames = [stat.to_frame(feature) for feature, stat in stats.items() if stat.count]
+    if not frames:
+        return pd.DataFrame({"hadm_id": []})
+    out = frames[0]
+    for frame in frames[1:]:
+        out = out.merge(frame, on="hadm_id", how="outer")
+    return out
+
+
+def aggregate_event_trends(
+    events_path: Path,
+    admissions: pd.DataFrame,
+    item_map: dict[int, str],
+    value_column: str = "valuenum",
+    chunksize: int = 1_000_000,
+) -> pd.DataFrame:
+    window = admissions[["hadm_id", "admittime"]].copy()
+    window["window_end"] = window["admittime"] + pd.Timedelta(hours=OBSERVATION_HOURS)
+    stats = {feature: TrendStats() for feature in set(item_map.values())}
+
+    usecols = ["hadm_id", "itemid", "charttime", value_column]
+    for chunk in pd.read_csv(events_path, usecols=usecols, chunksize=chunksize, compression="infer"):
+        chunk = chunk[chunk["hadm_id"].notna()]
+        chunk["hadm_id"] = chunk["hadm_id"].astype("int64")
+        chunk = chunk[chunk["itemid"].isin(item_map)]
+        if chunk.empty:
+            continue
+        chunk["charttime"] = pd.to_datetime(chunk["charttime"], errors="coerce")
+        chunk[value_column] = pd.to_numeric(chunk[value_column], errors="coerce")
+        chunk = chunk.merge(window, on="hadm_id", how="inner")
+        chunk = chunk[
+            chunk["charttime"].notna()
+            & chunk["charttime"].between(chunk["admittime"], chunk["window_end"], inclusive="both")
+        ]
+        if chunk.empty:
+            continue
+        chunk["feature"] = chunk["itemid"].map(item_map)
+        for feature, group in chunk.groupby("feature"):
+            for hadm_id, value, charttime in zip(group["hadm_id"], group[value_column], group["charttime"]):
+                stats[feature].add(int(hadm_id), value, charttime)
 
     frames = [stat.to_frame(feature) for feature, stat in stats.items() if stat.count]
     if not frames:
@@ -452,8 +542,8 @@ def build_dataset(root: Path, output_path: Path) -> None:
     print("Building OMR features...")
     df = df.merge(build_omr_features(admissions, root / "omr.csv.gz"), on="hadm_id", how="left")
 
-    print("Aggregating labevents...")
-    df = df.merge(aggregate_events(root / "labevents.csv.gz", admissions, LAB_ITEMIDS), on="hadm_id", how="left")
+    print("Aggregating labevents with trends...")
+    df = df.merge(aggregate_event_trends(root / "labevents.csv.gz", admissions, LAB_ITEMIDS), on="hadm_id", how="left")
 
     print("Aggregating chartevents...")
     df = df.merge(aggregate_events(root / "chartevents.csv.gz", admissions, CHART_ITEMIDS), on="hadm_id", how="left")
