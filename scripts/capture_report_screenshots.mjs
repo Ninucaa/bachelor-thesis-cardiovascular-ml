@@ -112,8 +112,11 @@ async function main() {
     await wait(500);
     await screenshot(cdp, "03-prediction-result.png");
 
+    await evaluate(cdp, "document.querySelector('#toggle-diagnoses-button')?.scrollIntoView({ block: 'center' })");
+    await wait(300);
     await evaluate(cdp, "document.querySelector('#toggle-diagnoses-button')?.click()");
-    await evaluate(cdp, "document.querySelector('.diagnosis-list')?.scrollIntoView({ block: 'center' })");
+    await waitFor(cdp, "document.body.innerText.includes('ყველა მოდელირებული სიგნალი')");
+    await evaluate(cdp, "document.querySelector('.subtype-section')?.scrollIntoView({ block: 'start' })");
     await wait(500);
     await screenshot(cdp, "04-diagnosis-cards.png");
 
