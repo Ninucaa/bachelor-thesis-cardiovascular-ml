@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: bachelor-cardio-ai-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn src.api.app:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: CORS_ALLOW_ORIGIN_REGEX
+        value: https://.*\.onrender\.com
+
+  - type: web
+    name: bachelor-cardio-ai-demo
+    runtime: static
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: frontend/dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://bachelor-cardio-ai-api.onrender.com

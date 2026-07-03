@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import os
+
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -24,11 +26,19 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://127.0.0.1:5173",
-        "http://localhost:5173",
-    ],
-    allow_origin_regex=r"http://(127\.0\.0\.1|localhost):517\d",
+    allow_origins=os.getenv(
+        "CORS_ALLOW_ORIGINS",
+        ",".join(
+            [
+                "http://127.0.0.1:5173",
+                "http://localhost:5173",
+            ]
+        ),
+    ).split(","),
+    allow_origin_regex=os.getenv(
+        "CORS_ALLOW_ORIGIN_REGEX",
+        r"http://(127\.0\.0\.1|localhost):517\d",
+    ),
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],

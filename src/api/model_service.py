@@ -16,6 +16,7 @@ DATA_PATH = PROJECT_DIR.parent / "data" / "processed" / "cardio_time_aware_model
 MODEL_DIR = PROJECT_DIR / "models" / "time_aware"
 MODEL_PATH = MODEL_DIR / "target_cvd.pkl"
 FEATURES_PATH = MODEL_DIR / "feature_columns.json"
+DEMO_PATIENTS_PATH = Path(__file__).with_name("demo_patients.json")
 SUBTYPE_MODEL_DIR = MODEL_DIR
 DIAGNOSIS_THRESHOLDS_PATH = MODEL_DIR / "clinical_group_thresholds.json"
 TARGET_NAME = "target_cvd"
@@ -836,6 +837,22 @@ class ModelService:
     @cached_property
     def demo_test_rows(self) -> dict[int, pd.Series]:
         demo_ids = {demo["hadm_id"] for demo in DEMO_TEST_PATIENTS.values()}
+        if not DATA_PATH.exists():
+            demo_rows = json.loads(DEMO_PATIENTS_PATH.read_text(encoding="utf-8"))
+            return {
+                int(row["hadm_id"]): pd.Series(
+                    {
+                        "subject_id": row["subject_id"],
+                        "hadm_id": row["hadm_id"],
+                        "split_hint": row["split_hint"],
+                        TARGET_NAME: row[TARGET_NAME],
+                        **row["features"],
+                    },
+                    name=sample_id,
+                )
+                for sample_id, row in demo_rows.items()
+            }
+
         usecols = ["subject_id", "hadm_id", "split_hint", TARGET_NAME, *self.feature_columns]
         df = pd.read_csv(DATA_PATH, usecols=usecols)
         df = df[df["hadm_id"].isin(demo_ids)]
@@ -849,6 +866,10 @@ class ModelService:
         demo = DEMO_TEST_PATIENTS.get(sample_id, DEMO_TEST_PATIENTS["demo-1"])
         resolved_sample_id = sample_id if sample_id in DEMO_TEST_PATIENTS else "demo-1"
         source_row = self.demo_test_rows[int(demo["hadm_id"])]
+        try:
+            original_csv_index = int(source_row.name)
+        except (TypeError, ValueError):
+            original_csv_index = -1
         features = {
             column: float(source_row[column])
             for column in self.feature_columns
@@ -858,7 +879,7 @@ class ModelService:
             "sample_id": resolved_sample_id,
             "sample_label": demo["label"],
             "row_index": -1,
-            "original_csv_index": int(source_row.name) if source_row.name is not None else -1,
+            "original_csv_index": original_csv_index,
             "actual_target": int(source_row[TARGET_NAME]),
             "features": features,
             "symptom_text": demo["symptom_text"],
